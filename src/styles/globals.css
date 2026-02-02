@@ -1,1 +1,65 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(0.6 0.18 200);
+  --color-secondary: oklch(0.7 0.15 250);
+  --color-accent: oklch(0.8 0.1 300);
+  --color-surface: oklch(0.98 0.01 250);
+
+  --font-sans: "Outfit", ui-sans-serif, system-ui;
+  --font-display: "Clash Display", ui-sans-serif, system-ui;
+}
+
+:root {
+  --bg-gradient: linear-gradient(
+    135deg,
+    oklch(0.98 0.01 250) 0%,
+    oklch(0.95 0.02 200) 100%
+  );
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
+}
+
+body {
+  background: var(--bg-gradient);
+  color: oklch(0.2 0.02 250);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+.text-gradient {
+  background: linear-gradient(
+    to right,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Smooth transitions for interactive elements */
+a,
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover {
+  transition:
+    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.4s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+}

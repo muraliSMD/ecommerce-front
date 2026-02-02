@@ -1,33 +1,28 @@
-"use client";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "../styles/globals.css";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import { Toaster } from "react-hot-toast";
-import { usePathname } from "next/navigation";
+import QueryProvider from "./QueryProvider";
+import { Outfit } from "next/font/google";
+import AuthModal from "@/components/AuthModal";
 
-const queryClient = new QueryClient();
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+});
 
-export default function RootLayout({ children }) {
-  const pathname = usePathname();
+export const metadata = {
+  title: "Premium Clothing | Shop Trending Styles",
+  description: "Experience the next generation of online shopping with our curated clothing collection.",
+};
 
-  // Determine if current route is auth
-  const isAuthRoute = pathname.startsWith("/auth");
-
-  return (
+export default function RootLayout({ children }) {  
+    return (
     <html lang="en">
-      <body className="bg-gray-50 min-h-screen flex flex-col">
-        {/* Render header only if NOT auth route */}
-        {!isAuthRoute && <Header />}
-
-        <QueryClientProvider client={queryClient}>
-          <main className="flex-1">{children}</main>
-          <Toaster position="top-right" />
-        </QueryClientProvider>
-
-        {/* Render footer only if NOT auth route */}
-        {!isAuthRoute && <Footer />}
+      <body className={`${outfit.variable} font-sans bg-surface min-h-screen antialiased`}>
+        <QueryProvider>
+          <AuthModal />
+          {children}
+          <Toaster position="bottom-center" />     
+        </QueryProvider>
       </body>
     </html>
   );
