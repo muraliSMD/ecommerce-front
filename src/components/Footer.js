@@ -13,7 +13,7 @@ export default function Footer() {
               <div className="bg-primary w-8 h-8 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">S</span>
               </div>
-              <span className="text-xl font-display font-bold tracking-tight">STXRE</span>
+              <span className="text-xl font-display font-bold tracking-tight">GRABSZY</span>
             </Link>
             <p className="text-gray-500 leading-relaxed">
               Curating the finest contemporary fashion since 2024. Your destination for style, quality, and conscious living.
@@ -39,7 +39,7 @@ export default function Footer() {
             <ul className="space-y-4 text-gray-500">
               <li><Link href="#" className="hover:text-primary transition-colors">New Arrivals</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">Best Sellers</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">Summer '26</Link></li>
+              <li><Link href="#" className="hover:text-primary transition-colors">Summer &apos;26</Link></li>
               <li><Link href="#" className="hover:text-primary transition-colors">Sustainable Line</Link></li>
             </ul>
           </div>
@@ -55,19 +55,19 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-display font-bold text-gray-900 mb-6">STXRE HQ</h4>
+            <h4 className="font-display font-bold text-gray-900 mb-6">GRABSZY HQ</h4>
             <p className="text-gray-500 leading-relaxed mb-4">
               Fashion District, 452 Fifth Avenue<br />
               New York, NY 10018
             </p>
             <p className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 cursor-pointer">
-              hello@stxre.com
+              hello@grabszy.com
             </p>
           </div>
         </div>
 
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
-          <p>© {new Date().getFullYear()} STXRE. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} GRABSZY. All rights reserved.</p>
           <div className="flex gap-8">
             <Link href="#" className="hover:text-gray-900">Privacy Policy</Link>
             <Link href="#" className="hover:text-gray-900">Terms of Service</Link>

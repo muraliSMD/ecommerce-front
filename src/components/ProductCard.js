@@ -4,11 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiPlus, FiArrowRight } from "react-icons/fi";
 
+import { useSettingsStore } from "@/store/settingsStore";
+
 export default function ProductCard({ product, onAddToCart }) {
   const hasVariants = product.variants && product.variants.length > 0;
+  const formatPrice = useSettingsStore((state) => state.formatPrice);
 
   return (
     <div className="group card-hover p-3 bg-white/40 backdrop-blur-sm rounded-[2rem] border border-white/50 overflow-hidden">
+      {/* ... keeping existing JSX ... */}
       <div className="relative aspect-square overflow-hidden rounded-[1.5rem] bg-surface">
         <Image
           src={product.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"}
@@ -31,7 +35,7 @@ export default function ProductCard({ product, onAddToCart }) {
             <p className="text-[10px] font-bold text-primary uppercase tracking-widest">{product.category || "Essentials"}</p>
             <h3 className="text-lg font-display font-bold text-gray-900 line-clamp-1">{product.name}</h3>
           </div>
-          <p className="text-lg font-bold text-gray-900">${product.price}</p>
+          <p className="text-lg font-bold text-gray-900">{formatPrice(product.price)}</p>
         </div>
 
         {hasVariants ? (

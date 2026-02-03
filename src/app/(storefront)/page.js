@@ -2,6 +2,7 @@
 
 import HeroSlider from "@/components/HeroSlider";
 import ProductCard from "@/components/ProductCard";
+import Image from "next/image";
 import { useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/hooks/useCart";
 import { motion } from "framer-motion";
@@ -43,7 +44,12 @@ export default function Home() {
               transition={{ delay: i * 0.1 }}
               className="group relative h-80 rounded-[2rem] overflow-hidden cursor-pointer"
             >
-              <img src={cat.image} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <Image 
+                src={cat.image} 
+                alt={cat.name} 
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-110" 
+              />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
               <div className="absolute bottom-6 left-6">
                 <h3 className="text-2xl font-bold text-white mb-1">{cat.name}</h3>
@@ -100,7 +106,7 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] -ml-48 -mb-48" />
           
           <div className="relative z-10 max-w-2xl mx-auto space-y-8">
-            <h2 className="text-4xl md:text-6xl font-display font-bold">Join the STXRE Club</h2>
+            <h2 className="text-4xl md:text-6xl font-display font-bold">Join the GRABSZY Club</h2>
             <p className="text-gray-400 text-lg">Subscribe to receive updates, access to exclusive deals, and more.</p>
             
             <div className="flex flex-col md:flex-row gap-4">

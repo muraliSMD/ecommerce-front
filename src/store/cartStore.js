@@ -1,8 +1,12 @@
 // src/store/cartStore.js
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export const useCartStore = create((set, get) => ({
-  items: [],
+export const useCartStore = create(
+  persist(
+    (set, get) => ({
+      items: [],
+      isHydrated: false,
 
   addToCart: (product, qty = 1, variant = null) => {
     set((state) => {
@@ -46,4 +50,12 @@ export const useCartStore = create((set, get) => ({
   },
 
   clearCart: () => set({ items: [] }),
-}));
+  setHydrated: () => set({ isHydrated: true }),
+}),
+{
+  name: "cart-storage",
+  onRehydrateStorage: () => (state) => {
+    state.setHydrated();
+  },
+}
+));

@@ -38,9 +38,9 @@ export async function PUT(request, { params }) {
     }
 
     const { id } = await params;
-    const { status } = await request.json();
+    const { orderStatus } = await request.json();
     
-    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+    const order = await Order.findByIdAndUpdate(id, { orderStatus }, { new: true });
     
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });

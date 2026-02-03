@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/db';
 import { Category } from '@/models/Category';
+import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -15,7 +16,11 @@ export async function GET() {
 export async function POST(request) {
   try {
     await dbConnect();
-    // TODO: Add auth/admin check
+    const user = await getFullUserFromRequest(request);
+    if (!isAdmin(user)) {
+      return NextResponse.json({ message: "Admin access required" }, { status: 403 });
+    }
+
     const { name, image } = await request.json();
     const category = await Category.create({ name, image });
     return NextResponse.json(category, { status: 201 });

@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const slides = [
   { 
@@ -49,10 +50,12 @@ export default function HeroSlider() {
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
         >
-          <img 
+          <Image 
             src={slides[index].image} 
             alt={slides[index].title} 
-            className="w-full h-full object-cover" 
+            fill
+            className="object-cover"
+            priority
           />
           <div className={`absolute inset-0 bg-gradient-to-r ${slides[index].color} to-black/60 flex items-center`}>
             <div className="container mx-auto px-8 md:px-16">
@@ -91,7 +94,7 @@ export default function HeroSlider() {
                   className="flex gap-4 pt-4"
                 >
                   <Link 
-                    href="/storeFront" 
+                    href="/shop" 
                     className="bg-white text-black px-8 py-4 rounded-2xl font-bold hover:bg-primary hover:text-white transition-all shadow-xl shadow-black/20 active:scale-95"
                   >
                     Shop Now
@@ -120,4 +123,3 @@ export default function HeroSlider() {
     </div>
   );
 }
-

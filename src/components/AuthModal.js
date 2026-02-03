@@ -43,8 +43,8 @@ export default function AuthModal() {
 
       if (res.ok) {
         if (mode === "login") {
-          login(data.token, data.user);
-          toast.success("Welcome back to STXRE!");
+          login(data.user, data.token);
+          toast.success("Welcome back to GRABSZY!");
           setAuthModalOpen(false);
         } else {
           toast.success("Account created! Please login.");
@@ -96,8 +96,8 @@ export default function AuthModal() {
             </h2>
             <p className="text-gray-500 mt-2">
               {mode === "login" 
-                ? "Sign in to access your STXRE account" 
-                : "Join the STXRE movement today"}
+                ? "Sign in to access your GRABSZY account" 
+                : "Join the GRABSZY movement today"}
             </p>
           </div>
 

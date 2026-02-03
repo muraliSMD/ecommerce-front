@@ -19,6 +19,10 @@ export async function POST(request) {
       return NextResponse.json({ message: "Invalid credentials" }, { status: 400 });
     }
 
+    if (user.isBanned) {
+        return NextResponse.json({ message: "Your account has been suspended." }, { status: 403 });
+    }
+
     const token = signToken({ userId: user._id });
 
     // Return user without password

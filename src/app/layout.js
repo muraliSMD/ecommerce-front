@@ -3,6 +3,9 @@ import { Toaster } from "react-hot-toast";
 import QueryProvider from "./QueryProvider";
 import { Outfit } from "next/font/google";
 import AuthModal from "@/components/AuthModal";
+import SettingsInitializer from "@/components/SettingsInitializer";
+import PopupManager from "@/components/popups/PopupManager";
+import ChatWidget from "@/components/ChatWidget";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -19,7 +22,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${outfit.variable} font-sans bg-surface min-h-screen antialiased`}>
         <QueryProvider>
+          <SettingsInitializer />
           <AuthModal />
+          <PopupManager />
+          <ChatWidget />
           {children}
           <Toaster position="bottom-center" />     
         </QueryProvider>

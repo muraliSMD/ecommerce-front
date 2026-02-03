@@ -31,9 +31,14 @@ const productSchema = new mongoose.Schema(
     reviews: [reviewSchema],
     averageRating: { type: Number, default: 0 },
     numReviews: { type: Number, default: 0 },
+    numReviews: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
+// Add indexes for performance optimization
+productSchema.index({ name: 'text', category: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ createdAt: -1 });
 
 export default mongoose.models.Product || mongoose.model("Product", productSchema);

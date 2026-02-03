@@ -1,15 +1,22 @@
 "use client";
 import Image from "next/image";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
+import { useSettingsStore } from "@/store/settingsStore";
 
 export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
+  const formatPrice = useSettingsStore((state) => state.formatPrice);
   const price = Number(item.variant?.price ?? item.product.price ?? 0);
   const image = item.variant?.images?.[0] || item.product.images?.[0] || "/placeholder.png";
 
   return (
     <div className="group bg-white rounded-[2rem] p-4 flex gap-6 items-center border border-gray-100 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-black/5">
-      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-surface flex-shrink-0">
-        <img src={image} alt={item.product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-surface flex-shrink-0 relative">
+        <Image 
+            src={image} 
+            alt={item.product.name} 
+            fill 
+            className="object-cover group-hover:scale-110 transition-transform duration-500" 
+        />
       </div>
 
       <div className="flex-grow space-y-2">
@@ -31,7 +38,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
         </div>
 
         <div className="flex justify-between items-end pt-2">
-          <p className="text-xl font-bold text-gray-900">${price.toLocaleString()}</p>
+          <p className="text-xl font-bold text-gray-900">{formatPrice(price)}</p>
           
           <div className="flex items-center bg-surface border border-gray-100 rounded-xl p-1">
             <button 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
+import { useSettingsStore } from "@/store/settingsStore";
 import CartItem from "@/components/CartItem";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Link from "next/link";
@@ -13,6 +14,10 @@ export default function CartPage() {
   const items = useCartStore((state) => state.items);
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const isHydrated = useCartStore((state) => state.isHydrated);
+
+  const settings = useSettingsStore((state) => state.settings);
+  const formatPrice = useSettingsStore((state) => state.formatPrice);
 
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,13 +39,19 @@ export default function CartPage() {
     0
   );
 
+  if (!isHydrated) return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
+    </div>
+  );
+
   if (!items.length) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
       <div className="w-24 h-24 bg-surface rounded-full flex items-center justify-center text-gray-300">
         <FiShoppingBag size={48} />
       </div>
       <h2 className="text-3xl font-display font-bold">Your cart is empty</h2>
-      <p className="text-gray-500">Looks like you haven't added anything to your cart yet.</p>
+      <p className="text-gray-500">Looks like you haven&apos;t added anything to your cart yet.</p>
       <Link href="/" className="bg-primary text-white px-8 py-3 rounded-2xl font-bold hover:bg-secondary transition-all">
         Start Shopping
       </Link>
@@ -92,16 +103,16 @@ export default function CartPage() {
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-gray-500">
                   <span>Subtotal</span>
-                  <span>${total.toLocaleString()}</span>
+                  <span>{formatPrice(total)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
-                  <span>Shipping</span>
-                  <span className="text-green-500 font-medium">Free</span>
+                  <span>Tax & Shipping</span>
+                  <span className="text-gray-400 font-medium">Calculated at checkout</span>
                 </div>
                 <div className="h-px bg-gray-100 my-4" />
                 <div className="flex justify-between text-xl font-bold text-gray-900">
-                  <span>Total</span>
-                  <span>${total.toLocaleString()}</span>
+                  <span>Estimated Total</span>
+                  <span>{formatPrice(total)}</span>
                 </div>
               </div>
 
@@ -113,7 +124,7 @@ export default function CartPage() {
               </Link>
               
               <p className="text-center text-xs text-gray-400 mt-6 px-4">
-                Shipping and taxes calculated at checkout. Secure SSL encrypted payment.
+                Prices are in {settings.currency}. Shipping and taxes calculated at checkout.
               </p>
             </div>
           </div>

@@ -6,11 +6,14 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { motion } from "framer-motion";
 import { FiCreditCard, FiTruck, FiCheckCircle, FiShield } from "react-icons/fi";
 import Link from "next/link";
+import Image from "next/image";
 import toast from "react-hot-toast";
+import { useSettingsStore } from "@/store/settingsStore";
 
 export default function CheckoutPage() {
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
+  const isHydrated = useCartStore((state) => state.isHydrated);
 
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -18,10 +21,58 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const total = items.reduce(
+  const settings = useSettingsStore((state) => state.settings);
+  const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const getCurrencySymbol = useSettingsStore((state) => state.getCurrencySymbol);
+
+  // Coupon State
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponError, setCouponError] = useState("");
+  const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+
+  const subtotal = items.reduce(
     (sum, i) => sum + (i.variant?.price ?? i.product.price) * i.quantity,
     0
   );
+
+  const shippingCost = settings.shippingCharge || 0;
+  const taxAmount = (subtotal * (settings.taxRate || 0)) / 100;
+  const total = subtotal + shippingCost + taxAmount;
+
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setIsValidatingCoupon(true);
+    setCouponError("");
+
+    try {
+        const res = await fetch('/api/coupons/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: couponCode, cartTotal: subtotal })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            setCouponError(data.message || "Invalid coupon");
+            setAppliedCoupon(null);
+        } else {
+            setAppliedCoupon({
+                code: data.code,
+                discountAmount: data.discountAmount,
+                discountType: data.discountType
+            });
+            toast.success("Coupon applied!");
+        }
+    } catch (err) {
+        setCouponError("Failed to validate coupon");
+    } finally {
+        setIsValidatingCoupon(false);
+    }
+  };
 
   const handlePlaceOrder = async () => {
     if (!name || !address || !phone) {
@@ -43,14 +94,21 @@ export default function CheckoutPage() {
             quantity: i.quantity,
             variant: i.variant,
             price: i.variant?.price ?? i.product.price
-          }))
+          })),
+          paymentInfo: {
+            couponCode: appliedCoupon?.code,
+            discountAmount: appliedCoupon?.discountAmount
+          }
         })
       });
 
       if (response.ok) {
+        const data = await response.json();
         toast.success("Order placed successfully!");
         clearCart();
-        window.location.href = "/";
+        setOrderId(data._id);
+        setIsSuccess(true);
+        // window.location.href = "/"; // Removed redirect
       } else {
         toast.error("Failed to place order.");
       }
@@ -60,6 +118,45 @@ export default function CheckoutPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (isSuccess) return (
+    <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6 text-center px-4">
+      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-4">
+        <FiCheckCircle size={40} />
+      </div>
+      <h2 className="text-4xl font-display font-bold text-gray-900">Order Placed Successfully!</h2>
+      <p className="text-gray-500 max-w-md">
+        Thank you for your purchase. Your order ID is <span className="font-bold text-gray-900">#{orderId?.slice(-6).toUpperCase()}</span>.
+        We&apos;ll send you a confirmation email shortly.
+      </p>
+      
+      <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-md">
+         {/* Placeholder for Track Order if no dedicated page exists yet */}
+         <Link 
+            href="/shop" 
+            className="flex-1 bg-white border border-gray-200 text-gray-900 py-4 rounded-xl font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+          >
+            Continue Shopping
+         </Link>
+         <Link 
+            href={`/orders/${orderId}`} // Assuming a future order details page
+            className="flex-1 bg-primary text-white py-4 rounded-xl font-bold hover:bg-secondary transition-colors flex items-center justify-center gap-2"
+            onClick={() => {
+               // Prevent navigation if page doesn't exist yet, or let it 404/redirect if handled
+               // For now, we'll assume the user wants this link to work eventually.
+            }}
+         >
+            Track Order
+         </Link>
+      </div>
+    </div>
+  );
+
+  if (!isHydrated) return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
+    </div>
+  );
 
   if (!items.length) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
@@ -179,14 +276,19 @@ export default function CheckoutPage() {
               <div className="space-y-6 mb-8 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
                 {items.map((item, i) => (
                   <div key={i} className="flex gap-4">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 flex-shrink-0">
-                      <img src={item.variant?.images?.[0] || item.product.images?.[0]} className="w-full h-full object-cover" />
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 flex-shrink-0 relative">
+                      <Image 
+                        src={item.variant?.images?.[0] || item.product.images?.[0]} 
+                        alt={item.product.name} 
+                        fill
+                        className="object-cover" 
+                      />
                     </div>
                     <div className="flex-grow">
                       <h4 className="font-bold text-sm line-clamp-1">{item.product.name}</h4>
-                      <p className="text-xs text-gray-400">{item.quantity} × ${item.variant?.price ?? item.product.price}</p>
+                      <p className="text-xs text-gray-400">{item.quantity} × {getCurrencySymbol()}{item.variant?.price ?? item.product.price}</p>
                     </div>
-                    <p className="font-bold text-sm">${((item.variant?.price ?? item.product.price) * item.quantity).toLocaleString()}</p>
+                    <p className="font-bold text-sm">{formatPrice((item.variant?.price ?? item.product.price) * item.quantity)}</p>
                   </div>
                 ))}
               </div>
@@ -194,15 +296,50 @@ export default function CheckoutPage() {
               <div className="space-y-4 pt-6 border-t border-white/10">
                 <div className="flex justify-between text-gray-400">
                   <span>Subtotal</span>
-                  <span>${total.toLocaleString()}</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+                 <div className="flex justify-between text-gray-400">
+                  <span>Tax ({settings.taxRate}%)</span>
+                  <span>{formatPrice(taxAmount)}</span>
                 </div>
                 <div className="flex justify-between text-gray-400">
                   <span>Shipping</span>
-                  <span className="text-primary font-bold">FREE</span>
+                  <span className={shippingCost === 0 ? "text-primary font-bold" : ""}>
+                    {shippingCost === 0 ? "FREE" : formatPrice(shippingCost)}
+                  </span>
                 </div>
+
+                {/* Coupon Code Section */}
+                <div className="pt-4 border-t border-white/10">
+                    <div className="flex gap-2">
+                        <input 
+                            type="text" 
+                            value={couponCode} 
+                            onChange={(e) => setCouponCode(e.target.value)}
+                            placeholder="Promo Code" 
+                            disabled={appliedCoupon}
+                            className="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white w-full outline-none placeholder:text-gray-500 focus:border-primary transition-all disabled:opacity-50"
+                        />
+                        <button 
+                            onClick={handleApplyCoupon}
+                            disabled={isValidatingCoupon || !couponCode || appliedCoupon}
+                            className="bg-white text-gray-900 px-4 rounded-xl font-bold text-sm hover:bg-gray-100 disabled:opacity-50 transition-all"
+                        >
+                            {isValidatingCoupon ? "..." : appliedCoupon ? "Applied" : "Apply"}
+                        </button>
+                    </div>
+                    {couponError && <p className="text-red-400 text-xs mt-2">{couponError}</p>}
+                    {appliedCoupon && (
+                        <div className="flex justify-between text-green-400 text-sm mt-3">
+                            <span>Discount ({appliedCoupon.code})</span>
+                            <span>-{formatPrice(appliedCoupon.discountAmount)}</span>
+                        </div>
+                    )}
+                </div>
+
                 <div className="flex justify-between text-2xl font-display font-bold pt-4 text-white">
                   <span>Total</span>
-                  <span>${total.toLocaleString()}</span>
+                  <span>{formatPrice(Math.max(0, total - (appliedCoupon?.discountAmount || 0)))}</span>
                 </div>
               </div>
 

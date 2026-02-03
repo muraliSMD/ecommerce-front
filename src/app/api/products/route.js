@@ -9,10 +9,15 @@ export async function GET(request) {
     const category = searchParams.get('category');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
+    const sort = searchParams.get('sort') || 'newest';
     const search = searchParams.get('search');
 
+    const page = Number(searchParams.get('page')) || 1;
+    const limit = Number(searchParams.get('limit')) || 0; // 0 means all
+    const skip = (page - 1) * limit;
+
     let filter = {};
-    if (category) filter.category = category;
+    if (category && category !== "All") filter.category = category;
     if (search) filter.name = { $regex: search, $options: "i" };
     if (minPrice || maxPrice) {
       filter.price = {};
@@ -20,7 +25,19 @@ export async function GET(request) {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    const products = await Product.find(filter);
+    let sortOption = { createdAt: -1 };
+    if (sort === 'price_asc') sortOption = { price: 1 };
+    if (sort === 'price_desc') sortOption = { price: -1 };
+    if (sort === 'oldest') sortOption = { createdAt: 1 };
+
+    let query = Product.find(filter).sort(sortOption);
+    
+    if (limit > 0) {
+      query = query.skip(skip).limit(limit);
+    }
+    
+    // Use .lean() for performance since we don't need mongoose document checks here
+    const products = await query.lean();
     return NextResponse.json(products);
   } catch (error) {
     return NextResponse.json({ message: "Server Error", error }, { status: 500 });

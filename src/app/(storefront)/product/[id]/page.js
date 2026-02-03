@@ -9,11 +9,17 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import ZoomImage from "@/components/ZoomImage";
 import toast from "react-hot-toast";
 import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus } from "react-icons/fi";
+import Image from "next/image";
+import { useSettingsStore } from "@/store/settingsStore";
 import { motion } from "framer-motion";
+import ReviewsSection from "@/components/ReviewsSection";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const addToCart = useCartStore((state) => state.addToCart);
+  const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const { addItem, removeItem, isInWishlist } = useWishlistStore();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -106,11 +112,16 @@ export default function ProductDetailPage() {
               <button
                 key={i}
                 onClick={() => setSelectedImage(img)}
-                className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
+                className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all relative ${
                   selectedImage === img ? "border-primary shadow-lg scale-105" : "border-transparent hover:border-gray-200"
                 }`}
               >
-                <img src={img} alt="" className="w-full h-full object-cover" />
+                <Image 
+                    src={img} 
+                    alt="" 
+                    fill
+                    className="object-cover" 
+                />
               </button>
             ))}
           </div>
@@ -131,9 +142,14 @@ export default function ProductDetailPage() {
                 <button
                   key={i}
                   onClick={() => setSelectedImage(img)}
-                  className="flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden"
+                  className="flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden relative"
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <Image 
+                    src={img} 
+                    alt="" 
+                    fill
+                    className="object-cover" 
+                  />
                 </button>
               ))}
             </div>
@@ -149,7 +165,7 @@ export default function ProductDetailPage() {
               
               <div className="flex items-center gap-6">
                 <p className="text-3xl font-bold text-gray-900">
-                  ${selectedVariant?.price ?? product.price}
+                  {formatPrice(selectedVariant?.price ?? product.price)}
                 </p>
                 {stock < 10 && stock > 0 && (
                   <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full">
@@ -238,7 +254,7 @@ export default function ProductDetailPage() {
                 disabled={!canAdd}
                 onClick={() => {
                   addToCart(product, quantity, selectedVariant);
-                  toast.success("Added to STXRE Cart!");
+                  toast.success("Added to GRABSZY Cart!");
                   setQuantity(1);
                 }}
                 className={`flex-grow flex items-center justify-center gap-3 py-5 rounded-[1.5rem] font-bold text-white transition-all active:scale-95 shadow-xl ${
@@ -251,8 +267,23 @@ export default function ProductDetailPage() {
                 {isOutOfStock ? "Out of Stock" : "Add to Cart"}
               </button>
 
-              <button className="w-16 h-16 sm:w-[68px] sm:h-[68px] flex-shrink-0 flex items-center justify-center border-2 border-gray-100 rounded-[1.5rem] text-gray-400 hover:text-red-500 hover:border-red-100 transition-all hover:bg-red-50/50">
-                <FiHeart size={24} />
+              <button 
+                onClick={() => {
+                   if (isInWishlist(product._id)) {
+                      removeItem(product._id);
+                      toast.success("Removed from Wishlist");
+                   } else {
+                      addItem(product);
+                      toast.success("Added to Wishlist");
+                   }
+                }}
+                className={`w-16 h-16 sm:w-[68px] sm:h-[68px] flex-shrink-0 flex items-center justify-center border-2 rounded-[1.5rem] transition-all ${
+                    isInWishlist(product._id) 
+                    ? "border-red-100 bg-red-50 text-red-500" 
+                    : "border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50"
+                }`}
+              >
+                <FiHeart size={24} className={isInWishlist(product._id) ? "fill-current" : ""} />
               </button>
             </div>
 
@@ -265,6 +296,9 @@ export default function ProductDetailPage() {
               </button>
             </div>
           </div>
+        </div>
+        <div className="mt-16">
+          <ReviewsSection productId={product._id} reviews={product.reviews || []} />
         </div>
       </div>
     </main>

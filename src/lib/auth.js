@@ -18,15 +18,20 @@ export const verifyToken = (token) => {
 };
 
 export const getUserFromRequest = async (req) => {
-  const authHeader = req.headers.get('authorization');
   let token = '';
+
+  const authHeader = req?.headers?.get('authorization');
 
   if (authHeader && authHeader.startsWith('Bearer')) {
     token = authHeader.split(' ')[1];
   } else {
-    // Check cookies if you use them
-    const cookieStore = await cookies();
-    token = cookieStore.get('token')?.value;
+    try {
+      const cookieStore = await cookies();
+      token = cookieStore.get('token')?.value;
+    } catch (error) {
+      // cookies() might fail in some environments
+      return null;
+    }
   }
 
   if (!token) return null;
