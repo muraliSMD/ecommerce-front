@@ -91,7 +91,7 @@ export default function Home() {
           <section className="bg-white py-16 md:py-24">
             <div className="container mx-auto px-4 md:px-8">
                 <div className="text-center mb-16">
-                    <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Don't Miss Out</span>
+                    <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Don&apos;t Miss Out</span>
                     <h2 className="text-3xl md:text-5xl font-display font-bold mt-2 text-gray-900">Featured Products</h2>
                 </div>
                 

@@ -232,7 +232,7 @@ export default function OrderDetailsPage() {
                               <>
                                   <option value="Damaged item">Damaged item</option>
                                   <option value="Wrong item received">Wrong item received</option>
-                                  <option value="Size/Color doesn't match">Size/Color doesn't match</option>
+                                  <option value="Size/Color doesn&apos;t match">Size/Color doesn&apos;t match</option>
                                   <option value="Quality not as expected">Quality not as expected</option>
                                   <option value="Other">Other</option>
                               </>

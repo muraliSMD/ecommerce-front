@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { FiStar, FiX } from "react-icons/fi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -56,7 +57,14 @@ export default function ReviewModal({ isOpen, onClose, productId, productName, p
             <div className="flex items-center gap-4 mb-8">
                 <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden relative border border-gray-200">
                     {productImage ? (
-                        <img src={productImage} alt={productName} className="w-full h-full object-cover" />
+                        <Image 
+                            src={productImage} 
+                            alt={productName} 
+                            width={64}
+                            height={64}
+                            className="object-cover w-full h-full"
+                            unoptimized
+                        />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">No Img</div>
                     )}

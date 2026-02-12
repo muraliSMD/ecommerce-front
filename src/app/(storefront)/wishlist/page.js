@@ -24,7 +24,7 @@ export default function WishlistPage() {
         </div>
         <h1 className="text-3xl font-display font-bold text-gray-900">Your Wishlist is Empty</h1>
         <p className="text-gray-500 max-w-md">
-          Looks like you haven't saved any items yet. Browse our shop and find something you love!
+          Looks like you haven&apos;t saved any items yet. Browse our shop and find something you love!
         </p>
         <Link 
             href="/shop"
