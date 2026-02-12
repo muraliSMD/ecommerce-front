@@ -15,7 +15,8 @@ import {
   FiUser,
   FiMapPin,
   FiMail,
-  FiPhone
+  FiPhone,
+  FiTrash2
 } from "react-icons/fi";
 import Image from "next/image";
 import { useState } from "react";
@@ -45,6 +46,19 @@ export default function AdminOrders() {
     },
     onError: () => {
       toast.error("Failed to update status");
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      await api.delete(`/orders/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["admin-orders"]);
+      toast.success("Order deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete order");
     }
   });
 
@@ -176,6 +190,16 @@ export default function AdminOrders() {
                     className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
                   >
                     <FiCheckCircle className="rotate-45" /> <span className="text-[10px] font-bold uppercase">Canc.</span>
+                  </button>
+                  <button 
+                    onClick={() => {
+                      if(confirm('Are you sure you want to delete this order?')) {
+                        deleteMutation.mutate(order._id);
+                      }
+                    }}
+                    className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 col-span-2 mt-2"
+                  >
+                    <FiTrash2 /> <span className="text-[10px] font-bold uppercase">Delete Order</span>
                   </button>
                 </div>
               </div>

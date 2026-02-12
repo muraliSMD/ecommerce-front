@@ -99,3 +99,25 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(request, { params }) {
+  try {
+    await dbConnect();
+    const user = await getFullUserFromRequest(request);
+    
+    if (!isAdmin(user)) {
+      return NextResponse.json({ message: "Admin access required" }, { status: 403 });
+    }
+
+    const { id } = await params;
+    const order = await Order.findByIdAndDelete(id);
+
+    if (!order) {
+      return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Order deleted successfully" });
+  } catch (error) {
+    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
+  }
+}
