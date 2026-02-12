@@ -4,6 +4,8 @@ frontend:
     preBuild:
       commands:
         - npm ci
+        - echo "MONGODB_URI=$MONGODB_URI" >> .env.production
+        - echo "JWT_SECRET=$JWT_SECRET" >> .env.production
     build:
       commands:
         - npm run build

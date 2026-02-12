@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
+import Image from "next/image";
 import { FiPackage, FiArrowRight, FiSearch } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore"; // Use global formatter
 
@@ -77,7 +78,14 @@ export default function MyOrdersPage() {
                     <div className="flex -space-x-3">
                         {order.items.slice(0, 3).map((item, i) => (
                             <div key={i} className="w-14 h-14 rounded-xl border-2 border-white bg-gray-100 overflow-hidden relative shadow-sm">
-                                <img src={item.product?.images?.[0] || "/placeholder.jpg"} alt="" className="w-full h-full object-cover" />
+                                <Image 
+                                    src={item.product?.images?.[0] || "/placeholder.jpg"} 
+                                    alt="Product" 
+                                    width={56}
+                                    height={56}
+                                    className="object-cover w-full h-full"
+                                    unoptimized
+                                />
                             </div>
                         ))}
                         {order.items.length > 3 && (

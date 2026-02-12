@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 import { api } from "@/lib/api";
 import { 
   FiSave, 
@@ -232,7 +233,13 @@ export default function AdminSettings() {
                     <div className="flex gap-4 items-center">
                         <div className="w-16 h-16 bg-surface rounded-xl flex items-center justify-center border border-gray-100 overflow-hidden relative">
                              {settings.logo ? (
-                                <img src={settings.logo} alt="Logo" className="w-full h-full object-contain" />
+                                <Image 
+                                    src={settings.logo} 
+                                    alt="Logo" 
+                                    fill
+                                    className="object-contain p-1"
+                                    unoptimized
+                                />
                              ) : (
                                 <FiImage className="text-gray-300" size={24} />
                              )}
@@ -267,7 +274,14 @@ export default function AdminSettings() {
                     <div className="flex gap-4 items-center">
                         <div className="w-16 h-16 bg-surface rounded-xl flex items-center justify-center border border-gray-100 overflow-hidden relative">
                              {settings.favicon ? (
-                                <img src={settings.favicon} alt="Favicon" className="w-8 h-8 object-contain" />
+                                <Image 
+                                    src={settings.favicon} 
+                                    alt="Favicon" 
+                                    width={32}
+                                    height={32}
+                                    className="object-contain"
+                                    unoptimized
+                                />
                              ) : (
                                 <FiImage className="text-gray-300" size={24} />
                              )}

@@ -153,7 +153,7 @@ export default function AddressesPage() {
         ))}
         {addresses?.length === 0 && !showAddForm && (
             <div className="md:col-span-2 text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                <p className="text-gray-500 mb-4">You haven't saved any addresses yet.</p>
+                <p className="text-gray-500 mb-4">You haven&apos;t saved any addresses yet.</p>
                 <button 
                     onClick={() => setShowAddForm(true)}
                     className="text-primary font-bold hover:underline"
