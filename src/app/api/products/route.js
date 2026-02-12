@@ -56,6 +56,12 @@ export async function GET(request) {
     if (sort === 'oldest') sortOption = { createdAt: 1 };
 
     let query = Product.find(filter).sort(sortOption);
+
+    // Optimize: Return lean data for lists by default
+    const type = searchParams.get('type');
+    if (type !== 'detail') {
+       query = query.select('-description -reviews');
+    }
     
     if (limit > 0) {
       query = query.skip(skip).limit(limit);

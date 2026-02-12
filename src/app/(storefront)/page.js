@@ -35,8 +35,8 @@ export default function Home() {
 
       {/* Categories Section */}
       <section className="container mx-auto py-16 md:py-24 px-4 md:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
-          <div>
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-4">
+          <div className="text-center md:text-left">
             <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Collections</span>
             <h2 className="text-3xl md:text-5xl font-display font-bold mt-2 text-gray-900">Shop by Category</h2>
           </div>
@@ -46,11 +46,11 @@ export default function Home() {
         </div>
         
         {isCategoriesLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                  {[1,2,3,4].map(i => <div key={i} className="h-64 md:h-80 bg-gray-200 rounded-[2rem] animate-pulse"></div>)}
             </div>
         ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {categories?.slice(0, 4).map((cat, i) => (
                 <Link href={`/shop?category=${cat.name}`} key={cat._id}>
                 <motion.div
@@ -95,7 +95,8 @@ export default function Home() {
                     <h2 className="text-3xl md:text-5xl font-display font-bold mt-2 text-gray-900">Featured Products</h2>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                     {featuredProducts.map((p, i) => (
                         <motion.div
                             key={p._id}
@@ -124,13 +125,13 @@ export default function Home() {
           </div>
 
           {isNewArrivalsLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="animate-pulse bg-white/50 h-96 rounded-[2rem]" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
               {newArrivals?.map((p, i) => (
                 <motion.div
                   key={p._id}

@@ -66,6 +66,7 @@ export default function Header() {
   };
 
   return (
+    <>
     <header 
       onMouseLeave={() => setActiveCategory(null)}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -78,12 +79,12 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="relative z-50 group">
             {settings?.logo ? (
-                <div className="relative h-10 w-32">
+                <div className="relative h-20 w-40">
                     <Image 
                         src={settings.logo} 
                         alt={settings.siteName || "Logo"} 
                         fill 
-                        className="object-contain object-left"
+                        className="object-cover object-left"
                     />
                 </div>
             ) : (
@@ -197,12 +198,24 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden w-10 h-10 flex items-center justify-center text-gray-900"
-          >
-            <FiMenu size={24} />
-          </button>
+          {/* Mobile Actions */}
+          <div className="flex lg:hidden items-center gap-5">
+            <Link href="/cart" className="relative">
+              <FiShoppingBag size={24} className="text-gray-900" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold shadow-sm">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            <button 
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="w-10 h-10 flex items-center justify-center text-gray-900"
+            >
+                <FiMenu size={28} />
+            </button>
+          </div>
         </div>
 
         {/* Mega Menu Dropdown */}
@@ -281,8 +294,9 @@ export default function Header() {
         </AnimatePresence>
 
       </div>
+    </header>
 
-      {/* Mobile Drawer Navigation */}
+    {/* Mobile Drawer Navigation moved outside header to avoid stacking context issues */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
@@ -375,7 +389,7 @@ export default function Header() {
           </>
         )}
       </AnimatePresence>
-    </header>
+    </>
   );
 }
 

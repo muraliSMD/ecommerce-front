@@ -7,6 +7,8 @@ import { useParams } from "next/navigation";
 import { FiArrowLeft, FiMapPin, FiTruck, FiCreditCard } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore";
 import Image from "next/image";
+import ReviewModal from "@/components/ReviewModal";
+import { FiStar } from "react-icons/fi";
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,6 +23,18 @@ export default function OrderDetailsPage() {
   const [modalType, setModalType] = useState(null); // 'cancel' or 'return'
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewProduct, setReviewProduct] = useState(null);
+
+  const openReviewModal = (item) => {
+      setReviewProduct({
+          id: item.product._id,
+          name: item.product.name,
+          image: item.product.images?.[0] || item.variant?.images?.[0] || "/placeholder.jpg"
+      });
+      setReviewModalOpen(true);
+  };
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", id],
@@ -121,10 +135,19 @@ export default function OrderDetailsPage() {
                                         {item.variant.color} / {item.variant.size}
                                     </p>
                                 )}
-                                <p className="text-sm text-gray-900 font-bold mt-1">Qty: {item.quantity}</p>
-                            </div>
-                            <p className="font-bold text-lg">{formatPrice(item.price * item.quantity)}</p>
-                         </div>
+                                    <p className="text-sm text-gray-900 font-bold mt-1">Qty: {item.quantity}</p>
+                                    
+                                    {order.orderStatus === 'Delivered' && (
+                                        <button 
+                                            onClick={() => openReviewModal(item)}
+                                            className="mt-2 text-primary text-sm font-bold flex items-center gap-1 hover:underline underline-offset-2"
+                                        >
+                                            <FiStar size={14} className="fill-current" /> Write a Review
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="font-bold text-lg">{formatPrice(item.price * item.quantity)}</p>
+                             </div>
                     ))}
                 </div>
             </div>
@@ -235,6 +258,15 @@ export default function OrderDetailsPage() {
               </div>
           </div>
       )}
+
+      {/* Review Modal */}
+      <ReviewModal 
+        isOpen={reviewModalOpen} 
+        onClose={() => setReviewModalOpen(false)}
+        productId={reviewProduct?.id}
+        productName={reviewProduct?.name}
+        productImage={reviewProduct?.image}
+      />
     </div>
   );
 }

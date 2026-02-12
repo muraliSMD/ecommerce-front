@@ -1,52 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { FiStar, FiUser, FiMessageSquare } from "react-icons/fi";
-import { useUserStore } from "@/store/userStore";
-import toast from "react-hot-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function ReviewsSection({ productId, reviews }) {
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const { userInfo, setAuthModalOpen } = useUserStore();
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationFn: async (newReview) => {
-      const res = await fetch(`/api/products/${productId}/reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newReview),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      return data;
-    },
-    onSuccess: () => {
-      toast.success("Review submitted!");
-      setComment("");
-      setRating(5);
-      queryClient.invalidateQueries(["product", productId]);
-       // Since reviews are typically passed as props from the page server-side or parent,
-       // we might need to reload the page or rely on parent refetch using queryClient if parent uses React Query.
-       // For this setup assuming parent page might need reload if it's strictly server component without hydration sync
-       // But typically we want immediate feedback.
-       window.location.reload(); 
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!userInfo) {
-      setAuthModalOpen(true, "login");
-      return;
-    }
-    mutation.mutate({ rating, comment });
-  };
 
   return (
     <div className="mt-20">
@@ -55,11 +11,17 @@ export default function ReviewsSection({ productId, reviews }) {
         <span className="text-lg font-normal text-gray-500">({reviews.length})</span>
       </h2>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 gap-12">
         {/* Reviews List */}
         <div className="space-y-6">
           {reviews.length === 0 ? (
-            <p className="text-gray-500 italic">No reviews yet. Be the first to write one!</p>
+            <div className="bg-gray-50 rounded-2xl p-10 text-center border border-gray-100">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-gray-300 mx-auto mb-4 shadow-sm">
+                    <FiMessageSquare size={24} />
+                </div>
+                <p className="text-gray-500 font-medium">No reviews yet.</p>
+                <p className="text-sm text-gray-400 mt-1">Verified customers can write reviews from their orders page.</p>
+            </div>
           ) : (
             reviews.map((review, index) => (
               <div key={index} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -85,49 +47,6 @@ export default function ReviewsSection({ productId, reviews }) {
               </div>
             ))
           )}
-        </div>
-
-        {/* Write Review Form */}
-        <div className="bg-surface rounded-[2.5rem] p-8 md:p-10 h-fit">
-          <h3 className="text-xl font-bold mb-6">Write a Review</h3>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-500 mb-2">Rating</label>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    onClick={() => setRating(star)}
-                    className={`text-2xl transition-colors ${
-                      star <= rating ? "text-yellow-400" : "text-gray-300"
-                    }`}
-                  >
-                    <FiStar className={star <= rating ? "fill-current" : ""} />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-500 mb-2">Review</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                required
-                className="w-full bg-white border border-gray-200 rounded-2xl p-4 outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 min-h-[120px]"
-                placeholder="Share your thoughts about this product..."
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              className="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition-all disabled:opacity-50"
-            >
-              {mutation.isPending ? "Submitting..." : "Submit Review"}
-            </button>
-          </form>
         </div>
       </div>
     </div>

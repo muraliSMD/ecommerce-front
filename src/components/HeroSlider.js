@@ -60,6 +60,7 @@ export default function HeroSlider() {
             src={slides[index].image}
             alt={slides[index].title}
             fill
+            sizes="100vw"
             className="object-cover"
             priority
           />

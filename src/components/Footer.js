@@ -22,12 +22,12 @@ export default function Footer() {
           <div className="space-y-6">
             <Link href="/" className="group flex items-center gap-3">
               {settings?.logo ? (
-                  <div className="relative h-12 w-36">
+                  <div className="relative h-20 w-40">
                       <Image 
                           src={settings.logo} 
                           alt={settings.siteName || "Logo"} 
                           fill 
-                          className="object-contain object-left"
+                          className="object-cover object-left"
                       />
                   </div>
               ) : (

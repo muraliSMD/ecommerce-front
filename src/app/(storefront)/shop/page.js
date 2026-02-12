@@ -279,7 +279,7 @@ const FilterContent = ({
 
             {/* Content */}
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-white rounded-[2rem] h-[400px] animate-pulse" />
                 ))}
@@ -305,7 +305,7 @@ const FilterContent = ({
             ) : (
                 <div className={
                     viewMode === "grid" 
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
                     : "space-y-4"
                 }>
                     <AnimatePresence mode="popLayout">
