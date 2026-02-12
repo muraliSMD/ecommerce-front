@@ -1,33 +1,47 @@
-"use client";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "../styles/globals.css";
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
 import { Toaster } from "react-hot-toast";
-import { usePathname } from "next/navigation";
+import QueryProvider from "./QueryProvider";
+import { Outfit } from "next/font/google";
+import AuthModal from "@/components/AuthModal";
+import SettingsInitializer from "@/components/SettingsInitializer";
+import PopupManager from "@/components/popups/PopupManager";
+import ChatWidget from "@/components/ChatWidget";
+import PushNotificationManager from "@/components/PushNotificationManager";
 
-const queryClient = new QueryClient();
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+});
 
-export default function RootLayout({ children }) {
-  const pathname = usePathname();
+import dbConnect from "@/lib/db";
+import Settings from "@/models/Settings";
 
-  // Determine if current route is auth
-  const isAuthRoute = pathname.startsWith("/auth");
+export async function generateMetadata() {
+  await dbConnect();
+  const settings = await Settings.findOne() || {};
+  
+  return {
+    title: settings.seo?.metaTitle || "Premium Clothing | Shop Trending Styles",
+    description: settings.seo?.metaDescription || "Experience the next generation of online shopping.",
+    icons: {
+      icon: settings.favicon || '/favicon.ico',
+    }
+  };
+}
 
-  return (
+export default function RootLayout({ children }) {  
+    return (
     <html lang="en">
-      <body className="bg-gray-50 min-h-screen flex flex-col">
-        {/* Render header only if NOT auth route */}
-        {!isAuthRoute && <Header />}
-
-        <QueryClientProvider client={queryClient}>
-          <main className="flex-1">{children}</main>
-          <Toaster position="top-right" />
-        </QueryClientProvider>
-
-        {/* Render footer only if NOT auth route */}
-        {!isAuthRoute && <Footer />}
+      <body className={`${outfit.variable} font-sans bg-surface min-h-screen antialiased`}>
+        <QueryProvider>
+          <SettingsInitializer />
+          <AuthModal />
+          <PopupManager />
+          <ChatWidget />
+          <PushNotificationManager />
+          {children}
+          <Toaster position="bottom-center" />     
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,1 +1,113 @@
 @import "tailwindcss";
+
+@theme {
+  /* Premium Palette */
+  --color-primary: oklch(0.55 0.25 260); /* Deep Royal Blue/Purple */
+  --color-primary-light: oklch(0.75 0.15 260);
+  --color-secondary: oklch(0.65 0.22 310); /* Vibrant Magenta/Pink */
+  --color-accent: oklch(0.85 0.15 180); /* Teal/Cyan */
+  
+  --color-surface: oklch(0.99 0.005 260); /* Very light cool gray */
+  --color-surface-dark: oklch(0.96 0.01 260);
+  
+  --font-sans: "Outfit", ui-sans-serif, system-ui;
+  --font-display: "Clash Display", ui-sans-serif, system-ui;
+
+  --animate-float: float 6s ease-in-out infinite;
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+:root {
+  --bg-gradient: linear-gradient(
+    135deg,
+    oklch(0.99 0.005 260) 0%,
+    oklch(0.96 0.02 280) 100%
+  );
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+body {
+  background: var(--bg-gradient);
+  color: oklch(0.2 0.03 260);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Enhanced Glassmorphism */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+}
+
+.text-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.8 0.05 260);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.7 0.1 260);
+}
+
+/* Animations & Transitions */
+a, button, .transition-all-custom {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Utilities */
+.container-padding {
+  @apply px-4 md:px-8 lg:px-12;
+}

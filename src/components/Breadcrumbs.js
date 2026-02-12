@@ -9,7 +9,7 @@ export default function Breadcrumbs() {
 
   return (
     <nav aria-label="Breadcrumb" className="text-sm mb-4">
-      <ol className="flex flex-wrap gap-1 text-gray-600">
+      <ol className="flex items-center gap-2 text-gray-600 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
         {/* Always render Home first */}
         <li>
           <Link href="/" className="hover:underline">
