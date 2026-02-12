@@ -8,9 +8,19 @@ import { FiArrowLeft, FiMapPin, FiTruck, FiCreditCard } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore";
 import Image from "next/image";
 
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
+
 export default function OrderDetailsPage() {
   const { id } = useParams();
   const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const queryClient = useQueryClient();
+  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState(null); // 'cancel' or 'return'
+  const [reason, setReason] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", id],
@@ -20,11 +30,36 @@ export default function OrderDetailsPage() {
     },
   });
 
+  const handleAction = async () => {
+      if(!reason.trim()) return toast.error("Please provide a reason");
+      
+      setIsSubmitting(true);
+      try {
+          const endpoint = modalType === 'cancel' ? `/orders/${id}/cancel` : `/orders/${id}/return`;
+          await api.put(endpoint, { reason });
+          
+          toast.success(modalType === 'cancel' ? "Order cancelled" : "Return requested");
+          queryClient.invalidateQueries(["order", id]);
+          setModalOpen(false);
+          setReason("");
+      } catch (error) {
+          toast.error(error.response?.data?.message || "Action failed");
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
+
+  const openModal = (type) => {
+      setModalType(type);
+      setModalOpen(true);
+      setReason("");
+  };
+
   if (isLoading) return <div className="h-96 bg-white rounded-3xl animate-pulse" />;
   if (!order) return <div>Order not found</div>;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
       <Link href="/account/orders" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-4 transition-colors">
         <FiArrowLeft /> Back to Orders
       </Link>
@@ -34,13 +69,33 @@ export default function OrderDetailsPage() {
             <h1 className="text-3xl font-display font-bold text-gray-900">Order #{order._id.slice(-6).toUpperCase()}</h1>
             <p className="text-gray-500">Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</p>
         </div>
-        <span className={`px-4 py-2 rounded-full font-bold uppercase tracking-wider ${
-             order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-600' :
-             order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-600' :
-             'bg-yellow-100 text-yellow-600'
-        }`}>
-            {order.orderStatus}
-        </span>
+        <div className="flex items-center gap-3">
+            {['Pending', 'Processing'].includes(order.orderStatus) && (
+                <button 
+                    onClick={() => openModal('cancel')}
+                    className="px-4 py-2 rounded-full border border-red-200 text-red-600 hover:bg-red-50 font-bold text-sm transition-colors"
+                >
+                    Cancel Order
+                </button>
+            )}
+            {order.orderStatus === 'Delivered' && (
+                 <button 
+                    onClick={() => openModal('return')}
+                    className="px-4 py-2 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-sm transition-colors"
+                >
+                    Return Items
+                </button>
+            )}
+            <span className={`px-4 py-2 rounded-full font-bold uppercase tracking-wider text-sm ${
+                order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-600' :
+                order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-600' :
+                order.orderStatus === 'Return Requested' ? 'bg-orange-100 text-orange-600' :
+                order.orderStatus === 'Returned' ? 'bg-gray-200 text-gray-600' :
+                'bg-yellow-100 text-yellow-600'
+            }`}>
+                {order.orderStatus}
+            </span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -121,6 +176,65 @@ export default function OrderDetailsPage() {
             </div>
         </div>
       </div>
+      
+      {/* Action Modal */}
+      {modalOpen && (
+          <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+              <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in slide-in-from-bottom-10 fade-in duration-300">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      {modalType === 'cancel' ? 'Cancel Order' : 'Request Return'}
+                  </h3>
+                  <p className="text-gray-500 mb-6 text-sm">
+                      {modalType === 'cancel' 
+                          ? 'Are you sure you want to cancel this order? This action cannot be undone.' 
+                          : 'Please select a reason for returning this item.'}
+                  </p>
+                  
+                  <div className="space-y-4 mb-8">
+                      <label className="block text-sm font-bold text-gray-700">Reason</label>
+                      <select 
+                          value={reason}
+                          onChange={(e) => setReason(e.target.value)}
+                          className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                      >
+                          <option value="">Select a reason</option>
+                          {modalType === 'cancel' ? (
+                              <>
+                                  <option value="Changed my mind">Changed my mind</option>
+                                  <option value="Ordered by mistake">Ordered by mistake</option>
+                                  <option value="Found better price">Found better price</option>
+                                  <option value="Other">Other</option>
+                              </>
+                          ) : (
+                              <>
+                                  <option value="Damaged item">Damaged item</option>
+                                  <option value="Wrong item received">Wrong item received</option>
+                                  <option value="Size/Color doesn't match">Size/Color doesn't match</option>
+                                  <option value="Quality not as expected">Quality not as expected</option>
+                                  <option value="Other">Other</option>
+                              </>
+                          )}
+                      </select>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                      <button 
+                          onClick={() => setModalOpen(false)}
+                          className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                      >
+                          Close
+                      </button>
+                      <button 
+                          onClick={handleAction}
+                          disabled={isSubmitting}
+                          className="flex-1 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50"
+                      >
+                          {isSubmitting ? 'Processing...' : 'Confirm'}
+                      </button>
+                  </div>
+              </div>
+          </div>
+      )}
     </div>
   );
 }

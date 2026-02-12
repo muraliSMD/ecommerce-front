@@ -23,6 +23,27 @@ const userSchema = new mongoose.Schema({
     ],
     createdAt: {type: Date, default: Date.now},
     isBanned: {type: Boolean, default: false},
+    pushSubscriptions: [
+        {
+            endpoint: { type: String, required: true },
+            expirationTime: { type: Number, default: null },
+            keys: {
+                p256dh: { type: String, required: true },
+                auth: { type: String, required: true }
+            }
+        }
+    ],
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    cart: [
+        {
+            product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+            quantity: { type: Number, default: 1 },
+            variant: { 
+                color: String, 
+                size: String 
+            }
+        }
+    ]
 });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

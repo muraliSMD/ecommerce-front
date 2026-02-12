@@ -12,10 +12,12 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiUsers,
-  FiMenu
+  FiMenu,
+  FiImage
 } from "react-icons/fi";
 import { useState } from "react";
 import { useUserStore } from "@/store/userStore";
+import NotificationBell from "./NotificationBell";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: FiHome },
@@ -23,6 +25,7 @@ const navItems = [
   { label: "Orders", href: "/admin/orders", icon: FiShoppingBag },
   { label: "Customers", href: "/admin/customers", icon: FiUsers },
   { label: "Categories", href: "/admin/categories", icon: FiGrid },
+  { label: "Hero Slider", href: "/admin/hero-slides", icon: FiImage },
   { label: "Settings", href: "/admin/settings", icon: FiSettings },
 ];
 
@@ -55,12 +58,14 @@ export default function AdminSidebar() {
         isCollapsed ? "md:w-20" : "md:w-72"
       } w-72 ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
     >
+
       {/* Brand */}
       <div className="p-6 mb-8 flex items-center justify-between">
         {!isCollapsed && (
           <div className="flex items-center gap-3">
             <div className="bg-primary w-8 h-8 rounded-xl flex items-center justify-center font-bold text-lg">S</div>
             <span className="text-xl font-display font-bold tracking-tight">GRABSZY <span className="text-primary font-normal text-xs uppercase tracking-widest ml-1">Admin</span></span>
+            <NotificationBell className="ml-2" />
           </div>
         )}
         <button 

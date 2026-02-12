@@ -28,6 +28,7 @@ export async function PUT(request) {
     }
 
     const body = await request.json();
+    console.log("Settings PUT received:", body);
     
     // Update the singleton document
     // upsert: true ensures it creates if somehow missing (though findOneAndUpdate usually needs a query)

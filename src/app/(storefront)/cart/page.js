@@ -59,7 +59,7 @@ export default function CartPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-20">
+    <main className="bg-surface min-h-screen pb-20 pt-32">
       <div className="container mx-auto px-4 md:px-8">
         <div className="py-6">
           <Breadcrumbs

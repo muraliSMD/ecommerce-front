@@ -93,9 +93,9 @@ export default function ProductDetailPage() {
       : product.images) || [];
 
   return (
-    <main className="bg-surface min-h-screen pb-20">
+    <main className="bg-surface min-h-screen pb-20 pt-32">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="py-6">
+        <div className="mb-6">
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
@@ -105,7 +105,7 @@ export default function ProductDetailPage() {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Gallery Sidebar */}
           <div className="lg:col-span-1 hidden lg:flex flex-col gap-4">
             {gallery.map((img, i) => (
@@ -131,18 +131,20 @@ export default function ProductDetailPage() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="rounded-[3rem] overflow-hidden bg-white shadow-2xl shadow-black/5"
+              className="aspect-square md:aspect-auto md:h-[600px] rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-2xl shadow-black/5 relative"
             >
               <ZoomImage src={selectedImage} zoomAmount={2.5} height={600} />
             </motion.div>
             
             {/* Mobile Thumbnails */}
-            <div className="flex lg:hidden gap-3 mt-4 overflow-x-auto pb-2 px-2 scrollbar-hide">
+            <div className="flex lg:hidden gap-3 mt-4 overflow-x-auto pb-2 px-2 snap-x snap-mandatory">
               {gallery.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setSelectedImage(img)}
-                  className="flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden relative"
+                  className={`flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden relative border-2 snap-start ${
+                    selectedImage === img ? "border-primary" : "border-transparent"
+                  }`}
                 >
                   <Image 
                     src={img} 
@@ -156,10 +158,10 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Product Details */}
-          <div className="lg:col-span-5 space-y-8">
+          <div className="lg:col-span-5 space-y-6 md:space-y-8">
             <div className="space-y-4">
               <span className="text-primary font-bold tracking-widest uppercase text-sm">{product.category || "New Arrival"}</span>
-              <h1 className="text-4xl md:text-6xl font-display font-bold text-gray-900 leading-tight">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
               
@@ -168,14 +170,14 @@ export default function ProductDetailPage() {
                   {formatPrice(selectedVariant?.price ?? product.price)}
                 </p>
                 {stock < 10 && stock > 0 && (
-                  <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full">
+                  <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full animate-pulse">
                     Only {stock} left!
                   </span>
                 )}
               </div>
             </div>
 
-            <p className="text-gray-500 leading-relaxed text-lg">
+            <p className="text-gray-500 leading-relaxed text-base md:text-lg">
               {product.description || "The ultimate statement piece for your wardrobe. Crafted with precision and style in mind."}
             </p>
 
@@ -185,12 +187,12 @@ export default function ProductDetailPage() {
             {allColors.length > 0 && (
               <div className="space-y-4">
                 <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Color</p>
-                <div className="flex gap-4 flex-wrap">
+                <div className="flex gap-3 flex-wrap">
                   {allColors.map((color) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
-                      className={`px-6 py-2.5 rounded-full border-2 transition-all font-medium ${
+                      className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full border-2 transition-all font-medium text-sm md:text-base ${
                         selectedColor === color
                           ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                           : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -207,7 +209,7 @@ export default function ProductDetailPage() {
             {allSizes.length > 0 && (
               <div className="space-y-4">
                 <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Size</p>
-                <div className="flex gap-3 flex-wrap">
+                <div className="flex gap-2.5 flex-wrap">
                   {allSizes.map((size) => {
                     const disabled = !availableSizesForColor.includes(size);
                     return (
@@ -215,7 +217,7 @@ export default function ProductDetailPage() {
                         key={size}
                         disabled={disabled}
                         onClick={() => setSelectedSize(size)}
-                        className={`min-w-[50px] h-12 rounded-2xl border-2 transition-all flex items-center justify-center font-bold ${
+                        className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
                           disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
                           selectedSize === size
                             ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
@@ -232,10 +234,10 @@ export default function ProductDetailPage() {
 
             {/* Quantity and Actions */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <div className="flex items-center bg-white border border-gray-100 rounded-[1.5rem] p-1.5 shadow-sm">
+              <div className="flex items-center justify-between sm:justify-start bg-white border border-gray-100 rounded-2xl p-2 shadow-sm">
                 <button 
                   onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
+                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
                   disabled={isOutOfStock}
                 >
                   <FiMinus />
@@ -243,7 +245,7 @@ export default function ProductDetailPage() {
                 <span className="w-12 text-center font-bold text-lg">{quantity}</span>
                 <button 
                   onClick={() => setQuantity(q => Math.min(stock, q + 1))}
-                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
+                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
                   disabled={isOutOfStock || quantity >= stock}
                 >
                   <FiPlus />
@@ -257,7 +259,7 @@ export default function ProductDetailPage() {
                   toast.success("Added to GRABSZY Cart!");
                   setQuantity(1);
                 }}
-                className={`flex-grow flex items-center justify-center gap-3 py-5 rounded-[1.5rem] font-bold text-white transition-all active:scale-95 shadow-xl ${
+                className={`flex-grow flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl ${
                   !canAdd 
                     ? "bg-gray-200 cursor-not-allowed" 
                     : "bg-primary hover:bg-secondary shadow-primary/20"
@@ -277,7 +279,7 @@ export default function ProductDetailPage() {
                       toast.success("Added to Wishlist");
                    }
                 }}
-                className={`w-16 h-16 sm:w-[68px] sm:h-[68px] flex-shrink-0 flex items-center justify-center border-2 rounded-[1.5rem] transition-all ${
+                className={`w-14 h-14 md:w-[68px] md:h-auto flex-shrink-0 flex items-center justify-center border-2 rounded-2xl transition-all ${
                     isInWishlist(product._id) 
                     ? "border-red-100 bg-red-50 text-red-500" 
                     : "border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50"
@@ -286,8 +288,8 @@ export default function ProductDetailPage() {
                 <FiHeart size={24} className={isInWishlist(product._id) ? "fill-current" : ""} />
               </button>
             </div>
-
-            <div className="flex items-center gap-6 pt-6">
+            
+            <div className="flex items-center gap-6 pt-4">
               <button className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors font-medium">
                 <FiShare2 /> Share
               </button>
@@ -297,7 +299,7 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
-        <div className="mt-16">
+        <div className="mt-16 md:mt-24">
           <ReviewsSection productId={product._id} reviews={product.reviews || []} />
         </div>
       </div>

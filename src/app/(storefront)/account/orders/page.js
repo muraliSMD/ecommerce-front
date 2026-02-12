@@ -53,13 +53,17 @@ export default function MyOrdersPage() {
             href={`/account/orders/${order._id}`}
             className="block bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all group"
           >
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                   <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-col md:flex-row md:items-center gap-6">
+                
+                {/* Order Info & Status */}
+                <div className="flex-1">
+                   <div className="flex flex-wrap items-center gap-3 mb-2">
                         <span className="font-bold text-gray-900 text-lg">#{order._id.slice(-6).toUpperCase()}</span>
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                             order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-600' :
                             order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-600' :
+                            order.orderStatus === 'Return Requested' ? 'bg-orange-100 text-orange-600' :
+                            order.orderStatus === 'Returned' ? 'bg-gray-200 text-gray-600' :
                             'bg-yellow-100 text-yellow-600'
                         }`}>
                             {order.orderStatus}
@@ -68,24 +72,28 @@ export default function MyOrdersPage() {
                    <p className="text-gray-500 text-sm"> Placed on {new Date(order.createdAt).toLocaleDateString()}</p>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <div className="flex -space-x-4">
+                {/* Product Images Preview */}
+                <div className="flex items-center gap-2">
+                    <div className="flex -space-x-3">
                         {order.items.slice(0, 3).map((item, i) => (
-                            <div key={i} className="w-12 h-12 rounded-full border-2 border-white bg-gray-100 overflow-hidden relative">
-                                <img src={item.product?.images?.[0]} alt="" className="w-full h-full object-cover" />
+                            <div key={i} className="w-14 h-14 rounded-xl border-2 border-white bg-gray-100 overflow-hidden relative shadow-sm">
+                                <img src={item.product?.images?.[0] || "/placeholder.jpg"} alt="" className="w-full h-full object-cover" />
                             </div>
                         ))}
                         {order.items.length > 3 && (
-                            <div className="w-12 h-12 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                            <div className="w-14 h-14 rounded-xl border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600 shadow-sm">
                                 +{order.items.length - 3}
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between md:justify-end gap-6 md:min-w-[200px]">
+                {/* Price & Action */}
+                <div className="flex items-center justify-between md:justify-end gap-6 md:min-w-[150px]">
                     <span className="font-bold text-gray-900 text-xl">{formatPrice(order.totalAmount)}</span>
-                    <FiArrowRight className="text-gray-400 group-hover:text-primary transition-colors" size={24} />
+                    <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                        <FiArrowRight size={20} />
+                    </div>
                 </div>
             </div>
           </Link>

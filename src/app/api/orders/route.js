@@ -2,8 +2,19 @@ import dbConnect from '@/lib/db';
 import Order from '@/models/Order';
 import Cart from '@/models/Cart';
 import Product from '@/models/Product';
+import Notification from '@/models/Notification';
+import User from '@/models/User';
 import { NextResponse } from 'next/server';
 import { getFullUserFromRequest, isAdmin, getUserFromRequest } from '@/lib/auth';
+import webpush from 'web-push';
+
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT || 'mailto:admin@example.com',
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+}
 
 export async function GET(request) {
   try {
@@ -76,9 +87,6 @@ export async function POST(request) {
     const discountAmount = body.paymentInfo?.discountAmount ? Number(body.paymentInfo.discountAmount) : 0;
     const finalAmount = Math.max(0, totalAmount + (body.shippingCharge || 0) + (body.taxAmount || 0) - discountAmount);
     
-    // Note: In real app, re-validate coupon here backend-side to prevent tampering. 
-    // For now taking client value but ensure we implement server-side re-calc later.
-
     const order = await new Order({
       user: userId,
       items,
@@ -102,6 +110,44 @@ export async function POST(request) {
         // Fallback: Reduce global stock if no variant
         await Product.findByIdAndUpdate(i.product, { $inc: { stock: -i.quantity } });
       }
+    }
+
+    // Trigger Admin Notification
+    try {
+        await Notification.create({
+            recipient: "admin",
+            type: "order_new",
+            title: "New Order Received",
+            message: `Order #${order._id.toString().slice(-6)} placed by ${body.shippingAddress?.fullName || "Guest"}`,
+            link: `/admin/orders/${order._id}`,
+            isRead: false
+        });
+        
+        // Push to Admins
+        if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+            const admins = await User.find({ role: 'admin' });
+            const payload = JSON.stringify({
+                title: "New Order Received",
+                body: `Order #${order._id.toString().slice(-6)} placed by ${body.shippingAddress?.fullName || "Guest"}`,
+                url: `/admin/orders/${order._id}`
+            });
+
+            for (const admin of admins) {
+                if (admin.pushSubscriptions && admin.pushSubscriptions.length > 0) {
+                    for (const sub of admin.pushSubscriptions) {
+                        try {
+                            await webpush.sendNotification(sub, payload);
+                        } catch (error) {
+                            console.error("Error sending push to admin", error);
+                            // Optional: remove invalid subscription logic here
+                        }
+                    }
+                }
+            }
+        }
+
+    } catch (err) {
+        console.error("Failed to create notification", err);
     }
 
     return NextResponse.json(order, { status: 201 });

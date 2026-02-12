@@ -16,13 +16,38 @@ export async function GET(request) {
     const limit = Number(searchParams.get('limit')) || 0; // 0 means all
     const skip = (page - 1) * limit;
 
+    const colors = searchParams.get('colors');
+    const sizes = searchParams.get('sizes');
+    const minRating = searchParams.get('minRating');
+
     let filter = {};
     if (category && category !== "All") filter.category = category;
     if (search) filter.name = { $regex: search, $options: "i" };
+    
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);
       if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    // Advanced Filtering
+    if (colors) {
+        const colorArray = colors.split(',');
+        filter['variants.color'] = { $in: colorArray.map(c => new RegExp(c, 'i')) };
+    }
+
+    if (sizes) {
+        const sizeArray = sizes.split(',');
+        filter['variants.size'] = { $in: sizeArray.map(s => new RegExp(s, 'i')) };
+    }
+
+    if (minRating) {
+        filter.averageRating = { $gte: Number(minRating) };
+    }
+
+    const isFeatured = searchParams.get('isFeatured');
+    if (isFeatured === 'true') {
+      filter.isFeatured = true;
     }
 
     let sortOption = { createdAt: -1 };

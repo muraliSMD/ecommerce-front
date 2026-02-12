@@ -6,16 +6,28 @@ import AuthModal from "@/components/AuthModal";
 import SettingsInitializer from "@/components/SettingsInitializer";
 import PopupManager from "@/components/popups/PopupManager";
 import ChatWidget from "@/components/ChatWidget";
+import PushNotificationManager from "@/components/PushNotificationManager";
 
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-outfit",
 });
 
-export const metadata = {
-  title: "Premium Clothing | Shop Trending Styles",
-  description: "Experience the next generation of online shopping with our curated clothing collection.",
-};
+import dbConnect from "@/lib/db";
+import Settings from "@/models/Settings";
+
+export async function generateMetadata() {
+  await dbConnect();
+  const settings = await Settings.findOne() || {};
+  
+  return {
+    title: settings.seo?.metaTitle || "Premium Clothing | Shop Trending Styles",
+    description: settings.seo?.metaDescription || "Experience the next generation of online shopping.",
+    icons: {
+      icon: settings.favicon || '/favicon.ico',
+    }
+  };
+}
 
 export default function RootLayout({ children }) {  
     return (
@@ -26,6 +38,7 @@ export default function RootLayout({ children }) {
           <AuthModal />
           <PopupManager />
           <ChatWidget />
+          <PushNotificationManager />
           {children}
           <Toaster position="bottom-center" />     
         </QueryProvider>

@@ -1,7 +1,18 @@
 import dbConnect from '@/lib/db';
 import Order from '@/models/Order';
+import Notification from '@/models/Notification';
+import User from '@/models/User';
 import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import webpush from 'web-push';
+
+if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+      process.env.VAPID_SUBJECT || 'mailto:admin@example.com',
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+}
 
 export async function GET(request, { params }) {
   try {
@@ -44,6 +55,43 @@ export async function PUT(request, { params }) {
     
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    // Trigger User Notification
+    if (order.user) {
+        try {
+            await Notification.create({
+                recipient: order.user,
+                type: "order_status",
+                title: "Order Update",
+                message: `Your order #${order._id.toString().slice(-6)} is now ${orderStatus}`,
+                link: `/account/orders/${order._id}`,
+                isRead: false
+            });
+
+            // Push to User
+            if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+                const userDoc = await User.findById(order.user);
+                if (userDoc && userDoc.pushSubscriptions && userDoc.pushSubscriptions.length > 0) {
+                    const payload = JSON.stringify({
+                        title: "Order Update",
+                        body: `Your order #${order._id.toString().slice(-6)} is now ${orderStatus}`,
+                        url: `/account/orders/${order._id}`
+                    });
+
+                    for (const sub of userDoc.pushSubscriptions) {
+                        try {
+                            await webpush.sendNotification(sub, payload);
+                        } catch (error) {
+                            console.error("Error sending push to user", error);
+                        }
+                    }
+                }
+            }
+
+        } catch (err) {
+            console.error("Failed to create notification", err);
+        }
     }
 
     return NextResponse.json(order);

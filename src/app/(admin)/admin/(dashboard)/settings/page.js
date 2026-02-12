@@ -30,6 +30,8 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState({
     siteName: "",
     supportEmail: "",
+    logo: "",
+    favicon: "",
     currency: "USD",
     taxRate: 0,
     shippingCharge: 0,
@@ -62,6 +64,8 @@ export default function AdminSettings() {
       setSettings({
         siteName: fetchedSettings.siteName || "",
         supportEmail: fetchedSettings.supportEmail || "",
+        logo: fetchedSettings.logo || "",
+        favicon: fetchedSettings.favicon || "",
         currency: fetchedSettings.currency || "USD",
         taxRate: fetchedSettings.taxRate || 0,
         shippingCharge: fetchedSettings.shippingCharge || 0,
@@ -117,6 +121,25 @@ export default function AdminSettings() {
           ...settings, 
           [name]: type === 'checkbox' ? checked : value 
         });
+    }
+  };
+
+  const handleFileUpload = async (e, field) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    
+    const toastId = toast.loading("Uploading...");
+    try {
+        const { data } = await api.post("/upload", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+        setSettings(prev => ({ ...prev, [field]: data.url }));
+        toast.success("Image uploaded!", { id: toastId });
+    } catch (err) {
+        toast.error("Upload failed", { id: toastId });
     }
   };
 
@@ -199,6 +222,76 @@ export default function AdminSettings() {
                     onChange={handleInputChange}
                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                 />
+                </div>
+                
+                {/* Logo Upload */}
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <FiImage /> Logo
+                    </label>
+                    <div className="flex gap-4 items-center">
+                        <div className="w-16 h-16 bg-surface rounded-xl flex items-center justify-center border border-gray-100 overflow-hidden relative">
+                             {settings.logo ? (
+                                <img src={settings.logo} alt="Logo" className="w-full h-full object-contain" />
+                             ) : (
+                                <FiImage className="text-gray-300" size={24} />
+                             )}
+                        </div>
+                        <div className="flex-1">
+                             <input 
+                                type="text"
+                                name="logo"
+                                value={settings.logo}
+                                onChange={handleInputChange}
+                                placeholder="Image URL"
+                                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-4 py-3 rounded-xl outline-none transition-all mb-2 text-sm"
+                            />
+                            <label className="inline-block bg-black text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-gray-800 transition-colors">
+                                Upload New Logo
+                                <input 
+                                    type="file" 
+                                    className="hidden" 
+                                    accept="image/*"
+                                    onChange={(e) => handleFileUpload(e, 'logo')}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Favicon Upload */}
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <FiImage /> Favicon
+                    </label>
+                    <div className="flex gap-4 items-center">
+                        <div className="w-16 h-16 bg-surface rounded-xl flex items-center justify-center border border-gray-100 overflow-hidden relative">
+                             {settings.favicon ? (
+                                <img src={settings.favicon} alt="Favicon" className="w-8 h-8 object-contain" />
+                             ) : (
+                                <FiImage className="text-gray-300" size={24} />
+                             )}
+                        </div>
+                        <div className="flex-1">
+                             <input 
+                                type="text"
+                                name="favicon"
+                                value={settings.favicon}
+                                onChange={handleInputChange}
+                                placeholder="Image URL"
+                                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-4 py-3 rounded-xl outline-none transition-all mb-2 text-sm"
+                            />
+                            <label className="inline-block bg-black text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-gray-800 transition-colors">
+                                Upload New Favicon
+                                <input 
+                                    type="file" 
+                                    className="hidden" 
+                                    accept="image/*"
+                                    onChange={(e) => handleFileUpload(e, 'favicon')}
+                                />
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
             </section>

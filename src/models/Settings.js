@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 const settingsSchema = new mongoose.Schema({
   siteName: { type: String, default: "GRABSZY" },
   supportEmail: { type: String, default: "support@grabszy.com" },
+  logo: { type: String, default: "" },
+  favicon: { type: String, default: "" },
   
   // Financial Settings
   currency: { type: String, default: "USD" },

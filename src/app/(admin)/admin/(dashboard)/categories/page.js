@@ -134,14 +134,42 @@ export default function AdminCategories() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Feature Image URL</label>
-                <input 
-                  type="text" 
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
-                  value={newCategory.image}
-                  onChange={(e) => setNewCategory({ ...newCategory, image: e.target.value })}
-                />
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Feature Image</label>
+                <div className="flex gap-4">
+                    <input 
+                    type="text" 
+                    placeholder="Image URL or upload file"
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    value={newCategory.image}
+                    onChange={(e) => setNewCategory({ ...newCategory, image: e.target.value })}
+                    />
+                    <label className="flex-shrink-0 bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 rounded-2xl flex items-center justify-center cursor-pointer transition-colors">
+                        <FiImage size={24} />
+                        <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                
+                                const formData = new FormData();
+                                formData.append("file", file);
+                                
+                                const toastId = toast.loading("Uploading...");
+                                try {
+                                    const { data } = await api.post("/upload", formData, {
+                                        headers: { "Content-Type": "multipart/form-data" },
+                                    });
+                                    setNewCategory(prev => ({ ...prev, image: data.url }));
+                                    toast.success("Image uploaded!", { id: toastId });
+                                } catch (err) {
+                                    toast.error("Upload failed", { id: toastId });
+                                }
+                            }}
+                        />
+                    </label>
+                </div>
               </div>
            </div>
            <button 

@@ -1,121 +1,116 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
-
-const slides = [
-  { 
-    id: 1, 
-    image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070", 
-    title: "Eco-Friendly Threads", 
-    subtitle: "Sustainable fashion for the conscious mind",
-    color: "from-emerald-500/20"
-  },
-  { 
-    id: 2, 
-    image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071", 
-    title: "Summer Collection '26", 
-    subtitle: "Lightweight fabrics for golden hours",
-    color: "from-orange-500/20"
-  },
-  { 
-    id: 3, 
-    image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070", 
-    title: "Street Style Redefined", 
-    subtitle: "Bold patterns and oversized comfort",
-    color: "from-indigo-500/20"
-  },
-];
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiArrowRight } from "react-icons/fi";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 export default function HeroSlider() {
   const [index, setIndex] = useState(0);
 
+  const { data: slides, isLoading } = useQuery({
+    queryKey: ["hero-slides"],
+    queryFn: async () => {
+      const { data } = await api.get("/hero-slides");
+      return data;
+    },
+  });
+
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (!slides || slides.length === 0) return;
+    const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides]);
+
+  const swipeHandlers = {
+    onDragEnd: (e, { offset, velocity }) => {
+      const swipe = Math.abs(offset.x) * velocity.x;
+      if (swipe < -10000) {
+        setIndex((prev) => (prev + 1) % slides.length);
+      } else if (swipe > 10000) {
+        setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+      }
+    },
+  };
+
+  if (isLoading) return <div className="h-[65vh] md:h-[85vh] bg-gray-100 animate-pulse" />;
+  if (!slides || slides.length === 0) return null;
 
   return (
-    <div className="relative w-full h-[85vh] overflow-hidden bg-surface">
+    <div className="relative w-full h-[65vh] md:h-[85vh] overflow-hidden bg-surface">
       <AnimatePresence mode="wait">
         <motion.div
-          key={slides[index].id}
-          className="relative w-full h-full"
-          initial={{ opacity: 0, scale: 1.1 }}
+          key={slides[index]._id}
+          className="relative w-full h-full cursor-grab active:cursor-grabbing"
+          initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          {...swipeHandlers}
         >
-          <Image 
-            src={slides[index].image} 
-            alt={slides[index].title} 
+          <Image
+            src={slides[index].image}
+            alt={slides[index].title}
             fill
             className="object-cover"
             priority
           />
-          <div className={`absolute inset-0 bg-gradient-to-r ${slides[index].color} to-black/60 flex items-center`}>
-            <div className="container mx-auto px-8 md:px-16">
-              <div className="max-w-2xl space-y-6">
-                <motion.span
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium tracking-wider uppercase"
+          <div className="absolute inset-0 bg-black/40 md:bg-black/30 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+          
+          <div className="absolute inset-0 flex items-center justify-center text-center px-6">
+            <div className="max-w-4xl space-y-6 md:space-y-8">
+              <motion.span
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="inline-block px-4 py-1.5 rounded-full border border-white/30 bg-white/10 text-white backdrop-blur-md text-sm font-medium tracking-wider uppercase"
+              >
+                {slides[index].subtitle}
+              </motion.span>
+              
+              <motion.h1
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white leading-[1.1] md:leading-tight drop-shadow-lg"
+              >
+                {slides[index].title}
+              </motion.h1>
+              
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7 }}
+              >
+                <Link
+                  href={slides[index].link}
+                  className="group inline-flex items-center gap-3 bg-white text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-primary hover:text-white transition-all duration-300 shadow-2xl active:scale-95"
                 >
-                  New Arrival
-                </motion.span>
-                
-                <motion.h2 
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-5xl md:text-8xl font-display font-bold text-white leading-tight"
-                >
-                  {slides[index].title}
-                </motion.h2>
-                
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
-                  className="text-xl text-white/80 font-light max-w-lg"
-                >
-                  {slides[index].subtitle}
-                </motion.p>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className="flex gap-4 pt-4"
-                >
-                  <Link 
-                    href="/shop" 
-                    className="bg-white text-black px-8 py-4 rounded-2xl font-bold hover:bg-primary hover:text-white transition-all shadow-xl shadow-black/20 active:scale-95"
-                  >
-                    Shop Now
-                  </Link>
-                  <button className="bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-2xl font-bold hover:bg-white/20 transition-all active:scale-95">
-                    View Lookbook
-                  </button>
-                </motion.div>
-              </div>
+                  Shop Collection
+                  <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </motion.div>
             </div>
           </div>
         </motion.div>
       </AnimatePresence>
 
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+      {/* Pagination Dots */}
+      <div className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 flex gap-2 md:gap-3 z-20">
         {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => setIndex(i)}
             className={`h-1.5 rounded-full transition-all duration-500 ${
-              i === index ? "w-12 bg-white" : "w-3 bg-white/40 hover:bg-white/60"
+              i === index ? "w-8 md:w-12 bg-white" : "w-2 md:w-3 bg-white/40 hover:bg-white/60"
             }`}
           />
         ))}
