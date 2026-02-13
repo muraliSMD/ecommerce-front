@@ -9,6 +9,9 @@ import Link from "next/link";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
+import { useUserStore } from "@/store/userStore";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 
 export default function CheckoutPage() {
   const items = useCartStore((state) => state.items);
@@ -84,43 +87,35 @@ export default function CheckoutPage() {
     });
   };
 
-  const handlePlaceOrder = async () => {
-    if (!name || !address || !phone) {
-      toast.error("Please fill in all details.");
-      return;
-    }
-
-    setIsSubmitting(true);
+  const handleRazorpayPayment = async () => {
     try {
-        let paymentData = {};
+        const res = await loadRazorpay();
+        if (!res) {
+            toast.error("Razorpay SDK failed to load. Are you online?");
+            setIsSubmitting(false);
+            return;
+        }
 
-        if (paymentMethod === "Online") {
-            const res = await loadRazorpay();
-            if (!res) {
-                toast.error("Razorpay SDK failed to load. Are you online?");
-                setIsSubmitting(false);
-                return;
-            }
+        // Create Order on Backend
+        const orderRes = await fetch("/api/payment/razorpay", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: Math.max(0, total - (appliedCoupon?.discountAmount || 0)) }),
+        });
+        const orderData = await orderRes.json();
 
-            // Create Order on Backend
-            const orderRes = await fetch("/api/payment/razorpay", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: Math.max(0, total - (appliedCoupon?.discountAmount || 0)) }),
-            });
-            const orderData = await orderRes.json();
+        if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
 
-            if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
-
-            const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
-                amount: orderData.amount,
-                currency: orderData.currency,
-                name: "GRABSZY",
-                description: "Order Payment",
-                image: "https://your-logo-url.com/logo.png", // Optional
-                order_id: orderData.id,
-                handler: async function (response) {
+        const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+            amount: orderData.amount, // Amount is in paise (e.g. 10000)
+            currency: orderData.currency,
+            name: "GRABSZY",
+            description: "Order Payment",
+            image: "https://your-logo-url.com/logo.png",
+            order_id: orderData.id,
+            handler: async function (response) {
+                try {
                     // Verify Payment
                     const verifyRes = await fetch("/api/payment/verification", {
                         method: "POST",
@@ -135,46 +130,75 @@ export default function CheckoutPage() {
 
                     if (verifyData.success) {
                         toast.success("Payment Successful!");
-                        paymentData = {
+                        const paymentData = {
                             transactionId: response.razorpay_payment_id,
                             status: "Paid",
                             onlineProvider: "Razorpay"
                         };
-                        // Proceed to create order in DB
                         submitOrderToBackend(paymentData);
                     } else {
                         toast.error("Payment verification failed.");
                         setIsSubmitting(false);
                     }
-                },
-                prefill: {
-                    name: name,
-                    email: "customer@example.com", // You should get this from user state/input
-                    contact: phone,
-                },
-                theme: {
-                    color: "#3399cc",
-                },
-                modal: {
-                    ondismiss: function() {
+                } catch (verifyError) {
+                        console.error("Verification Error", verifyError);
+                        toast.error("Payment verification failed");
                         setIsSubmitting(false);
-                    }
                 }
-            };
+            },
+            prefill: {
+                name: name,
+                email: "customer@example.com",
+                contact: phone,
+            },
+            theme: {
+                color: "#3399cc",
+            },
+            modal: {
+                ondismiss: function() {
+                    console.log("Razorpay modal dismissed");
+                    setIsSubmitting(false);
+                    toast("Payment cancelled");
+                }
+            }
+        };
 
-            const paymentObject = new window.Razorpay(options);
-            paymentObject.open();
-
-        } else {
-            // COD Logic
-            submitOrderToBackend({});
-        }
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.on('payment.failed', function (response){
+                console.error("Payment Failed", response.error);
+                toast.error(response.error.description || "Payment Failed");
+                setIsSubmitting(false);
+        });
+        paymentObject.open();
 
     } catch (error) {
-      console.error(error);
-      toast.error("Something went wrong.");
-      setIsSubmitting(false);
-    } 
+        console.error("Payment Flow Error", error);
+        toast.error("Failed to initiate payment");
+        setIsSubmitting(false);
+    }
+  };
+
+  const { userInfo, setAuthModalOpen, token } = useUserStore();
+
+  const handlePlaceOrder = async () => {
+    if (!userInfo) {
+      toast.error("Please login to place an order");
+      setAuthModalOpen(true, "login");
+      return;
+    }
+
+    if (!name || !address || !phone) {
+      toast.error("Please fill in all details.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    if (paymentMethod === "Online") {
+        await handleRazorpayPayment();
+    } else {
+        submitOrderToBackend({});
+    }
   };
 
   const submitOrderToBackend = async (extraPaymentInfo = {}) => {
@@ -215,34 +239,33 @@ export default function CheckoutPage() {
       }
   };
 
+  const { width, height } = useWindowSize();
+
   if (isSuccess) return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6 text-center px-4">
-      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-4">
-        <FiCheckCircle size={40} />
+    <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-6 text-center px-4 relative overflow-hidden">
+      <Confetti width={width} height={height} recycle={false} numberOfPieces={500} />
+      
+      <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-4 animate-bounce">
+        <FiCheckCircle size={48} />
       </div>
-      <h2 className="text-4xl font-display font-bold text-gray-900">Order Placed Successfully!</h2>
-      <p className="text-gray-500 max-w-md">
+      <h2 className="text-5xl font-display font-bold text-gray-900">Order Placed!</h2>
+      <p className="text-gray-500 max-w-lg text-lg">
         Thank you for your purchase. Your order ID is <span className="font-bold text-gray-900">#{orderId?.slice(-6).toUpperCase()}</span>.
         We&apos;ll send you a confirmation email shortly.
       </p>
       
-      <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-md">
-         {/* Placeholder for Track Order if no dedicated page exists yet */}
+      <div className="flex flex-col sm:flex-row gap-4 mt-10 w-full max-w-md z-10">
          <Link 
             href="/shop" 
-            className="flex-1 bg-white border border-gray-200 text-gray-900 py-4 rounded-xl font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-white border border-gray-200 text-gray-900 py-4 rounded-2xl font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 shadow-sm"
           >
             Continue Shopping
          </Link>
          <Link 
-            href={`/orders/${orderId}`} // Assuming a future order details page
-            className="flex-1 bg-primary text-white py-4 rounded-xl font-bold hover:bg-secondary transition-colors flex items-center justify-center gap-2"
-            onClick={() => {
-               // Prevent navigation if page doesn't exist yet, or let it 404/redirect if handled
-               // For now, we'll assume the user wants this link to work eventually.
-            }}
+            href={`/account/orders/${orderId}`} 
+            className="flex-1 bg-primary text-white py-4 rounded-2xl font-bold hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
          >
-            Track Order
+            Manage Order
          </Link>
       </div>
     </div>

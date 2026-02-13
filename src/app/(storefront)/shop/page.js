@@ -20,6 +20,71 @@ import {
 import Link from "next/link";
 import toast from "react-hot-toast";
 
+const FilterContent = ({ 
+    search, 
+    setSearch, 
+    categories, 
+    selectedCategory, 
+    setSelectedCategory, 
+    priceRange, 
+    setPriceRange 
+  }) => (
+    <div className="space-y-8">
+      {/* Search */}
+      <div className="relative">
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+        />
+      </div>
+
+      {/* Categories */}
+      <div>
+        <h3 className="font-bold text-gray-900 mb-4">Categories</h3>
+        <div className="space-y-2">
+          {categories?.map((cat) => (
+            <button
+              key={cat._id}
+              onClick={() => setSelectedCategory(cat.name)}
+              className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
+                selectedCategory === cat.name
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Price Range */}
+      <div>
+        <h3 className="font-bold text-gray-900 mb-4">Price Range</h3>
+        <div className="flex gap-4">
+          <input
+            type="number"
+            placeholder="Min"
+            value={priceRange.min}
+            onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm"
+          />
+          <input
+            type="number"
+            placeholder="Max"
+            value={priceRange.max}
+            onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
 export default function ShopPage() {
   // State
   const [viewMode, setViewMode] = useState("grid"); // grid | list
@@ -87,71 +152,6 @@ export default function ShopPage() {
         },
     });
   };
-
-const FilterContent = ({ 
-    search, 
-    setSearch, 
-    categories, 
-    selectedCategory, 
-    setSelectedCategory, 
-    priceRange, 
-    setPriceRange 
-  }) => (
-    <div className="space-y-8">
-      {/* Search */}
-      <div className="relative">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-        />
-      </div>
-
-      {/* Categories */}
-      <div>
-        <h3 className="font-bold text-gray-900 mb-4">Categories</h3>
-        <div className="space-y-2">
-          {categories?.map((cat) => (
-            <button
-              key={cat._id}
-              onClick={() => setSelectedCategory(cat.name)}
-              className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
-                selectedCategory === cat.name
-                  ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Price Range */}
-      <div>
-        <h3 className="font-bold text-gray-900 mb-4">Price Range</h3>
-        <div className="flex gap-4">
-          <input
-            type="number"
-            placeholder="Min"
-            value={priceRange.min}
-            onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm"
-          />
-          <input
-            type="number"
-            placeholder="Max"
-            value={priceRange.max}
-            onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm"
-          />
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <main className="bg-surface min-h-screen pb-20 pt-32">
@@ -352,12 +352,25 @@ const FilterContent = ({
                                     </div>
                                     <p className="text-gray-500 line-clamp-2 mb-4 text-sm max-w-xl">{product.description}</p>
                                     <div className="flex items-center gap-3">
-                                        <button 
-                                            onClick={() => handleAddToCart(product)}
-                                            className="bg-gray-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-gray-900/10 active:scale-95"
-                                        >
-                                            Add to Cart
-                                        </button>
+                                        {/* Logic similar to ProductCard: View Details if multiple variants, else Quick Add */}
+                                        {product.variants && product.variants.length > 1 ? (
+                                            <Link 
+                                                href={`/product/${product._id}`} 
+                                                className="bg-gray-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-gray-900/10 active:scale-95 flex items-center gap-2"
+                                            >
+                                                Select Options
+                                            </Link>
+                                        ) : (
+                                            <button 
+                                                onClick={() => {
+                                                    const variant = product.variants?.length === 1 ? product.variants[0] : null;
+                                                    handleAddToCart(product, 1, variant);
+                                                }}
+                                                className="bg-gray-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-gray-900/10 active:scale-95"
+                                            >
+                                                Add to Cart
+                                            </button>
+                                        )}
                                         <Link href={`/product/${product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
                                             View Details
                                         </Link>
