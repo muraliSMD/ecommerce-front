@@ -53,9 +53,23 @@ export default function Header() {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
     }
+    
+    // Cleanup on unmount
+    return () => { document.body.style.overflow = ""; };
   }, [isMobileMenuOpen]);
+
+  // Close mobile menu on resize > lg
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) { // lg breakpoint
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -65,12 +79,21 @@ export default function Header() {
     }
   };
 
+  const isHome = pathname === "/";
+  // Force scrolled styles on non-home pages so content is visible against light backgrounds
+  const effectiveScrolled = isScrolled || !isHome;
+
+  const textColor = effectiveScrolled ? "text-gray-600" : "text-white";
+  const hoverColor = effectiveScrolled ? "hover:text-primary" : "hover:text-white/80";
+  const logoColor = effectiveScrolled ? "text-gray-900" : "text-white";
+  const iconColor = effectiveScrolled ? "text-gray-600" : "text-white";
+
   return (
     <>
     <header 
       onMouseLeave={() => setActiveCategory(null)}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/80 backdrop-blur-md shadow-sm py-4" : "bg-transparent py-6"
+        effectiveScrolled ? "bg-white/80 backdrop-blur-md shadow-sm py-4" : "bg-transparent py-6"
       }`}
     >
       <div className="container mx-auto px-4 md:px-8">
@@ -88,9 +111,7 @@ export default function Header() {
                     />
                 </div>
             ) : (
-             <span className={`font-display font-bold text-2xl tracking-tighter ${
-                isScrolled ? "text-gray-900" : "text-gray-900"
-             }`}>
+             <span className={`font-display font-bold text-2xl tracking-tighter ${logoColor}`}>
                 {settings?.siteName || "GRABSZY"}
                 <span className="text-primary">.</span>
              </span>
@@ -101,7 +122,7 @@ export default function Header() {
           <nav className="hidden lg:flex items-center gap-8">
             <Link 
                 href="/" 
-                className="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+                className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}
                 onMouseEnter={() => setActiveCategory(null)}
             >
                 Home
@@ -109,15 +130,15 @@ export default function Header() {
             <div className="relative group">
                 <Link 
                     href="/shop" 
-                    className="text-sm font-medium text-gray-600 hover:text-primary transition-colors flex items-center gap-1"
+                    className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors flex items-center gap-1`}
                     onMouseEnter={() => setActiveCategory('shop')}
                 >
                     Shop <FiChevronDown />
                 </Link>
             </div>
 
-            <Link href="/about" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">About</Link>
-            <Link href="/contact" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">Contact</Link>
+            <Link href="/about" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>About</Link>
+            <Link href="/contact" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Contact</Link>
           </nav>
 
           {/* Actions */}
@@ -139,10 +160,10 @@ export default function Header() {
             {/* User Actions */}
             
              {/* Notification Bell (Only if user is logged in) */}
-             {user && <NotificationBell />}
+             {user && <NotificationBell className={iconColor} />}
 
              <Link href="/wishlist" className="relative group">
-               <FiHeart size={22} className="text-gray-600 group-hover:text-primary transition-colors" />
+               <FiHeart size={22} className={`${iconColor} ${hoverColor} transition-colors`} />
               {wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-sm">
                   {wishlistCount}
@@ -201,7 +222,7 @@ export default function Header() {
           {/* Mobile Actions */}
           <div className="flex lg:hidden items-center gap-5">
             <Link href="/cart" className="relative">
-              <FiShoppingBag size={24} className="text-gray-900" />
+              <FiShoppingBag size={24} className={iconColor} />
               {cartCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold shadow-sm">
                   {cartCount}
@@ -213,7 +234,7 @@ export default function Header() {
                 onClick={() => setIsMobileMenuOpen(true)}
                 className="w-10 h-10 flex items-center justify-center text-gray-900"
             >
-                <FiMenu size={28} />
+                <FiMenu size={28} className={iconColor} />
             </button>
           </div>
         </div>

@@ -49,6 +49,8 @@ export const useUserStore = create(
     }),
     {
       name: "user-storage",
+      version: 1,
+      partialize: (state) => ({ token: state.token, userInfo: state.userInfo }),
       onRehydrateStorage: () => (state) => {
         state.setHydrated();
       },

@@ -74,6 +74,16 @@ export default function CheckoutPage() {
     }
   };
 
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handlePlaceOrder = async () => {
     if (!name || !address || !phone) {
       toast.error("Please fill in all details.");
@@ -82,41 +92,127 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     try {
-      // Logic for placing order via API
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          shippingAddress: { name, address, phone },
-          paymentMethod,
-          items: items.map(i => ({
-            product: i.product._id,
-            quantity: i.quantity,
-            variant: i.variant,
-            price: i.variant?.price ?? i.product.price
-          })),
-          paymentInfo: {
-            couponCode: appliedCoupon?.code,
-            discountAmount: appliedCoupon?.discountAmount
-          }
-        })
-      });
+        let paymentData = {};
 
-      if (response.ok) {
-        const data = await response.json();
-        toast.success("Order placed successfully!");
-        clearCart();
-        setOrderId(data._id);
-        setIsSuccess(true);
-        // window.location.href = "/"; // Removed redirect
-      } else {
-        toast.error("Failed to place order.");
-      }
+        if (paymentMethod === "Online") {
+            const res = await loadRazorpay();
+            if (!res) {
+                toast.error("Razorpay SDK failed to load. Are you online?");
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Create Order on Backend
+            const orderRes = await fetch("/api/payment/razorpay", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: Math.max(0, total - (appliedCoupon?.discountAmount || 0)) }),
+            });
+            const orderData = await orderRes.json();
+
+            if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
+
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: "GRABSZY",
+                description: "Order Payment",
+                image: "https://your-logo-url.com/logo.png", // Optional
+                order_id: orderData.id,
+                handler: async function (response) {
+                    // Verify Payment
+                    const verifyRes = await fetch("/api/payment/verification", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        }),
+                    });
+                    const verifyData = await verifyRes.json();
+
+                    if (verifyData.success) {
+                        toast.success("Payment Successful!");
+                        paymentData = {
+                            transactionId: response.razorpay_payment_id,
+                            status: "Paid",
+                            onlineProvider: "Razorpay"
+                        };
+                        // Proceed to create order in DB
+                        submitOrderToBackend(paymentData);
+                    } else {
+                        toast.error("Payment verification failed.");
+                        setIsSubmitting(false);
+                    }
+                },
+                prefill: {
+                    name: name,
+                    email: "customer@example.com", // You should get this from user state/input
+                    contact: phone,
+                },
+                theme: {
+                    color: "#3399cc",
+                },
+                modal: {
+                    ondismiss: function() {
+                        setIsSubmitting(false);
+                    }
+                }
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+
+        } else {
+            // COD Logic
+            submitOrderToBackend({});
+        }
+
     } catch (error) {
+      console.error(error);
       toast.error("Something went wrong.");
-    } finally {
       setIsSubmitting(false);
-    }
+    } 
+  };
+
+  const submitOrderToBackend = async (extraPaymentInfo = {}) => {
+      try {
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+            shippingAddress: { name, address, phone },
+            paymentMethod,
+            items: items.map(i => ({
+                product: i.product._id,
+                quantity: i.quantity,
+                variant: i.variant,
+                price: i.variant?.price ?? i.product.price
+            })),
+            paymentInfo: {
+                couponCode: appliedCoupon?.code,
+                discountAmount: appliedCoupon?.discountAmount,
+                ...extraPaymentInfo
+            }
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            toast.success("Order placed successfully!");
+            clearCart();
+            setOrderId(data._id);
+            setIsSuccess(true);
+        } else {
+            toast.error("Failed to place order.");
+        }
+      } catch (err) {
+          toast.error("Failed to submit order to backend");
+      } finally {
+          setIsSubmitting(false);
+      }
   };
 
   if (isSuccess) return (
@@ -168,7 +264,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-20">
+    <main className="bg-surface min-h-screen pb-20 pt-32 lg:pt-36">
       <div className="container mx-auto px-4 md:px-8">
         <div className="py-6">
           <Breadcrumbs

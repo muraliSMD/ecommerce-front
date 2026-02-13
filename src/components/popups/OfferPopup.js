@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiGift, FiCopy, FiCheck } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore";
@@ -13,6 +13,15 @@ export default function OfferPopup({ isOpen, onClose }) {
   // Fallback to defaults if settings aren't loaded yet
   const discountText = settings?.marketing?.offerDiscount || "10% OFF";
   const code = settings?.marketing?.offerCode || "WELCOME10";
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -28,7 +37,7 @@ export default function OfferPopup({ isOpen, onClose }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -43,7 +52,7 @@ export default function OfferPopup({ isOpen, onClose }) {
             initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 50 }}
-            className="relative w-full max-w-md bg-white rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/20"
+            className="relative w-full max-w-md bg-white rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/20 max-h-[90vh] overflow-y-auto"
           >
             {/* Close Button */}
             <button 
@@ -56,7 +65,7 @@ export default function OfferPopup({ isOpen, onClose }) {
             {/* Content */}
             <div className="flex flex-col items-center text-center">
               {/* Header Image/Pattern */}
-              <div className="w-full h-32 bg-primary flex items-center justify-center relative overflow-hidden">
+              <div className="w-full h-32 bg-primary flex items-center justify-center relative overflow-hidden flex-shrink-0">
                 <div className="absolute inset-0 opacity-20 bg-[url('/pattern.png')] bg-repeat" />
                 <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md relative z-10 animate-bounce">
                     <FiGift className="text-white text-4xl" />
