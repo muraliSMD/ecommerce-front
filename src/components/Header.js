@@ -19,6 +19,8 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null); // For desktop mega menu
 
   const pathname = usePathname();
@@ -39,6 +41,25 @@ export default function Header() {
       const { data } = await api.get("/categories");
       return data;
     },
+  });
+
+  // Debounce Search Input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+        setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch Search Results
+  const { data: searchResults, isLoading: isLoadingSearch } = useQuery({
+      queryKey: ["search-preview", debouncedSearch],
+      queryFn: async () => {
+          if (debouncedSearch.length < 3) return [];
+          const { data } = await api.get(`/products?search=${debouncedSearch}&limit=5`);
+          return data;
+      },
+      enabled: debouncedSearch.length > 2,
   });
 
   useEffect(() => {
@@ -143,18 +164,74 @@ export default function Header() {
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-6">
-            <form onSubmit={handleSearch} className="relative group">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-4 pr-10 py-2 rounded-full bg-gray-100 border-transparent focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 w-40 focus:w-64 transition-all duration-300 outline-none text-sm"
-              />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary">
-                <FiSearch size={18} />
-              </button>
-            </form>
+            <div className="relative group">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setTimeout(() => setIsInputFocused(false), 200)} // Delay to allow clicking items
+                  className="pl-4 pr-10 py-2 rounded-full bg-gray-100 border-transparent focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 w-40 focus:w-64 transition-all duration-300 outline-none text-sm"
+                />
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary">
+                  <FiSearch size={18} />
+                </button>
+              </form>
+
+              {/* Live Search Dropdown */}
+                <AnimatePresence>
+                    {isInputFocused && searchQuery.length > 2 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute top-full right-0 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 mt-2 overflow-hidden z-[60]"
+                        >
+                            {isLoadingSearch ? (
+                                <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
+                            ) : searchResults?.length > 0 ? (
+                                <ul>
+                                    {searchResults.map((product) => (
+                                        <li key={product._id}>
+                                            <Link 
+                                                href={`/product/${product._id}`}
+                                                className="flex items-center gap-4 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
+                                            >
+                                                <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden relative flex-shrink-0">
+                                                    <Image 
+                                                        src={product.images?.[0] || "/placeholder.jpg"} 
+                                                        alt={product.name} 
+                                                        fill 
+                                                        className="object-cover"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="text-sm font-bold text-gray-900 truncate">{product.name}</h4>
+                                                    <p className="text-xs text-primary font-bold">{settings?.currency} {product.price}</p>
+                                                </div>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                    <li>
+                                        <Link 
+                                            href={`/shop?search=${encodeURIComponent(searchQuery)}`}
+                                            className="block text-center py-3 text-xs font-bold text-primary hover:bg-gray-50 transition-colors uppercase tracking-wider"
+                                        >
+                                            View All Results
+                                        </Link>
+                                    </li>
+                                </ul>
+                            ) : (
+                                <div className="p-4 text-center text-gray-400 text-sm">
+                                    No products found.
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
 
 
             {/* User Actions */}

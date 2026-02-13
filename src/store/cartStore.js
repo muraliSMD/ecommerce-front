@@ -47,18 +47,33 @@ export const useCartStore = create(
         
         set((state) => {
           const items = [...state.items];
+          
+          // Helper to check if variant is "empty" (null, undefined, or empty object)
+          const isEmptyVariant = (v) => !v || Object.keys(v).length === 0;
+          
           const index = items.findIndex(
             (i) =>
               i.product._id === product._id &&
-              ((i.variant && variant && i.variant.color === variant.color && i.variant.size === variant.size) ||
-               (!i.variant && !variant))
+              (
+                // Both have variants and they match
+                (!isEmptyVariant(i.variant) && !isEmptyVariant(variant) && 
+                 i.variant.color === variant.color && i.variant.size === variant.size) ||
+                // Both are empty/null variants
+                (isEmptyVariant(i.variant) && isEmptyVariant(variant))
+              )
           );
 
           if (index > -1) {
             items[index].quantity += qty;
+            // Prevent negative quantity if handled here, though usually handled in update
             if (items[index].quantity <= 0) items.splice(index, 1);
           } else if (qty > 0) {
-            items.push({ product, variant, quantity: qty });
+            // Ensure we store a consistent "null" for empty variants
+            items.push({ 
+                product, 
+                variant: isEmptyVariant(variant) ? null : variant, 
+                quantity: qty 
+            });
           }
 
           return { items };

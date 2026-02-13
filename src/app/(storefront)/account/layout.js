@@ -31,12 +31,12 @@ export default function AccountLayout({ children }) {
   ];
 
   return (
-    <main className="bg-surface min-h-screen pb-20 pt-10">
+    <main className="bg-surface min-h-screen pb-20 pt-32">
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
-             <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-28">
+             <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-32">
                 <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-xl">
                         {userInfo.name.charAt(0)}

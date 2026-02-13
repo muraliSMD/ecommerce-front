@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
     totalAmount: { type: Number, required: true},
     discountAmount: { type: Number, default: 0 },
     couponCode: { type: String },
-    paymentMethod: {type: String, enum:["COD","Stripe", "Razorpay"], default: "COD"},
+    paymentMethod: {type: String, enum:["COD","Stripe", "Razorpay", "Online"], default: "COD"},
     paymentStatus: {type: String, enum:["pending", "Paid", "Failed"], required: true},
     orderStatus:{
         type: String,
