@@ -107,7 +107,7 @@ export default function Home() {
                         >
                             <ProductCard
                                 product={p}
-                                onAddToCart={(prod) => addToCart(prod, 1)}
+                    onAddToCart={(prod, qty = 1, variant) => addToCart(prod, qty, variant)}
                             />
                         </motion.div>
                     ))}

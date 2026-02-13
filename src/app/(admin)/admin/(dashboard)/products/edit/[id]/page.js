@@ -12,7 +12,8 @@ import {
   FiType, 
   FiTag, 
   FiDollarSign, 
-  FiGrid 
+  FiGrid,
+  FiUpload
 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -126,6 +127,36 @@ export default function EditProduct({ params }) {
     updateProductMutation.mutate({ ...product, stock: totalStock });
   };
 
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileUpload = async (e, index) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploading(true);
+    try {
+      const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+          handleImageChange(index, data.url);
+          toast.success("Image uploaded!");
+      } else {
+          toast.error("Failed to upload image");
+      }
+    } catch (error) {
+      toast.error("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   return (
@@ -225,24 +256,40 @@ export default function EditProduct({ params }) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {product.images.map((img, idx) => (
-              <div key={idx} className="relative group">
-                <input 
-                  type="text" 
-                  value={img}
-                  onChange={(e) => handleImageChange(idx, e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
-                />
-                <button 
-                  onClick={() => removeImageField(idx)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
-                >
-                  <FiTrash2 size={18} />
-                </button>
+              <div key={idx} className="space-y-2">
+                <div className="relative group">
+                  <input 
+                    type="text" 
+                    value={img}
+                    onChange={(e) => handleImageChange(idx, e.target.value)}
+                    placeholder="https://..."
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all pr-12"
+                  />
+                  <button 
+                    onClick={() => removeImageField(idx)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <FiTrash2 size={18} />
+                  </button>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                    <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-gray-200">
+                        <FiUpload /> Upload
+                        <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload(e, idx)}
+                            disabled={uploading}
+                        />
+                    </label>
+                    {uploading && <span className="text-xs text-primary animate-pulse">Uploading...</span>}
+                </div>
               </div>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-6">Paste direct links to images stored on Unsplash, Cloudinary, etc.</p>
+          <p className="text-xs text-gray-400 mt-6">Paste direct links or upload images.</p>
         </section>
 
         {/* Variants */}

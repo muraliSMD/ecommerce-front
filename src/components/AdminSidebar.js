@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
   FiHome, 
   FiPackage, 
@@ -15,7 +15,7 @@ import {
   FiMenu,
   FiImage
 } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import NotificationBell from "./NotificationBell";
 
@@ -31,9 +31,25 @@ const navItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { logout, userInfo } = useUserStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
+
+  // Close mobile menu on resize > md
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <>
@@ -48,7 +64,7 @@ export default function AdminSidebar() {
     {/* Backdrop */}
     {isMobileOpen && (
         <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden glass"
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={() => setIsMobileOpen(false)}
         />
     )}
@@ -65,7 +81,7 @@ export default function AdminSidebar() {
           <div className="flex items-center gap-3">
             <div className="bg-primary w-8 h-8 rounded-xl flex items-center justify-center font-bold text-lg">S</div>
             <span className="text-xl font-display font-bold tracking-tight">GRABSZY <span className="text-primary font-normal text-xs uppercase tracking-widest ml-1">Admin</span></span>
-            <NotificationBell className="ml-2" />
+            <NotificationBell className="ml-2 text-white" align="left" />
           </div>
         )}
         <button 
@@ -106,11 +122,14 @@ export default function AdminSidebar() {
           </div>
         )}
         <button
-          onClick={logout}
+          onClick={() => {
+            logout();
+            router.push("/admin/login");
+          }}
           className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-gray-400 hover:bg-red-500/10 hover:text-red-500 transition-all font-bold text-sm tracking-wide"
         >
           <FiLogOut size={22} />
-          {!isCollapsed && <span>Logout Panel</span>}
+          {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
     </aside>

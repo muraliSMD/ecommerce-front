@@ -33,6 +33,7 @@ export async function PUT(request) {
   
       const body = await request.json();
       const updateData = { name: body.name, email: body.email };
+      if (body.image) updateData.image = body.image;
   
       if (body.password) {
         const salt = await bcrypt.genSalt(10);

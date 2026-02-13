@@ -77,8 +77,8 @@ export default function ShopPage() {
     },
   });
 
-  const handleAddToCart = (product) => {
-    addToCart(product, 1);
+  const handleAddToCart = (product, qty = 1, variant) => {
+    addToCart(product, qty, variant);
     toast.success("Added to cart", {
         style: {
             borderRadius: '16px',
