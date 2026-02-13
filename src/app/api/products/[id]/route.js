@@ -7,7 +7,18 @@ export async function GET(request, { params }) {
   try {
     await dbConnect();
     const { id } = await params;
-    const product = await Product.findById(id);
+    
+    let product;
+    
+    // Check if id is a valid ObjectId
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        product = await Product.findById(id);
+    } 
+    
+    // If not found by ID or invalid ID, try slug
+    if (!product) {
+        product = await Product.findOne({ slug: id });
+    }
     
     if (!product) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });

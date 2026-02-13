@@ -1,54 +1,65 @@
+
 "use client";
 
-import { FiStar, FiUser, FiMessageSquare } from "react-icons/fi";
+import { FiStar, FiUser } from "react-icons/fi";
+import { format } from "date-fns";
+import ReviewForm from "./ReviewForm";
 
-export default function ReviewsSection({ productId, reviews }) {
-
+export default function ReviewsSection({ product, refetch }) {
   return (
-    <div className="mt-20">
-      <h2 className="text-3xl font-display font-bold mb-10 flex items-center gap-3">
-        <FiMessageSquare className="text-primary" /> Customer Reviews 
-        <span className="text-lg font-normal text-gray-500">({reviews.length})</span>
-      </h2>
+    <div className="max-w-4xl mx-auto px-4 py-16">
+        <h2 className="font-display font-bold text-3xl text-gray-900 mb-8 text-center">Customer Reviews</h2>
 
-      <div className="grid grid-cols-1 gap-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Rating Summary */}
+            <div className="md:col-span-1 bg-white rounded-3xl p-8 shadow-sm border border-gray-100 text-center h-fit">
+                <div className="text-5xl font-bold text-gray-900 mb-2">{product.averageRating?.toFixed(1) || 0}</div>
+                <div className="flex justify-center gap-1 text-yellow-400 mb-2">
+                     {[...Array(5)].map((_, i) => (
+                        <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-gray-300"} />
+                     ))}
+                </div>
+                <p className="text-gray-500 font-medium">{product.numReviews || 0} Reviews</p>
+            </div>
+            
+            {/* Review Form */}
+            <div className="md:col-span-2">
+                <ReviewForm productId={product._id} onReviewSubmitted={refetch} />
+            </div>
+        </div>
+
         {/* Reviews List */}
         <div className="space-y-6">
-          {reviews.length === 0 ? (
-            <div className="bg-gray-50 rounded-2xl p-10 text-center border border-gray-100">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-gray-300 mx-auto mb-4 shadow-sm">
-                    <FiMessageSquare size={24} />
+            {product.reviews?.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-3xl">
+                    <p className="text-gray-500">No reviews yet. Be the first to review this product!</p>
                 </div>
-                <p className="text-gray-500 font-medium">No reviews yet.</p>
-                <p className="text-sm text-gray-400 mt-1">Verified customers can write reviews from their orders page.</p>
-            </div>
-          ) : (
-            reviews.map((review, index) => (
-              <div key={index} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
-                      <FiUser />
+            ) : (
+                product.reviews?.map((review) => (
+                    <div key={review._id} className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                    <FiUser />
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-gray-900">{review.name}</h4>
+                                    <div className="flex gap-1 text-yellow-400 text-xs">
+                                        {[...Array(5)].map((_, i) => (
+                                            <FiStar key={i} className={i < review.rating ? "fill-current" : "text-gray-300"} />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <span className="text-xs text-gray-400 font-medium">
+                                {review.createdAt ? format(new Date(review.createdAt), 'MMM dd, yyyy') : ''}
+                            </span>
+                        </div>
+                        <p className="text-gray-600 leading-relaxed">{review.comment}</p>
                     </div>
-                    <div>
-                      <p className="font-bold text-gray-900">{review.name}</p>
-                      <div className="flex text-yellow-400 text-sm">
-                        {[...Array(5)].map((_, i) => (
-                          <FiStar key={i} className={i < review.rating ? "fill-current" : "text-gray-200"} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-400">
-                    {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : "Recent"}
-                  </span>
-                </div>
-                <p className="text-gray-600 leading-relaxed">{review.comment}</p>
-              </div>
-            ))
-          )}
+                ))
+            )}
         </div>
-      </div>
     </div>
   );
 }

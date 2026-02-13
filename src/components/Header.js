@@ -92,11 +92,14 @@ export default function Header() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false); // New state for mobile search
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/shop?search=${encodeURIComponent(searchQuery)}`);
       setIsMobileMenuOpen(false);
+      setIsMobileSearchOpen(false); // Close mobile search on submit
     }
   };
 
@@ -298,6 +301,13 @@ export default function Header() {
           {/* Mobile Menu Button */}
           {/* Mobile Actions */}
           <div className="flex lg:hidden items-center gap-5">
+            <button
+                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                className="w-10 h-10 flex items-center justify-center text-gray-900"
+            >
+                <FiSearch size={22} className={iconColor} />
+            </button>
+
             <Link href="/cart" className="relative">
               <FiShoppingBag size={24} className={iconColor} />
               {cartCount > 0 && (
@@ -315,6 +325,84 @@ export default function Header() {
             </button>
           </div>
         </div>
+
+        {/* Mobile Search Bar Overlay */}
+        <AnimatePresence>
+            {isMobileSearchOpen && (
+                <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="lg:hidden absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-md z-40 overflow-hidden"
+                >
+                    <div className="p-4">
+                        <form onSubmit={handleSearch} className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                autoFocus
+                                className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-gray-900"
+                            />
+                            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                            <button 
+                                type="button" 
+                                onClick={() => setIsMobileSearchOpen(false)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1"
+                            >
+                                <FiX size={18} />
+                            </button>
+                        </form>
+
+                        {/* Mobile Live Results */}
+                        {searchQuery.length > 2 && (
+                             <div className="mt-4 max-h-[60vh] overflow-y-auto">
+                                {isLoadingSearch ? (
+                                    <div className="text-center text-gray-500 py-4">Searching...</div>
+                                ) : searchResults?.length > 0 ? (
+                                    <ul className="space-y-2">
+                                        {searchResults.map((product) => (
+                                            <li key={product._id}>
+                                                <Link 
+                                                    href={`/product/${product._id}`}
+                                                    onClick={() => setIsMobileSearchOpen(false)}
+                                                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                                                >
+                                                    <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 relative">
+                                                        <Image 
+                                                            src={product.images?.[0] || "/placeholder.jpg"} 
+                                                            alt={product.name} 
+                                                            fill 
+                                                            className="object-cover"
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
+                                                        <p className="text-xs text-primary font-bold">{settings?.currency} {product.price}</p>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                        ))}
+                                        <li>
+                                            <Link 
+                                                href={`/shop?search=${encodeURIComponent(searchQuery)}`}
+                                                onClick={() => setIsMobileSearchOpen(false)}
+                                                className="block text-center py-3 text-xs font-bold text-primary hover:bg-gray-50 transition-colors uppercase tracking-wider border-t border-gray-100 mt-2"
+                                            >
+                                                View All Results
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                ) : (
+                                    <div className="text-center text-gray-500 py-4">No products found.</div>
+                                )}
+                             </div>
+                        )}
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
 
         {/* Mega Menu Dropdown */}
         <AnimatePresence>
@@ -423,6 +511,11 @@ export default function Header() {
                </div>
 
                <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                  {/* Reuse the mobile search component logic here if desired, but sticking to design, we can keep or remove the drawer search if the header search is the primary one now. 
+                      However, keeping it as fallback or alternative is fine, or removing it to avoid duplication. 
+                      Let's hiding it or keeping it doesn't hurt. But typically if we have header search, drawer search is redundant.
+                      For now I'll leave it as is to avoid confusion, or user can decide to remove.
+                  */}
                   <form onSubmit={handleSearch} className="mb-6">
                      <div className="relative">
                         <input

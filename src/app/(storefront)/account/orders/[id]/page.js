@@ -8,7 +8,8 @@ import { FiArrowLeft, FiMapPin, FiTruck, FiCreditCard } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore";
 import Image from "next/image";
 import ReviewModal from "@/components/ReviewModal";
-import { FiStar } from "react-icons/fi";
+import { FiStar, FiDownload } from "react-icons/fi";
+import { generateInvoice } from "@/lib/invoiceGenerator";
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -78,12 +79,21 @@ export default function OrderDetailsPage() {
         <FiArrowLeft /> Back to Orders
       </Link>
 
+
+// ... inside OrderDetailsPage component
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h1 className="text-3xl font-display font-bold text-gray-900">Order #{order._id.slice(-6).toUpperCase()}</h1>
             <p className="text-gray-500">Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</p>
         </div>
         <div className="flex items-center gap-3">
+            <button
+                onClick={() => generateInvoice(order)}
+                className="px-4 py-2 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-sm transition-colors flex items-center gap-2"
+            >
+                <FiDownload /> Invoice
+            </button>
             {['Pending', 'Processing'].includes(order.orderStatus) && (
                 <button 
                     onClick={() => openModal('cancel')}

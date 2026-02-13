@@ -17,10 +17,22 @@ export default function AuthModal() {
 
   if (!isAuthModalOpen) return null;
 
-  const mode = authMode; // "login" | "signup"
+  const [mode, setMode] = useState(authMode); // Local state to handle "forgot_password"
+
+  // Sync local mode with global store, but allow local override for "forgot_password"
+  // Actually, better to just use local state for the view if we want to keep it simple, 
+  // or update store if we want "forgot_password" to be a global mode. 
+  // Let's use local state override for temporary views like forgot password.
+  
+  const currentMode = mode === "forgot_password" ? "forgot_password" : authMode;
 
   const toggleMode = () => {
-    setAuthModalOpen(true, mode === "login" ? "signup" : "login");
+    if (currentMode === "forgot_password") {
+        setMode("login"); // Back to login
+        setAuthModalOpen(true, "login");
+    } else {
+        setAuthModalOpen(true, authMode === "login" ? "signup" : "login");
+    }
   };
 
   const handleChange = (e) => {
@@ -32,26 +44,42 @@ export default function AuthModal() {
     setLoading(true);
 
     try {
-      const url = mode === "login" ? "/api/users/login" : "/api/users/register";
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        if (mode === "login") {
-          login(data.user, data.token);
-          toast.success("Welcome back to GRABSZY!");
-          setAuthModalOpen(false);
+      if (currentMode === "forgot_password") {
+        const res = await fetch("/api/user/forgot-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: formData.email }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+            toast.success("Check your email for the reset link!");
+            setMode("login");
+            setAuthModalOpen(false);
         } else {
-          toast.success("Account created! Please login.");
-          setAuthModalOpen(true, "login");
+            toast.error(data.message || "Something went wrong");
         }
       } else {
-        toast.error(data.message || "Something went wrong");
+          const url = authMode === "login" ? "/api/users/login" : "/api/users/register";
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          });
+    
+          const data = await res.json();
+    
+          if (res.ok) {
+            if (authMode === "login") {
+              login(data.user, data.token);
+              toast.success("Welcome back to GRABSZY!");
+              setAuthModalOpen(false);
+            } else {
+              toast.success("Account created! Please login.");
+              setAuthModalOpen(true, "login");
+            }
+          } else {
+            toast.error(data.message || "Something went wrong");
+          }
       }
     } catch (error) {
       toast.error("Network error. Please try again.");
@@ -92,17 +120,19 @@ export default function AuthModal() {
               <span className="text-white font-bold text-2xl font-display">S</span>
             </div>
             <h2 className="text-3xl font-display font-bold text-gray-900">
-              {mode === "login" ? "Welcome Back" : "Create Account"}
+              {currentMode === "login" ? "Welcome Back" : currentMode === "signup" ? "Create Account" : "Reset Password"}
             </h2>
             <p className="text-gray-500 mt-2">
-              {mode === "login" 
+              {currentMode === "login" 
                 ? "Sign in to access your GRABSZY account" 
-                : "Join the GRABSZY movement today"}
+                : currentMode === "signup" 
+                ? "Join the GRABSZY movement today"
+                : "Enter your email to receive a reset link"}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "signup" && (
+            {currentMode === "signup" && (
               <div className="relative group">
                 <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
                 <input
@@ -130,36 +160,50 @@ export default function AuthModal() {
               />
             </div>
 
-            <div className="relative group">
-              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-12 py-4 rounded-2xl outline-none transition-all"
-                required
-              />
-            </div>
+            {currentMode !== "forgot_password" && (
+                <div className="relative group">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-12 py-4 rounded-2xl outline-none transition-all"
+                    required
+                />
+                </div>
+            )}
+            
+            {currentMode === "login" && (
+                <div className="flex justify-end">
+                    <button 
+                        type="button"
+                        onClick={() => setMode("forgot_password")}
+                        className="text-sm text-gray-500 hover:text-primary transition-colors"
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
+            )}
 
             <button
               type="submit"
               disabled={loading}
               className="w-full bg-primary hover:bg-secondary text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-[0.98] mt-4"
             >
-              {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Sign Up"}
+              {loading ? "Please wait..." : currentMode === "login" ? "Sign In" : currentMode === "signup" ? "Sign Up" : "Send Reset Link"}
               <FiArrowRight />
             </button>
           </form>
 
           <p className="mt-8 text-center text-sm text-gray-500">
-            {mode === "login" ? "Don't have an account?" : "Already have an account?"}{" "}
+            {currentMode === "login" ? "Don't have an account?" : currentMode === "signup" ? "Already have an account?" : "Remember your password?"}{" "}
             <button
               onClick={toggleMode}
               className="text-primary font-bold hover:underline"
             >
-              {mode === "login" ? "Sign Up Now" : "Sign In"}
+              {currentMode === "login" ? "Sign Up Now" : "Sign In"}
             </button>
           </p>
         </motion.div>

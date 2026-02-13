@@ -80,7 +80,17 @@ export async function POST(request) {
     await dbConnect();
     // TODO: Add auth middleware equivalent for admin protection
     const body = await request.json();
-    const newProduct = new Product(body);
+    
+    // Generate slug from name
+    let slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    
+    // Check if slug exists
+    let existingProduct = await Product.findOne({ slug });
+    if (existingProduct) {
+        slug = `${slug}-${Date.now()}`;
+    }
+    
+    const newProduct = new Product({ ...body, slug });
     const savedProduct = await newProduct.save();
     return NextResponse.json(savedProduct, { status: 201 });
   } catch (error) {

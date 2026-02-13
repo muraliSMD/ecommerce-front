@@ -14,8 +14,10 @@ import {
   FiArrowLeft,
   FiTrash2,
   FiCalendar,
-  FiCreditCard
+  FiCreditCard,
+  FiDownload
 } from "react-icons/fi";
+import { generateInvoice } from "@/lib/invoiceGenerator";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -92,6 +94,13 @@ export default function AdminOrderDetails() {
            <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-display font-bold text-gray-900">Order #{order._id.slice(-6).toUpperCase()}</h1>
+                <button
+                    onClick={() => generateInvoice(order)}
+                    className="p-2 text-gray-400 hover:text-primary transition-colors"
+                    title="Download Invoice"
+                >
+                    <FiDownload size={20} />
+                </button>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                     order.orderStatus === 'Completed' ? 'bg-green-100 text-green-700' :
                     order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-700' :

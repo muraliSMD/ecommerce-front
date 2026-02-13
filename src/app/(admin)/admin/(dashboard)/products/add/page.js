@@ -35,8 +35,8 @@ export default function AddProduct() {
     },
   });
   
-  const [product, setProduct] = useState({
     name: "",
+    slug: "",
     description: "",
     price: "",
     category: "",
@@ -176,6 +176,18 @@ export default function AddProduct() {
                 className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Slug (URL)</label>
+              <input 
+                type="text" 
+                name="slug"
+                value={product.slug}
+                onChange={handleInputChange}
+                placeholder="e.g. essential-oversized-tee"
+                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all font-mono text-sm"
+              />
+              <p className="text-xs text-gray-400">Leave empty to auto-generate from name.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-2">

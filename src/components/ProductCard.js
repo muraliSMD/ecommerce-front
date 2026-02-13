@@ -11,9 +11,9 @@ export default function ProductCard({ product, onAddToCart }) {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
 
   return (
-    <div className="group card-hover p-3 bg-white/40 backdrop-blur-sm rounded-[2rem] border border-white/50 overflow-hidden">
+    <div className="group card-hover p-3 bg-white/40 backdrop-blur-sm rounded-[2rem] border border-white/50 overflow-hidden relative">
       {/* ... keeping existing JSX ... */}
-      <Link href={`/product/${product._id}`} className="block relative aspect-square overflow-hidden rounded-[1.5rem] bg-surface">
+      <Link href={`/product/${product.slug || product._id}`} className="block relative aspect-square overflow-hidden rounded-[1.5rem] bg-surface">
         <Image
           src={product.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"}
           alt={product.name.toString()}
@@ -40,7 +40,7 @@ export default function ProductCard({ product, onAddToCart }) {
         </div>
 
         {hasVariants ? (
-          <Link href={`/product/${product._id}`} className="mt-4 flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-3.5 rounded-2xl font-bold hover:bg-primary transition-all active:scale-95">
+          <Link href={`/product/${product.slug || product._id}`} className="mt-4 flex items-center justify-center gap-2 w-full bg-gray-900 text-white py-3.5 rounded-2xl font-bold hover:bg-primary transition-all active:scale-95">
             View Details
             <FiArrowRight />
           </Link>
