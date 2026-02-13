@@ -45,7 +45,7 @@ export default function ContactPage() {
         <div className="container mx-auto px-4 md:px-8 relative z-10 text-center">
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Contact Us</h1>
             <p className="text-gray-400 text-lg max-w-xl mx-auto">
-                Have questions? We'd love to hear from you. Reach out to our team for any inquiries or support.
+                Have questions? We&apos;d love to hear from you. Reach out to our team for any inquiries or support.
             </p>
         </div>
       </section>
@@ -62,7 +62,7 @@ export default function ContactPage() {
                         <div className="relative z-10">
                             <h2 className="text-3xl font-display font-bold mb-8">Get In Touch</h2>
                             <p className="text-white/80 mb-12 leading-relaxed">
-                                Whether you're interested in our wholesale rates, have a question about an order, or just want to say hello, we're here to help.
+                                Whether you&apos;re interested in our wholesale rates, have a question about an order, or just want to say hello, we&apos;re here to help.
                             </p>
 
                             <div className="space-y-8">
