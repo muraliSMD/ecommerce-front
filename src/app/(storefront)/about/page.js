@@ -49,7 +49,7 @@ export default function AboutPage() {
                         What started as a small wholesale operation two decades ago has grown into a trusted name in the industry. For over 25 years, we have been the silent force behind many successful retailers, providing them with top-tier products at unbeatable wholesale rates.
                     </p>
                     <p className="text-gray-600 leading-relaxed text-lg">
-                        Our journey has always been defined by one core principle: <strong className="text-gray-900">Quality shouldn't come at a premium.</strong> We believe that everyone deserves access to high-standard goods without the exorbitant markups.
+                        Our journey has always been defined by one core principle: <strong className="text-gray-900">Quality shouldn&apos;t come at a premium.</strong> We believe that everyone deserves access to high-standard goods without the exorbitant markups.
                     </p>
                     
                     <div className="grid grid-cols-2 gap-6 pt-6">
@@ -82,7 +82,7 @@ export default function AboutPage() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-3">Premium Quality</h3>
                     <p className="text-gray-500 leading-relaxed">
-                        We don't compromise. Every product is hand-picked and rigorously checked to ensure it meets our 25-year standard of excellence.
+                        We don&apos;t compromise. Every product is hand-picked and rigorously checked to ensure it meets our 25-year standard of excellence.
                     </p>
                 </div>
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all">
@@ -119,7 +119,7 @@ export default function AboutPage() {
                     <span className="inline-block py-1 px-3 rounded-full bg-white/10 text-white border border-white/20 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md">New Chapter</span>
                     <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6">Doing It For You</h2>
                     <p className="text-gray-300 text-lg mb-10 leading-relaxed">
-                        After 25 years of dominating the wholesale market, we realized it was time to evolve. We've launched our online store to bring our extensive catalog and unmatchable prices directly to the end consumer. No more barriers, just great products.
+                        After 25 years of dominating the wholesale market, we realized it was time to evolve. We&apos;ve launched our online store to bring our extensive catalog and unmatchable prices directly to the end consumer. No more barriers, just great products.
                     </p>
                     <Link href="/shop" className="inline-flex items-center gap-2 bg-primary hover:bg-white hover:text-gray-900 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-primary/25">
                         Explore Our Collection <FiCheck />

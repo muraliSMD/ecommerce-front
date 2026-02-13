@@ -3,6 +3,7 @@
 import { useUserStore } from "@/store/userStore";
 import { FiPackage, FiHeart, FiMapPin, FiCamera } from "react-icons/fi";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -65,7 +66,7 @@ export default function AccountOverview() {
         <div className="relative group shrink-0">
             <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white/20 overflow-hidden relative bg-white/10">
                 {userInfo?.image ? (
-                    <img src={userInfo.image} alt={userInfo.name} className="w-full h-full object-cover" />
+                    <Image src={userInfo.image} alt={userInfo.name} fill className="object-cover" />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl font-bold bg-primary text-white">
                         {userInfo?.name?.charAt(0).toUpperCase()}
