@@ -23,9 +23,10 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, unique: true },
+    sku: { type: String, unique: true, sparse: true },
     description: String,
-    category: String,
-    subCategory: String,
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+    // subCategory field is deprecated, using recursive category structure instead
     images: { type: [String], default: [] }, // general product images
     price: { type: Number, required: true }, // fallback price if no variants
     variants: [variantSchema],

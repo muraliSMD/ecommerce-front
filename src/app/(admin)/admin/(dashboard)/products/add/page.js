@@ -20,6 +20,8 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useQuery } from "@tanstack/react-query";
+import CategorySelector from "@/components/admin/CategorySelector";
+
 
 export default function AddProduct() {
   const router = useRouter();
@@ -35,8 +37,10 @@ export default function AddProduct() {
     },
   });
   
+  const [product, setProduct] = useState({
     name: "",
     slug: "",
+    sku: "",
     description: "",
     price: "",
     category: "",
@@ -189,22 +193,30 @@ export default function AddProduct() {
               />
               <p className="text-xs text-gray-400">Leave empty to auto-generate from name.</p>
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">SKU</label>
+              <input 
+                type="text" 
+                name="sku"
+                value={product.sku}
+                onChange={handleInputChange}
+                placeholder="e.g. TEE-BLK-XL"
+                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all font-mono text-sm"
+              />
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-2">
 
                   <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Category</label>
-                  <select 
-                    name="category"
-                    value={product.category}
-                    onChange={handleInputChange}
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all appearance-none"
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {categories?.map((cat) => (
-                      <option key={cat._id} value={cat.name}>{cat.name}</option>
-                    ))}
-                  </select>
+                  {categories ? (
+                    <CategorySelector 
+                        categories={categories}
+                        value={product.category}
+                        onChange={(val) => setProduct({...product, category: val})}
+                    />
+                  ) : (
+                    <p>Loading categories...</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Base Price ({getCurrencySymbol()})</label>

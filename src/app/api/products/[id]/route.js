@@ -17,7 +17,9 @@ export async function GET(request, { params }) {
     
     // If not found by ID or invalid ID, try slug
     if (!product) {
-        product = await Product.findOne({ slug: id });
+        product = await Product.findOne({ slug: id }).populate({ path: 'category', select: 'name slug', strictPopulate: false });
+    } else {
+        await product.populate({ path: 'category', select: 'name slug', strictPopulate: false });
     }
     
     if (!product) {

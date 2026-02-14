@@ -15,9 +15,11 @@ export default function AuthModal() {
     password: "",
   });
 
+  const [mode, setMode] = useState(authMode); // Local state to handle "forgot_password"
+
   if (!isAuthModalOpen) return null;
 
-  const [mode, setMode] = useState(authMode); // Local state to handle "forgot_password"
+  if (!isAuthModalOpen) return null;
 
   // Sync local mode with global store, but allow local override for "forgot_password"
   // Actually, better to just use local state for the view if we want to keep it simple, 

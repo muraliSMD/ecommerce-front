@@ -34,14 +34,37 @@ export default function Header() {
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const wishlistCount = wishlistItems.length;
 
+  // Build Category Tree
+  const buildCategoryTree = (categories) => {
+      if (!categories) return [];
+      const categoryMap = {};
+      const tree = [];
+      categories.forEach(cat => {
+          categoryMap[cat._id] = { ...cat, children: [] };
+      });
+      categories.forEach(cat => {
+          if (cat.parent) {
+              const parentId = typeof cat.parent === 'object' ? cat.parent._id : cat.parent;
+              if (categoryMap[parentId]) {
+                  categoryMap[parentId].children.push(categoryMap[cat._id]);
+              }
+          } else {
+              tree.push(categoryMap[cat._id]);
+          }
+      });
+      return tree;
+  };
+
   // Fetch Categories for Mega Menu
-  const { data: categories } = useQuery({
+  const { data: categoriesRaw } = useQuery({
     queryKey: ["categories-menu"],
     queryFn: async () => {
       const { data } = await api.get("/categories");
       return data;
     },
   });
+
+  const categories = buildCategoryTree(categoriesRaw);
 
   // Debounce Search Input
   useEffect(() => {
@@ -430,10 +453,10 @@ export default function Header() {
                                     <div key={cat._id}>
                                          <h3 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">{cat.name}</h3>
                                          <ul className="space-y-3">
-                                            {cat.subcategories?.length > 0 ? (
-                                                cat.subcategories.map(sub => (
+                                            {cat.children?.length > 0 ? (
+                                                cat.children.map(sub => (
                                                     <li key={sub._id}>
-                                                        <Link href={`/shop?category=${cat.name}&subcategory=${sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
+                                                        <Link href={`/shop?category=${sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
                                                             <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> {sub.name}
                                                         </Link>
                                                     </li>
@@ -459,9 +482,9 @@ export default function Header() {
                                             <div className="col-span-1">
                                                 <h3 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">Subcategories</h3>
                                                 <ul className="space-y-3">
-                                                    {cat.subcategories?.map(sub => (
+                                                    {cat.children?.map(sub => (
                                                         <li key={sub._id}>
-                                                            <Link href={`/shop?category=${cat.name}&subcategory=${sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
+                                                            <Link href={`/shop?category=${sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
                                                                 <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> {sub.name}
                                                             </Link>
                                                         </li>
@@ -536,9 +559,20 @@ export default function Header() {
                         <div className="pl-4 space-y-3 border-l-2 border-gray-100">
                            <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600">All Products</Link>
                            {categories?.map(cat => (
-                               <Link key={cat._id} href={`/shop?category=${cat.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600 flex items-center justify-between">
-                                  {cat.name}
-                               </Link>
+                               <div key={cat._id} className="space-y-1">
+                                   <Link href={`/shop?category=${cat.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-800 font-medium flex items-center justify-between">
+                                      {cat.name}
+                                   </Link>
+                                   {cat.children?.length > 0 && (
+                                       <div className="pl-4 border-l border-gray-100 space-y-1">
+                                           {cat.children.map(sub => (
+                                               <Link key={sub._id} href={`/shop?category=${sub.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-sm text-gray-500 hover:text-primary">
+                                                  {sub.name}
+                                               </Link>
+                                           ))}
+                                       </div>
+                                   )}
+                               </div>
                            ))}
                         </div>
                      </div>

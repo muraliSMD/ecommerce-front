@@ -24,10 +24,10 @@ export default function Home() {
   });
 
   // Fetch Featured Products
-  const { data: featuredProducts, isLoading: isFeaturedLoading } = useProducts({ isFeatured: true, limit: 4 });
+  const { data: featuredProducts, isLoading: isFeaturedLoading } = useProducts({ isFeatured: true, limit: 10 });
 
   // Fetch New Arrivals
-  const { data: newArrivals, isLoading: isNewArrivalsLoading } = useProducts({ sort: 'newest', limit: 8 });
+  const { data: newArrivals, isLoading: isNewArrivalsLoading } = useProducts({ sort: 'newest', limit: 10 });
 
   return (
     <main className="bg-surface min-h-screen">
@@ -46,19 +46,19 @@ export default function Home() {
         </div>
         
         {isCategoriesLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                 {[1,2,3,4].map(i => <div key={i} className="h-64 md:h-80 bg-gray-200 rounded-[2rem] animate-pulse"></div>)}
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
+                 {[...Array(16)].map((_, i) => <div key={i} className="aspect-square bg-gray-200 rounded-2xl animate-pulse"></div>)}
             </div>
         ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {categories?.slice(0, 4).map((cat, i) => (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
+            {categories?.slice(0, 16).map((cat, i) => (
                 <Link href={`/shop?category=${cat.name}`} key={cat._id}>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="group relative h-64 md:h-80 rounded-[2rem] overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-shadow bg-gray-100"
+                    transition={{ delay: i * 0.03 }}
+                    className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all bg-gray-100"
                 >
                     {cat.image ? (
                         <Image 
@@ -68,16 +68,13 @@ export default function Home() {
                         className="object-cover transition-transform duration-700 group-hover:scale-110" 
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-bold text-xl">
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-bold text-lg">
                             {cat.name}
                         </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors" />
-                    <div className="absolute bottom-6 left-6">
-                    <h3 className="text-2xl font-bold text-white mb-1 group-hover:translate-x-2 transition-transform">{cat.name}</h3>
-                    <p className="text-white/80 text-sm flex items-center gap-2 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                        Explore Collection <FiArrowRight />
-                    </p>
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <h3 className="text-xl font-bold text-white text-center px-2 drop-shadow-md transform group-hover:scale-105 transition-transform">{cat.name}</h3>
                     </div>
                 </motion.div>
                 </Link>
@@ -96,7 +93,7 @@ export default function Home() {
                 </div>
                 
                 
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
                     {featuredProducts.map((p, i) => (
                         <motion.div
                             key={p._id}
@@ -125,13 +122,13 @@ export default function Home() {
           </div>
 
           {isNewArrivalsLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="animate-pulse bg-white/50 h-96 rounded-[2rem]" />
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="animate-pulse bg-white/50 h-[260px] rounded-[2rem]" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
               {newArrivals?.map((p, i) => (
                 <motion.div
                   key={p._id}

@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
           <ChatWidget />
           <PushNotificationManager />
           {children}
-          <Toaster position="bottom-center" />     
+          <Toaster position="top-right" />   
         </QueryProvider>
       </body>
     </html>

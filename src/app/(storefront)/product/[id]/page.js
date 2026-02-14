@@ -167,7 +167,9 @@ export default function ProductDetailPage() {
           {/* Product Details */}
           <div className="lg:col-span-5 space-y-6 md:space-y-8">
             <div className="space-y-4">
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">{product.category || "New Arrival"}</span>
+              <span className="text-primary font-bold tracking-widest uppercase text-sm">
+                {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
+              </span>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
