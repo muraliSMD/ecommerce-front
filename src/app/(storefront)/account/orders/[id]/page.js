@@ -88,12 +88,13 @@ export default function OrderDetailsPage() {
             <p className="text-gray-500">Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</p>
         </div>
         <div className="flex items-center gap-3">
-            <button
+             <button 
                 onClick={() => generateInvoice(order)}
-                className="px-4 py-2 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-sm transition-colors flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full font-bold text-sm hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20"
             >
                 <FiDownload /> Invoice
             </button>
+
             {['Pending', 'Processing'].includes(order.orderStatus) && (
                 <button 
                     onClick={() => openModal('cancel')}
