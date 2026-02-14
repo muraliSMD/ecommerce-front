@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/db';
 import Product from '@/models/Product';
+import Category from '@/models/Category';
 import { NextResponse } from 'next/server';
 
 export async function GET(request) {
@@ -21,7 +22,29 @@ export async function GET(request) {
     const minRating = searchParams.get('minRating');
 
     let filter = {};
-    if (category && category !== "All") filter.category = category;
+    if (category && category !== "All") {
+        // If it's a valid ObjectId, use it directly
+        if (category.match(/^[0-9a-fA-F]{24}$/)) {
+            filter.category = category;
+        } else {
+            // Find category by name (case-insensitive for robustness)
+            const catDoc = await Category.findOne({ name: { $regex: new RegExp(`^${category}$`, 'i') } });
+            if (catDoc) {
+                // If it's a parent, we might want to include children? 
+                // For now, strict match or maybe children inclusion logic later.
+                // Simple strict match:
+                filter.category = catDoc._id;
+                
+                // OPTIONAL: Include all subcategories
+                // const descendants = await Category.find({ ancestors: catDoc._id });
+                // filter.category = { $in: [catDoc._id, ...descendants.map(d => d._id)] };
+            } else {
+                 // Category name provided but not found -> return empty or ignore?
+                 // Let's force a no-match filter
+                 filter.category = null; 
+            }
+        }
+    }
     if (search) filter.name = { $regex: search, $options: "i" };
     
     if (minPrice || maxPrice) {
@@ -68,7 +91,13 @@ export async function GET(request) {
     }
     
     // Use .lean() for performance since we don't need mongoose document checks here
-    const products = await query.lean();
+    const products = await query.populate({ path: 'category', select: 'name slug', strictPopulate: false }).lean();
+    
+    // Debugging: Check if population worked for the first few items
+    if (products.length > 0) {
+        console.log("Debug: First product category:", products[0].category);
+    }
+
     return NextResponse.json(products);
   } catch (error) {
     return NextResponse.json({ message: "Server Error", error }, { status: 500 });
@@ -80,7 +109,17 @@ export async function POST(request) {
     await dbConnect();
     // TODO: Add auth middleware equivalent for admin protection
     const body = await request.json();
-    const newProduct = new Product(body);
+    
+    // Generate slug from name
+    let slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    
+    // Check if slug exists
+    let existingProduct = await Product.findOne({ slug });
+    if (existingProduct) {
+        slug = `${slug}-${Date.now()}`;
+    }
+    
+    const newProduct = new Product({ ...body, slug });
     const savedProduct = await newProduct.save();
     return NextResponse.json(savedProduct, { status: 201 });
   } catch (error) {

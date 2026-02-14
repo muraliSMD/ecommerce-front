@@ -2,8 +2,33 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function Breadcrumbs() {
+export default function Breadcrumbs({ items }) {
   const pathname = usePathname();
+
+  if (items) {
+    return (
+      <nav aria-label="Breadcrumb" className="text-sm mb-4">
+        <ol className="flex items-center gap-2 text-gray-600 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
+          {items.map((item, idx) => {
+            const isLast = idx === items.length - 1;
+            return (
+              <li key={idx} className="flex items-center gap-1">
+                {idx > 0 && <span>/</span>}
+                {!isLast ? (
+                  <Link href={item.href} className="hover:underline">
+                    {item.label}
+                  </Link>
+                ) : (
+                  <span className="text-gray-800 font-medium">{item.label}</span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    );
+  }
+
   // split path into parts
   const segments = pathname.split("/").filter(Boolean);
 

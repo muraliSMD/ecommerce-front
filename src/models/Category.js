@@ -2,26 +2,26 @@ import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true, trim: true },
-    image: { type: String }, // optional: category banner
-  },
-  { timestamps: true }
-);
-
-const subcategorySchema = new mongoose.Schema(
-  {
     name: { type: String, required: true, trim: true },
-    categoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
+    slug: { type: String, unique: true, index: true },
+    parent: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Category", 
+      default: null 
     },
+    ancestors: [{ 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Category" 
+    }],
+    image: { type: String },
+    level: { type: Number, default: 0 },
+    description: String,
+    isActive: { type: Boolean, default: true }
   },
   { timestamps: true }
 );
 
-export const Category =
-  mongoose.models.Category || mongoose.model("Category", categorySchema);
+// Ensure slugs are unique (maybe scoped to parent? for now global unique is safer/simpler)
+// categorySchema.index({ slug: 1 }, { unique: true }); // Already defined in field
 
-export const Subcategory =
-  mongoose.models.Subcategory || mongoose.model("Subcategory", subcategorySchema);
+export default mongoose.models.Category || mongoose.model("Category", categorySchema);

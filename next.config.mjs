@@ -1,8 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
      reactStrictMode: false, 
-    images : {
-        domains : ['res.cloudinary.com', 'images.unsplash.com', 'picsum.photos'],
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'picsum.photos',
+            },
+        ],
     },
 };
 

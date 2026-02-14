@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -19,6 +19,33 @@ import {
 } from "react-icons/fi";
 import Link from "next/link";
 import toast from "react-hot-toast";
+
+// Helper to separate render
+const CategoryButton = ({ category, selectedCategory, setSelectedCategory, level = 0 }) => (
+    <>
+        <button
+          onClick={() => setSelectedCategory(category.name)}
+          className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-between ${
+            selectedCategory === category.name
+              ? "bg-primary text-white shadow-lg shadow-primary/20"
+              : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+          }`}
+          style={{ paddingLeft: `${level * 1 + 1}rem` }}
+        >
+          {category.name}
+          {selectedCategory === category.name && <FiX className="ml-2" onClick={(e) => { e.stopPropagation(); setSelectedCategory("All"); }} />}
+        </button>
+        {category.children?.map(child => (
+            <CategoryButton 
+                key={child._id} 
+                category={child} 
+                level={level + 1}
+                selectedCategory={selectedCategory} 
+                setSelectedCategory={setSelectedCategory} 
+            />
+        ))}
+    </>
+);
 
 const FilterContent = ({ 
     search, 
@@ -45,19 +72,24 @@ const FilterContent = ({
       {/* Categories */}
       <div>
         <h3 className="font-bold text-gray-900 mb-4">Categories</h3>
-        <div className="space-y-2">
-          {categories?.map((cat) => (
-            <button
-              key={cat._id}
-              onClick={() => setSelectedCategory(cat.name)}
+        <div className="space-y-1 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+           <button
+              onClick={() => setSelectedCategory("All")}
               className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
-                selectedCategory === cat.name
+                selectedCategory === "All"
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
                   : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
-              {cat.name}
+              All Categories
             </button>
+          {categories?.map((cat) => (
+             <CategoryButton 
+                key={cat._id} 
+                category={cat} 
+                selectedCategory={selectedCategory} 
+                setSelectedCategory={setSelectedCategory} 
+             />
           ))}
         </div>
       </div>
@@ -115,22 +147,52 @@ export default function ShopPage() {
     }
   }, [showMobileFilters]);
 
+  // Build Category Tree Logic
+  const buildCategoryTree = (categories) => {
+      if (!categories) return [];
+      const categoryMap = {};
+      const tree = [];
+      // Deep clone to avoid mutating original if needed, but here simple map is ok
+      categories.forEach(cat => {
+          categoryMap[cat._id] = { ...cat, children: [] };
+      });
+      categories.forEach(cat => {
+          if (cat.parent) {
+             const parentId = typeof cat.parent === 'object' ? cat.parent._id : cat.parent;
+             if (categoryMap[parentId]) {
+                 categoryMap[parentId].children.push(categoryMap[cat._id]);
+             }
+          } else {
+             tree.push(categoryMap[cat._id]);
+          }
+      });
+      return tree;
+  };
+
   // Fetch Categories
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data } = await api.get("/categories");
-      return [{ _id: "all", name: "All" }, ...data];
+      return buildCategoryTree(data);
     },
   });
 
-  // Fetch Products
-  const { data: products, isLoading } = useQuery({
+  // Fetch Products with Infinite Query
+  const { 
+    data, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage, 
+    isLoading 
+  } = useInfiniteQuery({
     queryKey: ["products", selectedCategory, sort, debouncedSearch, priceRange],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         sort,
         search: debouncedSearch,
+        page: pageParam,
+        limit: 20,
       });
       
       if (selectedCategory !== "All") params.append("category", selectedCategory);
@@ -140,7 +202,12 @@ export default function ShopPage() {
       const { data } = await api.get(`/products?${params.toString()}`);
       return data;
     },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage && lastPage.length === 20 ? allPages.length + 1 : undefined;
+    },
   });
+
+  const products = data?.pages.flatMap(page => page) || [];
 
   const handleAddToCart = (product, qty = 1, variant) => {
     addToCart(product, qty, variant);
@@ -303,9 +370,10 @@ export default function ShopPage() {
                  </button>
               </div>
             ) : (
+                <>
                 <div className={
                     viewMode === "grid" 
-                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
+                    ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4"
                     : "space-y-4"
                 }>
                     <AnimatePresence mode="popLayout">
@@ -343,7 +411,9 @@ export default function ShopPage() {
                                  <div className="flex-1 w-full">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">{product.category}</p>
+                                            <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
+                                                {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "Collection")}
+                                            </p>
                                             <Link href={`/product/${product._id}`}>
                                                 <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-primary transition-colors">{product.name}</h3>
                                             </Link>
@@ -381,6 +451,27 @@ export default function ShopPage() {
                         ))}
                     </AnimatePresence>
                 </div>
+                
+                {/* Load More Button */}
+                {hasNextPage && (
+                    <div className="mt-12 text-center">
+                        <button
+                            onClick={() => fetchNextPage()}
+                            disabled={isFetchingNextPage}
+                            className="bg-white border border-gray-200 text-gray-900 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                        >
+                            {isFetchingNextPage ? (
+                                <span className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+                                    Loading...
+                                </span>
+                            ) : (
+                                "Load More Products"
+                            )}
+                        </button>
+                    </div>
+                )}
+                </>
             )}
           </div>
         </div>

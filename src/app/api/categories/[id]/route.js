@@ -1,5 +1,5 @@
 import dbConnect from '@/lib/db';
-import { Category } from '@/models/Category';
+import Category from '@/models/Category';
 import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 

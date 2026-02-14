@@ -1,6 +1,7 @@
 // src/store/cartStore.js
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import toast from "react-hot-toast";
 
 export const useCartStore = create(
   persist(
@@ -45,6 +46,8 @@ export const useCartStore = create(
       addToCart: async (product, qty = 1, variant = null) => {
         const { userId } = get();
         
+        const currentStock = variant ? variant.stock : product.stock;
+
         set((state) => {
           const items = [...state.items];
           
@@ -64,39 +67,49 @@ export const useCartStore = create(
           );
 
           if (index > -1) {
-            items[index].quantity += qty;
-            // Prevent negative quantity if handled here, though usually handled in update
+            const newQuantity = items[index].quantity + qty;
+            if (newQuantity > currentStock) {
+                // Determine how many can be added
+                const remaining = Math.max(0, currentStock - items[index].quantity);
+                if (remaining > 0) {
+                     items[index].quantity += remaining;
+                     toast.error(`Only ${remaining} more available in stock`);
+                } else {
+                     toast.error("Max quantity reached");
+                }
+            } else {
+                items[index].quantity += qty;
+            }
+            
+            // Prevent negative quantity
             if (items[index].quantity <= 0) items.splice(index, 1);
           } else if (qty > 0) {
-            // Ensure we store a consistent "null" for empty variants
-            items.push({ 
-                product, 
-                variant: isEmptyVariant(variant) ? null : variant, 
-                quantity: qty 
-            });
+             // New item
+             if (qty > currentStock) {
+                 items.push({ 
+                    product, 
+                    variant: isEmptyVariant(variant) ? null : variant, 
+                    quantity: currentStock // Clamp to max stock
+                });
+                toast.error(`Only ${currentStock} available in stock`);
+             } else {
+                items.push({ 
+                    product, 
+                    variant: isEmptyVariant(variant) ? null : variant, 
+                    quantity: qty 
+                });
+             }
           }
 
           return { items };
         });
 
         if (userId) {
-             const { items } = get();
              await fetch('/api/user/cart', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ cartItems: [{ product, quantity: qty, variant }] }), 
-                // Note: The API handles specific item merge or full sync. 
-                // For efficiency, ideally we send just the update or use PUT.
-                // Re-using POST as "merge" is safe but maybe heavy. 
-                // Let's stick to efficient sync call or just fire-and-forget the merge?
-                // The syncWithBackend does a full fetch. 
-                // Let's call syncWithBackend to ensure consistency or just manual fetch?
-                // To keep it responsive, we updated local state first.
-                // Let's trigger a background sync.
             });
-            // Optimization: We could just send the delta, but ensuring consistency is key.
-            // Let's trigger a fetch to be sure.
-            // get().syncWithBackend(); 
         }
       },
 

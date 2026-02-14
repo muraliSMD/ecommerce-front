@@ -21,7 +21,7 @@ export default function ProductDetailPage() {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const { addItem, removeItem, isInWishlist } = useWishlistStore();
 
-  const { data: product, isLoading } = useQuery({
+  const { data: product, isLoading, refetch } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       const { data } = await api.get(`/products/${id}`);
@@ -140,7 +140,7 @@ export default function ProductDetailPage() {
               animate={{ opacity: 1, scale: 1 }}
               className="aspect-square md:aspect-auto md:h-[600px] rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-2xl shadow-black/5 relative"
             >
-              <ZoomImage src={selectedImage} zoomAmount={2.5} height={600} />
+              <ZoomImage src={selectedImage} zoomAmount={250} height={600} />
             </motion.div>
             
             {/* Mobile Thumbnails */}
@@ -167,7 +167,9 @@ export default function ProductDetailPage() {
           {/* Product Details */}
           <div className="lg:col-span-5 space-y-6 md:space-y-8">
             <div className="space-y-4">
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">{product.category || "New Arrival"}</span>
+              <span className="text-primary font-bold tracking-widest uppercase text-sm">
+                {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
+              </span>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
@@ -307,7 +309,9 @@ export default function ProductDetailPage() {
           </div>
         </div>
         <div className="mt-16 md:mt-24">
-          <ReviewsSection productId={product._id} reviews={product.reviews || []} />
+        <div className="mt-16 md:mt-24">
+          <ReviewsSection product={product} refetch={refetch} />
+        </div>
         </div>
       </div>
     </main>

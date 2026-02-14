@@ -48,13 +48,16 @@ export default function AdminProducts() {
     }
   });
 
+  const getCategoryName = (product) => product.category?.name || product.category || "Uncategorized";
+
   const filteredProducts = products?.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === "All" || p.category === filterCategory;
+    const categoryName = getCategoryName(p);
+    const matchesCategory = filterCategory === "All" || categoryName === filterCategory;
     return matchesSearch && matchesCategory;
   }) || [];
 
-  const categories = ["All", ...new Set(products?.map(p => p.category) || [])];
+  const categories = ["All", ...new Set(products?.map(p => getCategoryName(p)).filter(c => c !== "Uncategorized") || [])];
 
   if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
@@ -135,7 +138,7 @@ export default function AdminProducts() {
                   </td>
                   <td className="px-8 py-6">
                     <span className="px-3 py-1 bg-surface border border-gray-100 rounded-full text-xs font-bold text-gray-600">
-                      {product.category}
+                      {getCategoryName(product)}
                     </span>
                   </td>
                   <td className="px-8 py-6">
