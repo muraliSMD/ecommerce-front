@@ -32,7 +32,7 @@ export async function generateMetadata() {
 export default function RootLayout({ children }) {  
     return (
     <html lang="en">
-      <body className={`${outfit.variable} font-sans bg-surface min-h-screen antialiased`}>
+      <body className={`${outfit.variable} font-sans bg-surface min-h-screen antialiased`} suppressHydrationWarning={true}>
         <QueryProvider>
           <SettingsInitializer />
           <AuthModal />
