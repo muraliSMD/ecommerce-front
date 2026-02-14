@@ -23,7 +23,7 @@ export async function POST(request) {
         return NextResponse.json({ message: "Your account has been suspended." }, { status: 403 });
     }
 
-    if (!user.isVerified) {
+    if (!user.isVerified && user.role !== 'admin') {
         return NextResponse.json({ message: "Please verify your email to login." }, { status: 403 });
     }
 
