@@ -123,6 +123,15 @@ export default function EditProduct({ params }) {
     setProduct({ ...product, variants: newVariants });
   };
 
+  const handleVariantChange = (index, field, value) => {
+    const newVariants = [...product.variants];
+    newVariants[index] = {
+      ...newVariants[index],
+      [field]: field === 'stock' || field === 'price' ? Number(value) : value
+    };
+    setProduct({ ...product, variants: newVariants });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (product.variants.length === 0) {
@@ -380,18 +389,39 @@ export default function EditProduct({ params }) {
           <div className="space-y-3">
             {product.variants.map((v, i) => (
               <div key={i} className="flex items-center justify-between p-4 bg-surface rounded-2xl border border-gray-50 group">
-                <div className="flex gap-8">
-                  <div className="flex items-center gap-2">
+                <div className="flex gap-4 flex-1 items-center">
+                  <div className="flex items-center gap-2 min-w-[100px]">
                     <div className="w-3 h-3 rounded-full bg-gray-900" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
                     <span className="font-bold text-gray-900">{v.color}</span>
                   </div>
-                  <span className="font-bold text-gray-500">Size: {v.size}</span>
-                  <span className="font-bold text-gray-900">{getCurrencySymbol()}{v.price}</span>
-                  <span className="text-gray-400">{v.stock} in stock</span>
+                  <span className="font-bold text-gray-500 min-w-[60px]">Size: {v.size}</span>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase">Price</span>
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{getCurrencySymbol()}</span>
+                        <input 
+                            type="number" 
+                            value={v.price} 
+                            onChange={(e) => handleVariantChange(i, 'price', e.target.value)}
+                            className="w-24 bg-white border border-gray-100 pl-6 pr-2 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                        />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase">Stock</span>
+                    <input 
+                        type="number" 
+                        value={v.stock} 
+                        onChange={(e) => handleVariantChange(i, 'stock', e.target.value)}
+                        className="w-24 bg-white border border-gray-100 px-3 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                    />
+                  </div>
                 </div>
                 <button 
                   onClick={() => removeVariant(i)}
-                  className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                  className="p-2 text-gray-300 hover:text-red-500 transition-colors ml-4"
                 >
                   <FiTrash2 />
                 </button>
