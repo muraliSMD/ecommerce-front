@@ -1,6 +1,8 @@
 // store/userStore.js
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useCartStore } from "./cartStore";
+import { useWishlistStore } from "./wishlistStore";
 
 export const useUserStore = create(
   persist(
@@ -22,14 +24,11 @@ export const useUserStore = create(
         set({ token, userInfo, isAuthModalOpen: false });
         
         // Sync Cart & Wishlist
-        import("./cartStore").then(({ useCartStore }) => {
-            useCartStore.getState().setUserId(userInfo._id);
-            useCartStore.getState().syncWithBackend();
-        });
-        import("./wishlistStore").then(({ useWishlistStore }) => {
-            useWishlistStore.getState().setUserId(userInfo._id);
-            useWishlistStore.getState().syncWithBackend();
-        });
+        useCartStore.getState().setUserId(userInfo._id);
+        useCartStore.getState().syncWithBackend();
+        
+        useWishlistStore.getState().setUserId(userInfo._id);
+        useWishlistStore.getState().syncWithBackend();
       },
       logout: () => {
         // Clear cookie
@@ -37,14 +36,11 @@ export const useUserStore = create(
         set({ token: null, userInfo: null });
 
         // Clear/Reset Cart & Wishlist User State
-        import("./cartStore").then(({ useCartStore }) => {
-            useCartStore.getState().setUserId(null);
-            useCartStore.getState().clearCart(); // Optional: clear or keep local? Typically clear on logout for security/privacy.
-        });
-        import("./wishlistStore").then(({ useWishlistStore }) => {
-            useWishlistStore.getState().setUserId(null);
-            useWishlistStore.getState().clearWishlist();
-        });
+        useCartStore.getState().setUserId(null);
+        useCartStore.getState().clearCart(); 
+        
+        useWishlistStore.getState().setUserId(null);
+        useWishlistStore.getState().clearWishlist();
       },
     }),
     {
