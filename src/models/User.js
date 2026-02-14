@@ -24,6 +24,9 @@ const userSchema = new mongoose.Schema({
     ],
     createdAt: {type: Date, default: Date.now},
     isBanned: {type: Boolean, default: false},
+    isVerified: { type: Boolean, default: false },
+    verificationToken: String,
+    verificationTokenExpire: Date,
     pushSubscriptions: [
         {
             endpoint: { type: String, required: true },

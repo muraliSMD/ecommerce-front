@@ -23,6 +23,10 @@ export async function POST(request) {
         return NextResponse.json({ message: "Your account has been suspended." }, { status: 403 });
     }
 
+    if (!user.isVerified) {
+        return NextResponse.json({ message: "Please verify your email to login." }, { status: 403 });
+    }
+
     const token = signToken({ userId: user._id });
 
     // Return user without password
