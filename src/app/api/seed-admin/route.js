@@ -18,7 +18,8 @@ export async function GET() {
       name: 'Global Admin',
       email: 'admin@grabszy.com',
       password: hashedPassword,
-      role: 'admin'
+      role: 'admin',
+      isVerified: true
     });
 
     await adminUser.save();

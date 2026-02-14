@@ -242,7 +242,7 @@ export default function CheckoutPage() {
   const { width, height } = useWindowSize();
 
   if (isSuccess) return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center space-y-6 text-center px-4 relative overflow-hidden">
+    <div className="min-h-[70vh] pt-32 lg:pt-36 flex flex-col items-center justify-center space-y-6 text-center px-4 relative overflow-hidden">
       <Confetti width={width} height={height} recycle={false} numberOfPieces={500} />
       
       <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-4 animate-bounce">
