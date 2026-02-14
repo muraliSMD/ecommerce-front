@@ -3,9 +3,19 @@ import Razorpay from "razorpay";
 
 export async function POST(req) {
   try {
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      console.error("Razorpay keys are missing in environment variables.");
-      return NextResponse.json({ error: "Server configuration error: Razorpay keys missing" }, { status: 500 });
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret) {
+      console.error(`Razorpay keys missing. KeyID: ${keyId ? 'Set' : 'Missing'}, Secret: ${keySecret ? 'Set' : 'Missing'}`);
+      return NextResponse.json({ 
+        error: "Server configuration error: Razorpay keys missing", 
+        debug: { 
+            keyIdStatus: keyId ? 'Set' : 'Missing', 
+            keySecretStatus: keySecret ? 'Set' : 'Missing',
+            envExists: !!process.env
+        } 
+      }, { status: 500 });
     }
 
     const razorpay = new Razorpay({
