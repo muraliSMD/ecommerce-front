@@ -2,6 +2,7 @@ import dbConnect from '@/lib/db';
 import Product from '@/models/Product';
 import Category from '@/models/Category';
 import { NextResponse } from 'next/server';
+import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
 
 export async function GET(request) {
   try {
@@ -107,7 +108,13 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     await dbConnect();
-    // TODO: Add auth middleware equivalent for admin protection
+    
+    // Auth check
+    const user = await getFullUserFromRequest(request);
+    if (!isAdmin(user)) {
+      return NextResponse.json({ message: "Access denied" }, { status: 403 });
+    }
+
     const body = await request.json();
     
     // Generate slug from name
