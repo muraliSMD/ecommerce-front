@@ -8,5 +8,6 @@ export const useProducts = (filters = {}) => {
             const {data} = await api.get('/products', { params: filters });
             return data;
         },
+        staleTime: 5 * 60 * 1000, // 5 minutes
     });
 }

@@ -8,5 +8,6 @@ export const useCategories = () => {
       const res = await axios.get("http://localhost:5000/api/categories");
       return res.data;
     },
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

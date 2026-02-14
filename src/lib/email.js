@@ -60,3 +60,17 @@ export const sendOrderConfirmationEmail = async (order, user) => {
     `;
     await sendEmail({ to: user.email, subject: `Order Confirmation #${order._id}`, html });
 };
+
+export const sendVerificationEmail = async (user, token) => {
+    const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
+    const html = `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+            <h1>Verify Your Email 📧</h1>
+            <p>Hi ${user.name}, please verify your email address to complete your registration.</p>
+            <a href="${verifyUrl}" style="display: inline-block; padding: 10px 20px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px;">Verify Email</a>
+            <p>This link will expire in 24 hours.</p>
+        </div>
+    `;
+    await sendEmail({ to: user.email, subject: "Verify Your Email 📧", html });
+};
+

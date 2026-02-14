@@ -13,8 +13,8 @@ export default function PopupManager() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Don't show on admin pages or if settings loading
-    if (isLoading || pathname.startsWith("/admin") || pathname.startsWith("/account")) return;
+    // Don't show on admin pages, auth pages, or if settings loading
+    if (isLoading || pathname.startsWith("/admin") || pathname.startsWith("/account") || pathname.startsWith("/reset-password") || pathname.startsWith("/verify-email")) return;
 
     const checkPopups = () => {
         const hasSeenOffer = localStorage.getItem("grabszy_offer_seen");
