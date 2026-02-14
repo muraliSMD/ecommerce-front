@@ -107,7 +107,7 @@ export default function CheckoutPage() {
         if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
 
         const options = {
-            key: process.env.RAZORPAY_KEY_ID, 
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
             amount: orderData.amount, // Amount is in paise (e.g. 10000)
             currency: orderData.currency,
             name: "GRABSZY",
