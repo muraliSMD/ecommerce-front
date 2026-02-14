@@ -57,3 +57,7 @@ export const getFullUserFromRequest = async (req) => {
 export const isAdmin = (user) => {
   return user && user.role === 'admin';
 };
+
+export const isAuth = (user) => {
+  return !!user;
+};
