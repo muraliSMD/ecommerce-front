@@ -6,7 +6,7 @@ export async function GET(request) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
-    consttoken = searchParams.get('token');
+    const token = searchParams.get('token');
 
     if (!token) {
       return NextResponse.json({ message: "Invalid token" }, { status: 400 });

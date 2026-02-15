@@ -18,6 +18,7 @@ import { toast } from "react-hot-toast";
 export default function OrderDetailsPage() {
   const { id } = useParams();
   const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const { settings } = useSettingsStore();
   const queryClient = useQueryClient();
   
   const [modalOpen, setModalOpen] = useState(false);
@@ -73,14 +74,17 @@ export default function OrderDetailsPage() {
   if (isLoading) return <div className="h-96 bg-white rounded-3xl animate-pulse" />;
   if (!order) return <div>Order not found</div>;
 
+
+
+  const handleInvoiceDownload = () => {
+      generateInvoice(order, settings);
+  };
+    
   return (
     <div className="space-y-8 relative">
       <Link href="/account/orders" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-4 transition-colors">
         <FiArrowLeft /> Back to Orders
       </Link>
-
-
-
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -89,8 +93,10 @@ export default function OrderDetailsPage() {
         </div>
         <div className="flex items-center gap-3">
              <button 
-                onClick={() => generateInvoice(order)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full font-bold text-sm hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20"
+                onClick={handleInvoiceDownload}
+                disabled={order.orderStatus !== 'Delivered'}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full font-bold text-sm hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+                title={order.orderStatus !== 'Delivered' ? "Invoice available after delivery" : "Download Invoice"}
             >
                 <FiDownload /> Invoice
             </button>
@@ -115,6 +121,7 @@ export default function OrderDetailsPage() {
                 order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-600' :
                 order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-600' :
                 order.orderStatus === 'Return Requested' ? 'bg-orange-100 text-orange-600' :
+                order.orderStatus === 'Cancellation Requested' ? 'bg-red-50 text-red-600 border border-red-100' :
                 order.orderStatus === 'Returned' ? 'bg-gray-200 text-gray-600' :
                 'bg-yellow-100 text-yellow-600'
             }`}>

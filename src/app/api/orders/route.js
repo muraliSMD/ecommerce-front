@@ -4,6 +4,8 @@ import Cart from '@/models/Cart';
 import Product from '@/models/Product';
 import Notification from '@/models/Notification';
 import User from '@/models/User';
+import Coupon from '@/models/Coupon';
+import CouponUsage from '@/models/CouponUsage';
 import { NextResponse } from 'next/server';
 import { getFullUserFromRequest, isAdmin, getUserFromRequest } from '@/lib/auth';
 import webpush from 'web-push';
@@ -82,23 +84,87 @@ export async function POST(request) {
     }
 
     let totalAmount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    
+    // --- Server-Side Coupon Validation & Discount Calculation ---
+    let discountAmount = 0;
+    let usedCoupon = null;
+    const couponCode = body.paymentInfo?.couponCode;
 
-    // Apply Discount if any
-    const discountAmount = body.paymentInfo?.discountAmount ? Number(body.paymentInfo.discountAmount) : 0;
+    if (couponCode) {
+        const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
+        
+        if (coupon) {
+            // 1. Check Expiry
+            if (coupon.expiryDate && new Date() > new Date(coupon.expiryDate)) {
+                 return NextResponse.json({ message: "Coupon has expired" }, { status: 400 });
+            }
+
+            // 2. Check Global Usage Limit
+            if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
+                 return NextResponse.json({ message: "Coupon global usage limit reached" }, { status: 400 });
+            }
+
+            // 3. Check User Usage (One-time use)
+            if (userId) {
+                const usage = await CouponUsage.findOne({ userId, couponCode: coupon.code });
+                if (usage) {
+                    return NextResponse.json({ message: "You have already used this coupon" }, { status: 400 });
+                }
+            }
+
+            // 4. Check Min Order Amount
+            if (totalAmount < coupon.minOrderAmount) {
+                 return NextResponse.json({ message: `Minimum order of $${coupon.minOrderAmount} required for this coupon` }, { status: 400 });
+            }
+
+            // 5. Calculate Discount
+            if (coupon.discountType === 'percentage') {
+                discountAmount = (totalAmount * coupon.value) / 100;
+                if (coupon.maxDiscountAmount) {
+                    discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount);
+                }
+            } else {
+                discountAmount = coupon.value;
+            }
+
+            // Cap discount at total amount
+            discountAmount = Math.min(discountAmount, totalAmount);
+            usedCoupon = coupon;
+        } else {
+            // Coupon provided but invalid/not found
+            return NextResponse.json({ message: "Invalid coupon code" }, { status: 400 });
+        }
+    }
+    
+    // Calculate Final Amount
     const finalAmount = Math.max(0, totalAmount + (body.shippingCharge || 0) + (body.taxAmount || 0) - discountAmount);
     
     const order = await new Order({
       user: userId,
       items,
-      totalAmount: finalAmount, // Saved as the discounted final total
+      totalAmount: finalAmount, 
       discountAmount: discountAmount,
-      couponCode: body.paymentInfo?.couponCode,
+      couponCode: usedCoupon ? usedCoupon.code : null,
       paymentMethod: body.paymentMethod || "COD",
       shippingAddress: body.shippingAddress,
       paymentStatus: body.paymentMethod === 'COD' ? 'pending' : 'Paid'
     }).save();
 
-    // Reduce stock
+    // --- Post-Order Extensions ---
+    
+    // 1. Record Coupon Usage & Increment Count
+    if (usedCoupon) {
+        await Coupon.findByIdAndUpdate(usedCoupon._id, { $inc: { usedCount: 1 } });
+        if (userId) {
+            await CouponUsage.create({
+                userId,
+                couponCode: usedCoupon.code,
+                orderId: order._id
+            });
+        }
+    }
+
+    // 2. Reduce stock
     for (const i of items) {
       if (i.variant && i.variant.color && i.variant.size) {
         // Reduce stock from specific variant
@@ -112,7 +178,7 @@ export async function POST(request) {
       }
     }
 
-    // Trigger Admin Notification
+    // 3. Trigger Admin Notification
     try {
         await Notification.create({
             recipient: "admin",

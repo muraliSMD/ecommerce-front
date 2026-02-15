@@ -24,9 +24,12 @@ export async function PUT(request, { params }) {
     }
 
     const { id } = await params;
-    const { reason } = await request.json();
+    const json = await request.json();
+    const reason = json.reason;
+    console.log("Processing cancellation for Order ID:", id, "Reason:", reason);
 
     const order = await Order.findById(id).populate("items.product");
+    console.log("Order found:", order ? order._id : "null");
 
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
@@ -41,24 +44,17 @@ export async function PUT(request, { params }) {
     }
 
     // Update Order
-    order.orderStatus = 'Cancelled';
+    order.orderStatus = 'Cancellation Requested';
     order.cancellationReason = reason;
+    console.log("Saving order with status 'Cancellation Requested'");
     await order.save();
+    console.log("Order saved.");
 
-    // Restore Stock
-    for (const item of order.items) {
-        if (item.variant && item.variant.color && item.variant.size) {
-            await Product.findOneAndUpdate(
-                { _id: item.product._id, "variants.color": item.variant.color, "variants.size": item.variant.size },
-                { $inc: { "variants.$.stock": item.quantity } }
-            );
-        } else {
-            await Product.findByIdAndUpdate(item.product._id, { $inc: { stock: item.quantity } });
-        }
-    }
+
 
     // Notify Admin
     try {
+        console.log("Creating notification for admin...");
         await Notification.create({
             recipient: "admin",
             type: "order_status",
@@ -67,6 +63,7 @@ export async function PUT(request, { params }) {
             link: `/admin/orders/${order._id}`,
             isRead: false
         });
+        console.log("Notification created.");
 
         // Push to Admin
         if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
@@ -92,6 +89,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ message: "Order cancelled successfully", order });
 
   } catch (error) {
+    console.error("CANCELLATION ERROR:", error);
     return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
   }
 }

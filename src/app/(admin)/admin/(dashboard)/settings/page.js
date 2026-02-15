@@ -36,6 +36,7 @@ export default function AdminSettings() {
     currency: "USD",
     taxRate: 0,
     shippingCharge: 0,
+    signature: "",
     maintenanceMode: false,
     seo: {
       metaTitle: "",
@@ -60,6 +61,17 @@ export default function AdminSettings() {
     },
   });
 
+  const { data: activeCoupons } = useQuery({
+    queryKey: ["active-coupons"],
+    queryFn: async () => {
+      // Fetch all coupons (admin endpoint returns all, but we can filter or use a specific param if needed)
+      // Ideally we want only active ones for the dropdown, but admins might want to select any.
+      // For now, let's fetch all and filter client-side or assume admin wants to select from all.
+      const { data } = await api.get("/coupons");
+      return data.filter(c => c.isActive);
+    },
+  });
+
   useEffect(() => {
     if (fetchedSettings) {
       setSettings({
@@ -70,6 +82,7 @@ export default function AdminSettings() {
         currency: fetchedSettings.currency || "USD",
         taxRate: fetchedSettings.taxRate || 0,
         shippingCharge: fetchedSettings.shippingCharge || 0,
+        signature: fetchedSettings.signature || "",
         maintenanceMode: fetchedSettings.maintenanceMode || false,
         seo: {
             metaTitle: fetchedSettings.seo?.metaTitle || "",
@@ -370,6 +383,47 @@ export default function AdminSettings() {
                 />
                 </div>
 
+                <div className="col-span-1 md:col-span-3 space-y-2 border-t border-gray-100 pt-6 mt-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <FiImage /> Brand Owner Signature
+                    </label>
+                    <div className="flex gap-4 items-center">
+                        <div className="w-32 h-16 bg-surface rounded-xl flex items-center justify-center border border-gray-100 overflow-hidden relative">
+                                {settings.signature ? (
+                                <Image 
+                                    src={settings.signature} 
+                                    alt="Signature" 
+                                    fill
+                                    className="object-contain p-2"
+                                    unoptimized
+                                />
+                                ) : (
+                                <span className="text-xs text-gray-400">No Signature</span>
+                                )}
+                        </div>
+                        <div className="flex-1">
+                                <input 
+                                type="text"
+                                name="signature"
+                                value={settings.signature}
+                                onChange={handleInputChange}
+                                placeholder="Image URL"
+                                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-4 py-3 rounded-xl outline-none transition-all mb-2 text-sm"
+                            />
+                            <label className="inline-block bg-black text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer hover:bg-gray-800 transition-colors">
+                                Upload Signature
+                                <input 
+                                    type="file" 
+                                    className="hidden" 
+                                    accept="image/*"
+                                    onChange={(e) => handleFileUpload(e, 'signature')}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                    <p className="text-xs text-gray-400">This signature will appear at the bottom of customer invoices.</p>
+                </div>
+
             </div>
             </section>
         )}
@@ -476,15 +530,37 @@ export default function AdminSettings() {
                         <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                             <FiGift /> Offer Code
                         </label>
-                        <input 
-                            type="text" 
+                        <select
                             name="marketing.offerCode"
                             value={settings.marketing.offerCode}
-                            onChange={handleInputChange}
-                            placeholder="WELCOME10"
+                            onChange={(e) => {
+                                handleInputChange(e);
+                                const selectedCoupon = activeCoupons?.find(c => c.code === e.target.value);
+                                if (selectedCoupon) {
+                                    const discountText = selectedCoupon.discountType === 'percentage' 
+                                        ? `${selectedCoupon.value}% OFF` 
+                                        : `$${selectedCoupon.value} OFF`;
+                                    
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        marketing: {
+                                            ...prev.marketing,
+                                            offerCode: selectedCoupon.code,
+                                            offerDiscount: discountText
+                                        }
+                                    }));
+                                }
+                            }}
                             disabled={!settings.marketing.showOfferPopup}
-                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all disabled:opacity-50"
-                        />
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all disabled:opacity-50 appearance-none"
+                        >
+                            <option value="">Select a Coupon</option>
+                            {activeCoupons?.map(coupon => (
+                                <option key={coupon._id} value={coupon.code}>
+                                    {coupon.code} ({coupon.discountType === 'percentage' ? `${coupon.value}%` : `$${coupon.value}`})
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                      <div className="space-y-2">

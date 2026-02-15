@@ -15,7 +15,8 @@ import {
   FiTrash2,
   FiCalendar,
   FiCreditCard,
-  FiDownload
+  FiDownload,
+  FiX
 } from "react-icons/fi";
 import { generateInvoice } from "@/lib/invoiceGenerator";
 import Image from "next/image";
@@ -28,8 +29,9 @@ import { PageLoader } from "@/components/Loader";
 export default function AdminOrderDetails() {
   const { id } = useParams();
   const router = useRouter();
+  console.log("Rendering AdminOrderDetails, ID:", id);
   const queryClient = useQueryClient();
-  const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const { formatPrice, settings } = useSettingsStore();
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["admin-order", id],
@@ -95,7 +97,7 @@ export default function AdminOrderDetails() {
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-display font-bold text-gray-900">Order #{order._id.slice(-6).toUpperCase()}</h1>
                 <button
-                    onClick={() => generateInvoice(order)}
+                    onClick={() => generateInvoice(order, settings)}
                     className="p-2 text-gray-400 hover:text-primary transition-colors"
                     title="Download Invoice"
                 >
@@ -111,6 +113,7 @@ export default function AdminOrderDetails() {
                     {order.orderStatus || 'Pending'}
                 </span>
               </div>
+
               <p className="text-gray-500 text-sm mt-1 flex items-center gap-2">
                 <FiCalendar className="text-gray-400" /> {new Date(order.createdAt).toLocaleString()}
               </p>
@@ -243,21 +246,69 @@ export default function AdminOrderDetails() {
                   <FiTruck className="text-primary" /> Update Status
                </h2>
                <div className="space-y-3">
-                  {['Processing', 'Shipped', 'Delivered', 'Cancelled'].map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => updateStatusMutation.mutate(status)}
-                        disabled={order.orderStatus === status}
-                        className={`w-full py-3 px-4 rounded-xl flex items-center justify-between font-bold text-sm transition-all ${
-                            order.orderStatus === status 
-                            ? 'bg-primary text-white shadow-lg shadow-primary/20 cursor-default'
-                            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                         {status}
-                         {order.orderStatus === status && <FiCheckCircle />}
-                      </button>
-                  ))}
+                  {order.orderStatus === 'Cancellation Requested' ? (
+                      <div className="space-y-3">
+                          <p className="text-sm text-red-600 font-medium mb-2">
+                             User requested cancellation. <br/>
+                             Reason: &quot;{order.cancellationReason}&quot;
+                          </p>
+                          <button 
+                              onClick={() => updateStatusMutation.mutate('Cancelled')}
+                              className="w-full py-3 px-4 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20 flex items-center justify-between"
+                          >
+                              Approve Cancellation
+                              <FiCheckCircle />
+                          </button>
+                          <button 
+                              onClick={() => updateStatusMutation.mutate('Processing')}
+                              className="w-full py-3 px-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-between"
+                          >
+                              Reject Request
+                              <FiX />
+                          </button>
+                      </div>
+                  ) : order.orderStatus === 'Return Requested' ? (
+                      <div className="space-y-3">
+                          <p className="text-sm text-orange-600 font-medium mb-2">
+                             User requested return. <br/>
+                             Reason: &quot;{order.returnReason}&quot;
+                          </p>
+                          <button 
+                              onClick={() => updateStatusMutation.mutate('Returned')}
+                              className="w-full py-3 px-4 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20 flex items-center justify-between"
+                          >
+                              Approve Return
+                              <FiCheckCircle />
+                          </button>
+                          <button 
+                              onClick={() => updateStatusMutation.mutate('Delivered')}
+                              className="w-full py-3 px-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-between"
+                          >
+                              Reject Return
+                              <FiX />
+                          </button>
+                      </div>
+                  ) : (
+                      ['Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested', 'Returned'].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => updateStatusMutation.mutate(status)}
+                            disabled={
+                                order.orderStatus === status || 
+                                order.orderStatus === 'Cancelled' || 
+                                (order.orderStatus === 'Delivered' && status === 'Cancelled')
+                            }
+                            className={`w-full py-3 px-4 rounded-xl flex items-center justify-between font-bold text-sm transition-all ${
+                                order.orderStatus === status 
+                                ? 'bg-primary text-white shadow-lg shadow-primary/20 cursor-default'
+                                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                             {status}
+                             {order.orderStatus === status && <FiCheckCircle />}
+                          </button>
+                      ))
+                  )}
                </div>
             </div>
 

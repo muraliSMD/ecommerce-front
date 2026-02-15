@@ -16,9 +16,11 @@ import {
   FiMapPin,
   FiMail,
   FiPhone,
-  FiTrash2
+  FiTrash2,
+  FiX
 } from "react-icons/fi";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
@@ -108,7 +110,9 @@ export default function AdminOrders() {
                     <FiShoppingBag size={24} />
                   </div>
                   <div>
-                    <h3 className="font-mono text-sm text-gray-400">Order #{order._id.slice(-8).toUpperCase()}</h3>
+                    <Link href={`/admin/orders/${order._id}`} className="hover:underline hover:text-primary transition-colors">
+                      <h3 className="font-mono text-sm text-gray-400">Order #{order._id.slice(-8).toUpperCase()}</h3>
+                    </Link>
                     <div className="flex items-center gap-4 mt-1">
                       <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
                         order.orderStatus === 'Completed' ? 'bg-green-50 text-green-600' :
@@ -167,30 +171,68 @@ export default function AdminOrders() {
               <div className="lg:w-64 flex flex-col justify-center border-l border-gray-50 pl-8 space-y-4">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Update Status</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <button 
-                    onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Processing' })}
-                    className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FiClock /> <span className="text-[10px] font-bold uppercase">Proc.</span>
-                  </button>
-                  <button 
-                    onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Shipped' })}
-                    className="p-3 bg-purple-50 text-purple-600 rounded-xl hover:bg-purple-100 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FiTruck /> <span className="text-[10px] font-bold uppercase">Ship.</span>
-                  </button>
-                  <button 
-                    onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Delivered' })}
-                    className="p-3 bg-green-50 text-green-600 rounded-xl hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FiCheckCircle /> <span className="text-[10px] font-bold uppercase">Deliv.</span>
-                  </button>
-                  <button 
-                    onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Cancelled' })}
-                    className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <FiCheckCircle className="rotate-45" /> <span className="text-[10px] font-bold uppercase">Canc.</span>
-                  </button>
+                  {order.orderStatus === 'Cancellation Requested' ? (
+                       <>
+                          <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Cancelled' })}
+                            className="p-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors flex items-center justify-center gap-2 col-span-2 shadow-lg shadow-red-600/20"
+                          >
+                            <FiCheckCircle /> <span className="text-[10px] font-bold uppercase">Approve Cancel</span>
+                          </button>
+                          <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Processing' })}
+                            className="p-3 bg-white text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 col-span-2"
+                          >
+                            <FiX /> <span className="text-[10px] font-bold uppercase">Reject Request</span>
+                          </button>
+                       </>
+                  ) : order.orderStatus === 'Return Requested' ? (
+                       <>
+                          <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Returned' })}
+                            className="p-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 col-span-2 shadow-lg shadow-orange-500/20"
+                          >
+                            <FiCheckCircle /> <span className="text-[10px] font-bold uppercase">Approve Return</span>
+                          </button>
+                          <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Delivered' })}
+                            className="p-3 bg-white text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 col-span-2"
+                          >
+                            <FiX /> <span className="text-[10px] font-bold uppercase">Reject Return</span>
+                          </button>
+                       </>
+                  ) : (
+                      <>
+                        <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Processing' })}
+                            disabled={order.orderStatus === 'Processing' || order.orderStatus === 'Cancelled'}
+                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Processing' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                        >
+                            <FiClock /> <span className="text-[10px] font-bold uppercase">Proc.</span>
+                        </button>
+                        <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Shipped' })}
+                            disabled={order.orderStatus === 'Shipped' || order.orderStatus === 'Cancelled'}
+                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Shipped' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
+                        >
+                            <FiTruck /> <span className="text-[10px] font-bold uppercase">Ship.</span>
+                        </button>
+                        <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Delivered' })}
+                            disabled={order.orderStatus === 'Delivered' || order.orderStatus === 'Cancelled'}
+                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Delivered' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
+                        >
+                            <FiCheckCircle /> <span className="text-[10px] font-bold uppercase">Deliv.</span>
+                        </button>
+                        <button 
+                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Cancelled' })}
+                            disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}
+                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Cancelled' ? 'bg-red-600 text-white shadow-lg shadow-red-600/20' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
+                        >
+                            <FiCheckCircle className="rotate-45" /> <span className="text-[10px] font-bold uppercase">Canc.</span>
+                        </button>
+                      </>
+                  )}
                   <button 
                     onClick={() => {
                       if(confirm('Are you sure you want to delete this order?')) {

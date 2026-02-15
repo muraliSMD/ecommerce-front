@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/db';
 import Order from '@/models/Order';
+import Product from '@/models/Product';
 import Notification from '@/models/Notification';
 import User from '@/models/User';
 import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
@@ -55,6 +56,21 @@ export async function PUT(request, { params }) {
     
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    // Restore Stock if Cancelled
+    if (orderStatus === 'Cancelled') {
+        for (const item of order.items) {
+            const productId = item.product._id || item.product;
+            if (item.variant && item.variant.color && item.variant.size) {
+                await Product.findOneAndUpdate(
+                    { _id: productId, "variants.color": item.variant.color, "variants.size": item.variant.size },
+                    { $inc: { "variants.$.stock": item.quantity } }
+                );
+            } else {
+                await Product.findByIdAndUpdate(productId, { $inc: { stock: item.quantity } });
+            }
+        }
     }
 
     // Trigger User Notification
