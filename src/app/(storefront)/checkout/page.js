@@ -1,38 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { motion } from "framer-motion";
-import { FiCreditCard, FiTruck, FiCheckCircle, FiShield } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiCreditCard, FiTruck, FiCheckCircle, FiShield, FiTag, FiX, FiPlus, FiHome, FiBriefcase, FiMapPin, FiEdit2, FiTrash2 } from "react-icons/fi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useUserStore } from "@/store/userStore";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { format } from "date-fns";
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const isHydrated = useCartStore((state) => state.isHydrated);
 
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
+  // Address State
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  
+  const [formData, setFormData] = useState({
+     name: "",
+     email: "",
+     phone: "",
+     address1: "",
+     address2: "",
+     address3: "",
+     city: "",
+     state: "",
+     pincode: "",
+     landmark: "",
+     label: "Home"
+  });
+
+  // Derived state for back-compat if needed, or just use selected address
+  const selectedAddress = addresses.find(a => a._id === selectedAddressId);
+  // Default to form data if no address selected (guest or new address)
+  const billingDetail = selectedAddress || formData; 
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const settings = useSettingsStore((state) => state.settings);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const getCurrencySymbol = useSettingsStore((state) => state.getCurrencySymbol);
+  const { userInfo, setAuthModalOpen, token } = useUserStore();
 
   // Coupon State
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState("");
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
+  const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
 
   const subtotal = items.reduce(
     (sum, i) => sum + (i.variant?.price ?? i.product.price) * i.quantity,
@@ -43,11 +70,77 @@ export default function CheckoutPage() {
   const taxAmount = (subtotal * (settings.taxRate || 0)) / 100;
   const total = subtotal + shippingCost + taxAmount;
 
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [orderId, setOrderId] = useState(null);
 
-  const handleApplyCoupon = async () => {
-    if (!couponCode) return;
+
+  // Fetch Available Coupons
+  const { data: availableCoupons } = useQuery({
+    queryKey: ["available-coupons", userInfo?._id], // Refetch when user changes
+    queryFn: async () => {
+        // Only fetch if user is logged in, otherwise empty list (or could fetch public coupons)
+        // Adjust API to handle public coupons if needed, but for now assuming user-specific logic is key
+        const { data } = await api.get("/coupons?available=true");
+        return data;
+    },
+    enabled: !!userInfo, // Only fetch if logged in
+  });
+
+  // Fetch User Addresses
+  const { data: userAddresses, refetch: refetchAddresses } = useQuery({
+    queryKey: ["user-addresses", userInfo?._id],
+    queryFn: async () => {
+        const { data } = await api.get("/user/addresses?limit=100"); // Ensure we get all
+        return data;
+    },
+    enabled: !!userInfo,
+  });
+
+  useEffect(() => {
+    if (userAddresses) {
+        setAddresses(userAddresses);
+        if (userAddresses.length > 0) {
+            if (!selectedAddressId) {
+                const defaultAddr = userAddresses.find(a => a.isDefault);
+                setSelectedAddressId(defaultAddr ? defaultAddr._id : userAddresses[0]._id);
+            }
+            setShowAddressForm(false);
+        } else {
+            setShowAddressForm(true);
+        }
+    }
+  }, [userAddresses, selectedAddressId]);
+
+  const handleInputChange = (e) => {
+     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSaveAddress = async () => {
+      // Basic validation
+      if(!formData.name || !formData.phone || !formData.address1 || !formData.city || !formData.pincode) {
+          toast.error("Please fill required fields");
+          return;
+      }
+
+      setIsSubmitting(true);
+      try {
+          const { data } = await api.post("/user/addresses", formData);
+          setAddresses(data);
+          setShowAddressForm(false);
+          // Set the newly created address as selected (it's the last one usually, or logic in route handles default)
+          // Ideally the route returns the updated list.
+          const newAddr = data[data.length - 1]; // Assuming appended
+          setSelectedAddressId(newAddr._id);
+          toast.success("Address saved!");
+      } catch (err) {
+          toast.error("Failed to save address");
+      } finally {
+          setIsSubmitting(false);
+      }
+  };
+
+  const handleApplyCoupon = async (codeOverride = null) => {
+    const codeToUse = codeOverride || couponCode;
+    if (!codeToUse) return;
+    
     setIsValidatingCoupon(true);
     setCouponError("");
 
@@ -55,7 +148,7 @@ export default function CheckoutPage() {
         const res = await fetch('/api/coupons/validate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: couponCode, cartTotal: subtotal })
+            body: JSON.stringify({ code: codeToUse, cartTotal: subtotal })
         });
         const data = await res.json();
 
@@ -68,7 +161,9 @@ export default function CheckoutPage() {
                 discountAmount: data.discountAmount,
                 discountType: data.discountType
             });
+            setCouponCode(data.code); // Update input if applied from list
             toast.success("Coupon applied!");
+            setIsCouponsModalOpen(false);
         }
     } catch (err) {
         setCouponError("Failed to validate coupon");
@@ -147,9 +242,9 @@ export default function CheckoutPage() {
                 }
             },
             prefill: {
-                name: name,
-                email: "customer@example.com",
-                contact: phone,
+                name: billingDetail.name,
+                email: billingDetail.email || userInfo?.email,
+                contact: billingDetail.phone,
             },
             theme: {
                 color: "#3399cc",
@@ -178,8 +273,6 @@ export default function CheckoutPage() {
     }
   };
 
-  const { userInfo, setAuthModalOpen, token } = useUserStore();
-
   const handlePlaceOrder = async () => {
     if (!userInfo) {
       toast.error("Please login to place an order");
@@ -187,8 +280,11 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (!name || !address || !phone) {
-      toast.error("Please fill in all details.");
+    const hasLegacyAddress = !!billingDetail.address;
+    const hasNewAddress = billingDetail.address1 && billingDetail.city && billingDetail.pincode;
+
+    if (!billingDetail.name || (!hasLegacyAddress && !hasNewAddress)) {
+      toast.error("Please fill in all shipping details or select an address.");
       return;
     }
 
@@ -207,7 +303,20 @@ export default function CheckoutPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-            shippingAddress: { name, address, phone },
+            shippingAddress: {
+                name: billingDetail.name,
+                email: billingDetail.email,
+                phone: billingDetail.phone,
+                address1: billingDetail.address1,
+                address2: billingDetail.address2,
+                address3: billingDetail.address3,
+                city: billingDetail.city,
+                state: billingDetail.state,
+                pincode: billingDetail.pincode,
+                landmark: billingDetail.landmark,
+                label: billingDetail.label,
+                address: billingDetail.address || (billingDetail.address1 ? `${billingDetail.address1}, ${billingDetail.address2}, ${billingDetail.city}, ${billingDetail.pincode}` : "")
+            },
             paymentMethod,
             items: items.map(i => ({
                 product: i.product._id,
@@ -227,10 +336,10 @@ export default function CheckoutPage() {
             const data = await response.json();
             toast.success("Order placed successfully!");
             clearCart();
-            setOrderId(data._id);
-            setIsSuccess(true);
+            router.push(`/checkout/success/${data._id}`);
         } else {
-            toast.error("Failed to place order.");
+            const data = await response.json();
+            toast.error(data.message || "Failed to place order.");
         }
       } catch (err) {
           toast.error("Failed to submit order to backend");
@@ -241,35 +350,7 @@ export default function CheckoutPage() {
 
   const { width, height } = useWindowSize();
 
-  if (isSuccess) return (
-    <div className="min-h-[70vh] pt-32 lg:pt-36 flex flex-col items-center justify-center space-y-6 text-center px-4 relative overflow-hidden">
-      <Confetti width={width} height={height} recycle={false} numberOfPieces={500} />
-      
-      <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-500 mb-4 animate-bounce">
-        <FiCheckCircle size={48} />
-      </div>
-      <h2 className="text-5xl font-display font-bold text-gray-900">Order Placed!</h2>
-      <p className="text-gray-500 max-w-lg text-lg">
-        Thank you for your purchase. Your order ID is <span className="font-bold text-gray-900">#{orderId?.slice(-6).toUpperCase()}</span>.
-        We&apos;ll send you a confirmation email shortly.
-      </p>
-      
-      <div className="flex flex-col sm:flex-row gap-4 mt-10 w-full max-w-md z-10">
-         <Link 
-            href="/shop" 
-            className="flex-1 bg-white border border-gray-200 text-gray-900 py-4 rounded-2xl font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 shadow-sm"
-          >
-            Continue Shopping
-         </Link>
-         <Link 
-            href={`/account/orders/${orderId}`} 
-            className="flex-1 bg-primary text-white py-4 rounded-2xl font-bold hover:bg-secondary transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
-         >
-            Manage Order
-         </Link>
-      </div>
-    </div>
-  );
+
 
   if (!isHydrated) return (
     <div className="min-h-[60vh] flex items-center justify-center">
@@ -305,44 +386,221 @@ export default function CheckoutPage() {
           {/* Form */}
           <div className="lg:col-span-7 space-y-8">
             <section className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                  <FiTruck size={24} />
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                    <FiTruck size={24} />
+                    </div>
+                    <h2 className="text-2xl font-display font-bold">Shipping Details</h2>
                 </div>
-                <h2 className="text-2xl font-display font-bold">Shipping Details</h2>
+                {!showAddressForm && addresses.length > 0 && (
+                     <button 
+                        onClick={() => {
+                            setShowAddressForm(true);
+                            setFormData({
+                                name: "", email: "", phone: "", address1: "", address2: "", address3: "", city: "", state: "", pincode: "", landmark: "", label: "Home"
+                            });
+                        }}
+                        className="flex items-center gap-2 text-primary font-bold hover:underline"
+                     >
+                        <FiPlus /> Add New
+                     </button>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
-                    placeholder="John Doe"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Detailed Address</label>
-                  <textarea
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 min-h-[120px]"
-                    placeholder="123 Fashion Street, Suite 456, New York"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
-                    placeholder="+1 (555) 000-0000"
-                  />
-                </div>
-              </div>
+              {!showAddressForm && addresses.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {addresses.map((addr) => (
+                          <div 
+                            key={addr._id}
+                            onClick={() => setSelectedAddressId(addr._id)}
+                            className={`border-2 rounded-2xl p-5 cursor-pointer transition-all relative ${
+                                selectedAddressId === addr._id 
+                                ? "border-primary bg-primary/5" 
+                                : "border-gray-100 hover:border-gray-200"
+                            }`}
+                          >
+                                <div className="flex items-center gap-2 mb-2">
+                                    {(addr.label === "Home" || !addr.label) && <FiHome className="text-primary" />}
+                                    {addr.label === "Office" && <FiBriefcase className="text-primary" />}
+                                    {!["Home", "Office", "", undefined].includes(addr.label) && <FiMapPin className="text-primary" />}
+                                    <span className="font-bold text-gray-900">{addr.label || "Address"}</span>
+                                    {addr.isDefault && <span className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Default</span>}
+                                </div>
+                                <p className="font-bold text-gray-900 pr-8">{addr.name}</p>
+                                
+                                {addr.address1 ? (
+                                    <>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            {addr.address1}
+                                            {addr.address2 ? `, ${addr.address2}` : ""}
+                                        </p>
+                                        <p className="text-sm text-gray-500">
+                                            {addr.city}
+                                            {addr.state ? `, ${addr.state}` : ""} 
+                                            {addr.pincode ? ` - ${addr.pincode}` : ""}
+                                        </p>
+                                    </>
+                                ) : (
+                                    <p className="text-sm text-gray-500 mt-1">{addr.address}</p>
+                                )}
+                                
+                                <p className="text-sm text-gray-500 mt-2">{addr.phone}</p>
+                          </div>
+                      ))}
+                  </div>
+              ) : (
+                  <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name *</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="John Doe"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="john@example.com"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Phone Number *</label>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="+1 (555) 000-0000"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Line 1 *</label>
+                                <input
+                                    type="text"
+                                    name="address1"
+                                    value={formData.address1}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="House No, Building Name"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Line 2</label>
+                                <input
+                                    type="text"
+                                    name="address2"
+                                    value={formData.address2}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="Street, Area"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Line 3</label>
+                                <input
+                                    type="text"
+                                    name="address3"
+                                    value={formData.address3}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="Landmark (Optional)"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">City *</label>
+                                <input
+                                    type="text"
+                                    name="city"
+                                    value={formData.city}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="New York"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">State</label>
+                                <input
+                                    type="text"
+                                    name="state"
+                                    value={formData.state}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="NY"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Pincode *</label>
+                                <input
+                                    type="text"
+                                    name="pincode"
+                                    value={formData.pincode}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="10001"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Landmark</label>
+                                <input
+                                    type="text"
+                                    name="landmark"
+                                    value={formData.landmark}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    placeholder="Near Central Park"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Type</label>
+                                <div className="flex gap-4">
+                                    {["Home", "Office", "Other"].map(label => (
+                                        <button
+                                            key={label}
+                                            onClick={() => setFormData({...formData, label})}
+                                            className={`px-6 py-3 rounded-xl font-bold border-2 transition-all ${
+                                                formData.label === label 
+                                                ? "border-primary bg-primary text-white" 
+                                                : "border-gray-200 text-gray-500 hover:border-gray-300"
+                                            }`}
+                                        >
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                            <button
+                                onClick={handleSaveAddress}
+                                disabled={isSubmitting}
+                                className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors disabled:opacity-50"
+                            >
+                                {isSubmitting ? "Saving..." : "Save Address"}
+                            </button>
+                            {addresses.length > 0 && (
+                                <button
+                                    onClick={() => setShowAddressForm(false)}
+                                    className="text-gray-500 font-bold hover:text-gray-900"
+                                >
+                                    Cancel
+                                </button>
+                            )}
+                        </div>
+                  </div>
+              )}
             </section>
 
             <section className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
@@ -437,16 +695,36 @@ export default function CheckoutPage() {
                             onChange={(e) => setCouponCode(e.target.value)}
                             placeholder="Promo Code" 
                             disabled={appliedCoupon}
-                            className="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white w-full outline-none placeholder:text-gray-500 focus:border-primary transition-all disabled:opacity-50"
+                            className="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white w-full outline-none placeholder:text-gray-500 focus:border-primary transition-all disabled:opacity-50 uppercase font-mono"
                         />
                         <button 
-                            onClick={handleApplyCoupon}
+                            onClick={() => handleApplyCoupon()}
                             disabled={isValidatingCoupon || !couponCode || appliedCoupon}
                             className="bg-white text-gray-900 px-4 rounded-xl font-bold text-sm hover:bg-gray-100 disabled:opacity-50 transition-all"
                         >
                             {isValidatingCoupon ? "..." : appliedCoupon ? "Applied" : "Apply"}
                         </button>
                     </div>
+                    
+                    {/* View Offers Button */}
+                     {userInfo && availableCoupons?.length > 0 && !appliedCoupon && (
+                        <button
+                          onClick={() => setIsCouponsModalOpen(true)}
+                          className="text-primary text-xs font-bold mt-2 hover:underline flex items-center gap-1"
+                        >
+                          <FiTag /> View Available Offers ({availableCoupons.length})
+                        </button>
+                     )}
+                     
+                     {!userInfo && (
+                        <button
+                          onClick={() => setAuthModalOpen(true, "login")}
+                          className="text-primary text-xs font-bold mt-2 hover:underline flex items-center gap-1"
+                        >
+                          <FiTag /> Login to see available offers
+                        </button>
+                     )}
+
                     {couponError && <p className="text-red-400 text-xs mt-2">{couponError}</p>}
                     {appliedCoupon && (
                         <div className="flex justify-between text-green-400 text-sm mt-3">
@@ -478,8 +756,90 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+        
+        {/* Coupons Modal */}
+        <AnimatePresence>
+            {isCouponsModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                        onClick={() => setIsCouponsModalOpen(false)}
+                    />
+                    <motion.div 
+                        initial={{ scale: 0.95, opacity: 0 }} 
+                        animate={{ scale: 1, opacity: 1 }} 
+                        exit={{ scale: 0.95, opacity: 0 }}
+                        className="bg-white rounded-[2rem] p-6 max-w-md w-full relative z-10 max-h-[80vh] overflow-hidden flex flex-col"
+                    >
+                         <button 
+                            onClick={() => setIsCouponsModalOpen(false)}
+                            className="absolute top-4 right-4 p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                         >
+                            <FiX />
+                         </button>
+
+                         <h3 className="text-2xl font-display font-bold mb-1">Available Coupons</h3>
+                         <p className="text-gray-500 text-sm mb-6">Select a coupon to apply to your order.</p>
+
+                         <div className="space-y-4 overflow-y-auto pr-2">
+                            {availableCoupons?.sort(a => a.minOrderAmount > subtotal ? 1 : -1).map(coupon => {
+                                const isEligible = subtotal >= coupon.minOrderAmount;
+                                
+                                return (
+                                <div 
+                                    key={coupon._id} 
+                                    className={`border rounded-2xl p-4 flex flex-col gap-2 transition-all ${
+                                        isEligible 
+                                        ? "border-primary/20 bg-primary/5 hover:border-primary" 
+                                        : "border-gray-100 bg-gray-50 opacity-60"
+                                    }`}
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <span className="font-mono font-bold bg-white border border-dashed border-gray-300 px-2 py-1 rounded text-primary text-sm uppercase tracking-wider">
+                                                {coupon.code}
+                                            </span>
+                                            <h4 className="font-bold text-gray-900 mt-2">
+                                                {coupon.discountType === 'percentage' 
+                                                ? `${coupon.value}% OFF` 
+                                                : `${formatPrice(coupon.value)} OFF`
+                                                }
+                                            </h4>
+                                        </div>
+                                        {isEligible ? (
+                                             <button
+                                                onClick={() => handleApplyCoupon(coupon.code)}
+                                                className="bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-secondary transition-colors"
+                                             >
+                                                Apply
+                                             </button>
+                                        ) : (
+                                            <span className="text-xs font-bold text-orange-500 bg-orange-100 px-2 py-1 rounded-lg">
+                                                Min {formatPrice(coupon.minOrderAmount)}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-gray-500">
+                                        expires {coupon.expiryDate ? format(new Date(coupon.expiryDate), "MMM dd") : "Never"} • 
+                                        Min order {formatPrice(coupon.minOrderAmount)}
+                                    </p>
+                                </div>
+                            )})}
+                            
+                            {availableCoupons?.length === 0 && (
+                                <p className="text-center text-gray-400 py-4">No coupons available at the moment.</p>
+                            )}
+                         </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
       </div>
     </main>
   );
 }
+
 

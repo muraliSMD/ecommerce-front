@@ -1,16 +1,27 @@
-
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-export const generateInvoice = (order) => {
+export const generateInvoice = (order, settings = {}) => {
   const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
 
   // Company Logo/Header
-  doc.setFontSize(20);
-  doc.text("GRABSZY", 14, 22);
+  if (settings.logo) {
+      try {
+          doc.addImage(settings.logo, 'PNG', 14, 15, 40, 20, undefined, 'FAST');
+      } catch (e) {
+          console.error("Error adding logo", e);
+          doc.setFontSize(20);
+          doc.text(settings.siteName || "GRABSZY", 14, 22);
+      }
+  } else {
+      doc.setFontSize(20);
+      doc.text(settings.siteName || "GRABSZY", 14, 22);
+  }
+
   doc.setFontSize(10);
-  doc.text("Your Premium Store", 14, 28);
-  doc.text("contact@grabszy.com", 14, 34);
+  doc.text("Your Premium Store", 14, 40);
+  doc.text(settings.supportEmail || "contact@grabszy.com", 14, 45);
 
   // Invoice Details
   doc.setFontSize(12);
@@ -21,23 +32,23 @@ export const generateInvoice = (order) => {
   doc.text(`Status: ${order.paymentStatus}`, 140, 40);
 
   // Bill To / Ship To
-  doc.line(14, 45, 196, 45);
-  doc.text("Bill To:", 14, 55);
+  doc.line(14, 50, 196, 50);
+  doc.text("Bill To:", 14, 60);
   doc.setFont("helvetica", "bold");
-  doc.text(order.shippingAddress?.name || "Guest", 14, 60);
+  doc.text(order.shippingAddress?.name || "Guest", 14, 65);
   doc.setFont("helvetica", "normal");
-  doc.text(order.user?.email || "", 14, 65);
-  doc.text(order.shippingAddress?.phone || "", 14, 70);
+  doc.text(order.user?.email || "", 14, 70);
+  doc.text(order.shippingAddress?.phone || "", 14, 75);
 
-  doc.text("Ship To:", 110, 55);
+  doc.text("Ship To:", 110, 60);
   doc.setFont("helvetica", "bold");
-  doc.text(order.shippingAddress?.name || "Guest", 110, 60);
+  doc.text(order.shippingAddress?.name || "Guest", 110, 65);
   doc.setFont("helvetica", "normal");
   const addressLines = doc.splitTextToSize(
     `${order.shippingAddress?.address}, ${order.shippingAddress?.city}, ${order.shippingAddress?.postalCode}, ${order.shippingAddress?.country}`,
     80
   );
-  doc.text(addressLines, 110, 65);
+  doc.text(addressLines, 110, 70);
 
   // Items Table
   const tableColumn = ["Item", "Quantity", "Price", "Total"];
@@ -56,7 +67,7 @@ export const generateInvoice = (order) => {
   autoTable(doc, {
     head: [tableColumn],
     body: tableRows,
-    startY: 85,
+    startY: 95,
     theme: "striped",
     headStyles: { fillColor: [79, 70, 229] }, // Primary color
     styles: { fontSize: 9 },
@@ -66,13 +77,26 @@ export const generateInvoice = (order) => {
   const finalY = doc.lastAutoTable.finalY + 10;
   doc.text(`Subtotal: ${order.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}`, 140, finalY);
   doc.text(`Shipping: ${order.shippingCount ? order.shippingCount.toFixed(2) : "Free"}`, 140, finalY + 6);
+  
+  let totalY = finalY + 12;
   if(order.discountAmount > 0) {
       doc.text(`Discount: -${order.discountAmount.toFixed(2)}`, 140, finalY + 12);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Total: ${order.totalAmount.toFixed(2)}`, 140, finalY + 18);
-  } else {
-      doc.setFont("helvetica", "bold");
-      doc.text(`Total: ${order.totalAmount.toFixed(2)}`, 140, finalY + 12);
+      totalY = finalY + 18;
+  }
+  
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total: ${order.totalAmount.toFixed(2)}`, 140, totalY);
+
+  // Signature
+  if (settings.signature) {
+      try {
+          doc.addImage(settings.signature, 'PNG', 140, totalY + 20, 40, 20, undefined, 'FAST');
+          doc.setFontSize(8);
+          doc.setFont("helvetica", "normal");
+          doc.text("Authorized Signature", 140, totalY + 45);
+      } catch (e) {
+          console.error("Error adding signature", e);
+      }
   }
 
   // Footer
@@ -82,3 +106,4 @@ export const generateInvoice = (order) => {
 
   doc.save(`invoice-GRABSZY-${order._id.slice(-6)}.pdf`);
 };
+

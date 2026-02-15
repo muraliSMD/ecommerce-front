@@ -13,7 +13,8 @@ import {
   FiChevronRight,
   FiUsers,
   FiMenu,
-  FiImage
+  FiImage,
+  FiTag
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
@@ -25,6 +26,7 @@ const navItems = [
   { label: "Orders", href: "/admin/orders", icon: FiShoppingBag },
   { label: "Customers", href: "/admin/customers", icon: FiUsers },
   { label: "Categories", href: "/admin/categories", icon: FiGrid },
+  { label: "Coupons", href: "/admin/coupons", icon: FiTag },
   { label: "Hero Slider", href: "/admin/hero-slides", icon: FiImage },
   { label: "Settings", href: "/admin/settings", icon: FiSettings },
 ];

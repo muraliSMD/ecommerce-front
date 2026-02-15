@@ -13,20 +13,23 @@ export default function AddressesPage() {
   // Form State
   const [formData, setFormData] = useState({
     name: "",
-    address: "",
-    phone: ""
+    email: "",
+    phone: "",
+    address1: "",
+    address2: "",
+    address3: "",
+    city: "",
+    state: "",
+    pincode: "",
+    landmark: "",
+    label: "Home"
   });
 
   const { data: addresses, isLoading } = useQuery({
     queryKey: ["addresses"],
     queryFn: async () => {
       const { data } = await api.get("/user/addresses");
-      // The GET endpoint might be missing? Let's assume we can fetch user profile or if not, add GET to route.
-      // Actually the route only had POST/DELETE. I should check if I need to add GET or just use user profile.
-      // Let's assume for now we use the profile-embedded addresses or add GET. 
-      // Safe bet: Fetch PROFILE for now as that's standard.
-      const profile = await api.get("/user/profile"); 
-      return profile.data.address || [];
+      return data;
     },
   });
 
@@ -39,7 +42,9 @@ export default function AddressesPage() {
       queryClient.invalidateQueries(["addresses"]);
       toast.success("Address added successfully");
       setShowAddForm(false);
-      setFormData({ name: "", address: "", phone: "" });
+      setFormData({ 
+        name: "", email: "", phone: "", address1: "", address2: "", address3: "", city: "", state: "", pincode: "", landmark: "", label: "Home" 
+      });
     },
     onError: (err) => toast.error(err.response?.data?.message || "Failed to add address"),
   });
@@ -83,31 +88,104 @@ export default function AddressesPage() {
             <h3 className="text-xl font-bold mb-6">New Address</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                   <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Full Name</label>
-                   <input 
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Full Name *</label>
+                    <input 
                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value})}
                         placeholder="e.g. John Doe"
-                   />
+                    />
                 </div>
                 <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Phone Number</label>
-                   <input 
-                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
-                        value={formData.phone}
-                        onChange={e => setFormData({...formData, phone: e.target.value})}
-                        placeholder="+1 234 567 890"
-                   />
-                </div>
-                <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Detailed Address</label>
-                   <textarea 
-                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors min-h-[100px]"
-                        value={formData.address}
-                        onChange={e => setFormData({...formData, address: e.target.value})}
-                        placeholder="Street address, City, State, Zip"
-                   />
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Phone Number *</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.phone}
+                         onChange={e => setFormData({...formData, phone: e.target.value})}
+                         placeholder="+1 234 567 890"
+                    />
+                 </div>
+                 <div className="md:col-span-2">
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Address Line 1 *</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.address1}
+                         onChange={e => setFormData({...formData, address1: e.target.value})}
+                         placeholder="House No, Building Name"
+                    />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Address Line 2</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.address2}
+                         onChange={e => setFormData({...formData, address2: e.target.value})}
+                         placeholder="Street, Area"
+                    />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Address Line 3</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.address3}
+                         onChange={e => setFormData({...formData, address3: e.target.value})}
+                         placeholder="Landmark (Optional)"
+                    />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">City *</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.city}
+                         onChange={e => setFormData({...formData, city: e.target.value})}
+                         placeholder="City"
+                    />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">State</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.state}
+                         onChange={e => setFormData({...formData, state: e.target.value})}
+                         placeholder="State"
+                    />
+                 </div>
+                 <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Pincode *</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.pincode}
+                         onChange={e => setFormData({...formData, pincode: e.target.value})}
+                         placeholder="Pincode"
+                    />
+                 </div>
+                  <div>
+                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Landmark</label>
+                    <input 
+                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                         value={formData.landmark}
+                         onChange={e => setFormData({...formData, landmark: e.target.value})}
+                         placeholder="Landmark"
+                    />
+                 </div>
+                 <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Label</label>
+                    <div className="flex gap-4">
+                        {["Home", "Office", "Other"].map(l => (
+                            <button
+                                key={l}
+                                type="button"
+                                onClick={() => setFormData({...formData, label: l})}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold border transition-colors ${
+                                    formData.label === l 
+                                    ? "bg-black text-white border-black" 
+                                    : "bg-white text-gray-500 border-gray-200 hover:border-gray-300"
+                                }`}
+                            >
+                                {l}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
             <div className="flex justify-end mt-6">
@@ -143,9 +221,18 @@ export default function AddressesPage() {
                         <FiTrash2 />
                      </button>
                 </div>
-                <div className="space-y-2 text-sm text-gray-500 pl-13 ml-12 border-l-2 border-gray-50 pl-4">
-                    <p>{item.address}</p>
-                    <div className="flex items-center gap-2 pt-1">
+                <div className="space-y-1 text-sm text-gray-500 pl-13 ml-12 border-l-2 border-gray-50 pl-4">
+                    {/* Display formatted address if available, otherwise fallback to legacy 'address' field */}
+                    {item.address1 ? (
+                        <>
+                            <p>{item.address1} {item.address2 && `, ${item.address2}`}</p>
+                            <p>{item.city} {item.state && `, ${item.state}`} - {item.pincode}</p>
+                            {item.landmark && <p className="text-xs text-gray-400">Near {item.landmark}</p>}
+                        </>
+                    ) : (
+                        <p>{item.address}</p>
+                    )}
+                    <div className="flex items-center gap-2 pt-2">
                         <FiPhone size={14} /> {item.phone}
                     </div>
                 </div>

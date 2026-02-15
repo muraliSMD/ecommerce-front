@@ -9,8 +9,17 @@ const userSchema = new mongoose.Schema({
     address: [
         {
             name: String,
-            address: String,
+            address: String, // Keep for backward compatibility
+            email: {type: String, default: ""},
             phone: String,
+            address1: {type: String, default: ""},
+            address2: {type: String, default: ""},
+            address3: {type: String, default: ""},
+            city: {type: String, default: ""},
+            state: {type: String, default: ""},
+            pincode: {type: String, default: ""},
+            landmark: {type: String, default: ""},
+            label: {type: String, default: ""},
             isDefault: {type: Boolean, default: false},
         },
     ],
