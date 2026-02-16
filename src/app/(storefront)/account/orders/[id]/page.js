@@ -130,6 +130,17 @@ export default function OrderDetailsPage() {
         </div>
       </div>
 
+      {order.rejectionReason && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-900">
+              <h3 className="font-bold flex items-center gap-2 mb-2">
+                  <FiTruck /> Request Update
+              </h3>
+              <p className="text-sm">
+                  <span className="font-bold">Admin Note:</span> {order.rejectionReason}
+              </p>
+          </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
