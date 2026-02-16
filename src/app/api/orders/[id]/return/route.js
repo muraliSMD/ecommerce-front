@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db';
+import dbConnect from '@/lib/db';
 import Order from '@/models/Order';
 import { getFullUserFromRequest } from "@/lib/auth";
 
@@ -20,7 +20,7 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ message: "Return reason is required" }, { status: 400 });
     }
 
-    await connectToDatabase();
+    await dbConnect();
 
     const user = await getFullUserFromRequest(req);
     
