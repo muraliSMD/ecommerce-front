@@ -62,34 +62,31 @@ export async function POST(request) {
         // For sync from local storage on login, we might want to merge local items into DB items.
         
         for (const item of cartItems) {
+            // Robust ID extraction
+            const incomingProductId = typeof item.product === 'object' ? item.product._id : item.product;
+            const incomingVariant = item.variant || {};
+
             const existingItemIndex = user.cart.findIndex(cartItem => {
-                const sameProduct = cartItem.product.toString() === item.product._id;
-                const sameVariant = (cartItem.variant?.color === item.variant?.color) && (cartItem.variant?.size === item.variant?.size);
-                return sameProduct && sameVariant;
+                // Determine if products match
+                const existingProductId = cartItem.product.toString();
+                const productsMatch = existingProductId === incomingProductId.toString();
+                
+                // Determine if variants match (treating null/undefined/empty string as same)
+                const existingVariant = cartItem.variant || {};
+                
+                const normalize = (val) => (!val ? null : val);
+                
+                const colorMatch = normalize(existingVariant.color) === normalize(incomingVariant.color);
+                const sizeMatch = normalize(existingVariant.size) === normalize(incomingVariant.size);
+                
+                return productsMatch && colorMatch && sizeMatch;
             });
 
             if (existingItemIndex > -1) {
-                 // Optional: Decide whether to add quantity or replace. 
-                 // If syncing from local, we might want to ensure at least that quantity exists.
-                 // Let's assume we add qunatity if syncing, or just set it?
-                 // For simplicity in a basic sync: if we receive the full cart state, strictly set it?
-                 // But wait, if I have 5 items in DB and 2 in local, I want 7? Or just the 2?
-                 // Best UX: Merge.
-                 // If local=2, DB=5 -> result=7.
-                 // However, "POST" here acts as "Sync/Merge".
-                 // BUT, typically cart operations are: Add Item, Remove Item, Update Qty.
-                 // Let's support "Bulk Sync" here.
-                 // If the item comes from local storage, we can assume it's "new" to the session if we are just logging in.
-                //  But simplest robust logic:
-                //  Take max(local, db) or sum? Sum is safer.
-                //  Let's simplisticly overwrite for now OR push. 
-                //  Actually, let's make this endpoint "Update Cart" (replace entirely) or "Merge".
-                //  Let's do "Merge".
-
                  user.cart[existingItemIndex].quantity += item.quantity;
             } else {
                 user.cart.push({
-                    product: item.product._id,
+                    product: incomingProductId,
                     quantity: item.quantity,
                     variant: item.variant
                 });

@@ -53,7 +53,8 @@ const userSchema = new mongoose.Schema({
             quantity: { type: Number, default: 1 },
             variant: { 
                 color: String, 
-                size: String 
+                size: String,
+                _id: false 
             }
         }
     ],
