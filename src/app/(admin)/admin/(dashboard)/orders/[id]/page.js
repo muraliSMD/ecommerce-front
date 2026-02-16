@@ -42,19 +42,41 @@ export default function AdminOrderDetails() {
     enabled: !!id,
   });
 
+  const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [targetStatus, setTargetStatus] = useState("");
+
   const updateStatusMutation = useMutation({
-    mutationFn: async (status) => {
-      await api.put(`/orders/${id}`, { orderStatus: status });
+    mutationFn: async (variables) => {
+      const status = typeof variables === 'object' ? variables.status : variables;
+      const reason = typeof variables === 'object' ? variables.rejectionReason : null;
+      
+      const payload = { orderStatus: status };
+      if (reason) payload.rejectionReason = reason;
+
+      await api.put(`/orders/${id}`, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["admin-order", id]);
       queryClient.invalidateQueries(["admin-orders"]);
       toast.success("Order status updated");
+      setRejectionModalOpen(false);
+      setRejectionReason("");
     },
     onError: () => {
       toast.error("Failed to update status");
     }
   });
+
+  const handleReject = (status) => {
+      setTargetStatus(status);
+      setRejectionModalOpen(true);
+  };
+
+  const confirmRejection = () => {
+      if (!rejectionReason.trim()) return toast.error("Please provide a reason");
+      updateStatusMutation.mutate({ status: targetStatus, rejectionReason });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -86,7 +108,7 @@ export default function AdminOrderDetails() {
   );
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-20">
+    <div className="space-y-8 max-w-5xl mx-auto pb-20 relative">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -260,7 +282,7 @@ export default function AdminOrderDetails() {
                               <FiCheckCircle />
                           </button>
                           <button 
-                              onClick={() => updateStatusMutation.mutate('Processing')}
+                              onClick={() => handleReject('Processing')}
                               className="w-full py-3 px-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-between"
                           >
                               Reject Request
@@ -281,7 +303,7 @@ export default function AdminOrderDetails() {
                               <FiCheckCircle />
                           </button>
                           <button 
-                              onClick={() => updateStatusMutation.mutate('Delivered')}
+                              onClick={() => handleReject('Delivered')}
                               className="w-full py-3 px-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm flex items-center justify-between"
                           >
                               Reject Return
@@ -361,6 +383,46 @@ export default function AdminOrderDetails() {
             </div>
          </div>
       </div>
+
+       {/* Rejection Modal */}
+       {rejectionModalOpen && (
+           <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+               <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-200">
+                   <h3 className="text-xl font-bold text-gray-900 mb-2">Reject Request</h3>
+                   <p className="text-gray-500 mb-6 text-sm">
+                       Please provide a reason for rejecting this request. This will be visible to the customer.
+                   </p>
+                   
+                   <div className="mb-6">
+                       <label className="block text-sm font-bold text-gray-700 mb-2">Reason</label>
+                       <textarea
+                           value={rejectionReason}
+                           onChange={(e) => setRejectionReason(e.target.value)}
+                           className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium h-32 resize-none"
+                           placeholder="e.g., Return period expired, Item not eligible..."
+                       />
+                   </div>
+                   
+                   <div className="flex gap-3">
+                       <button 
+                           onClick={() => {
+                               setRejectionModalOpen(false);
+                               setRejectionReason("");
+                           }}
+                           className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                       >
+                           Cancel
+                       </button>
+                       <button 
+                           onClick={confirmRejection}
+                           className="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors shadow-lg shadow-red-600/20"
+                       >
+                           Confirm Rejection
+                       </button>
+                   </div>
+               </div>
+           </div>
+       )}
     </div>
   );
 }

@@ -50,9 +50,14 @@ export async function PUT(request, { params }) {
     }
 
     const { id } = await params;
-    const { orderStatus } = await request.json();
+    const { orderStatus, rejectionReason } = await request.json();
     
-    const order = await Order.findByIdAndUpdate(id, { orderStatus }, { new: true });
+    const updateData = { orderStatus };
+    if (rejectionReason) {
+        updateData.rejectionReason = rejectionReason;
+    }
+
+    const order = await Order.findByIdAndUpdate(id, updateData, { new: true });
     
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
