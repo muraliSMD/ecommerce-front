@@ -184,7 +184,7 @@ export async function POST(request) {
             recipient: "admin",
             type: "order_new",
             title: "New Order Received",
-            message: `Order #${order._id.toString().slice(-6)} placed by ${body.shippingAddress?.fullName || "Guest"}`,
+            message: `Order #${order._id.toString().slice(-6)} placed by ${body.shippingAddress?.name || "Guest"}`,
             link: `/admin/orders/${order._id}`,
             isRead: false
         });
@@ -194,7 +194,7 @@ export async function POST(request) {
             const admins = await User.find({ role: 'admin' });
             const payload = JSON.stringify({
                 title: "New Order Received",
-                body: `Order #${order._id.toString().slice(-6)} placed by ${body.shippingAddress?.fullName || "Guest"}`,
+                body: `Order #${order._id.toString().slice(-6)} placed by ${body.shippingAddress?.name || "Guest"}`,
                 url: `/admin/orders/${order._id}`
             });
 
