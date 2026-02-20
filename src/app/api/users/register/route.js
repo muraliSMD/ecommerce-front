@@ -5,11 +5,28 @@ import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { sendVerificationEmail } from '@/lib/email';
+import { rateLimit } from '@/lib/rateLimit';
+import { registerSchema } from '@/lib/validations/auth';
 
 export async function POST(request) {
   try {
+    // 1. Rate Limiting (Max 3 registrations per minute per IP)
+    const rateLimitResponse = rateLimit(request, 3, 60000);
+    if (rateLimitResponse) return rateLimitResponse;
+
     await dbConnect();
-    const { name, email, password } = await request.json();
+    const body = await request.json();
+
+    // 2. Schema Validation
+    const validation = registerSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json(
+            { message: "Validation failed", errors: validation.error.format() }, 
+            { status: 400 }
+        );
+    }
+
+    const { name, email, password } = validation.data;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {

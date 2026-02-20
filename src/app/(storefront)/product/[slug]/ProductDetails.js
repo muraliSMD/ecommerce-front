@@ -103,8 +103,12 @@ export default function ProductDetails({ initialProduct }) {
   );
   if (!product) return <p className="text-center mt-20 text-2xl font-display">Product not found</p>;
 
-  const isOutOfStock = !selectedVariant || selectedVariant.stock === 0;
-  const stock = selectedVariant?.stock ?? 0;
+  const hasVariants = variants.length > 0;
+  const isOutOfStock = hasVariants 
+    ? (!selectedVariant || selectedVariant.stock === 0)
+    : (product.stock === 0);
+  
+  const stock = hasVariants ? (selectedVariant?.stock ?? 0) : (product.stock ?? 0);
   const canAdd = !isOutOfStock && quantity > 0 && quantity <= stock;
 
   const gallery =

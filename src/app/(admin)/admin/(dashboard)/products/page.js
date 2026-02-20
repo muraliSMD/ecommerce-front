@@ -148,18 +148,34 @@ export default function AdminProducts() {
                     )}
                   </td>
                   <td className="px-8 py-6">
-                    <p className={`font-bold ${product.stock > 0 ? 'text-gray-900' : 'text-red-500'}`}>
-                      {product.stock}
-                    </p>
-                    <div className="w-24 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full ${product.stock > 10 ? 'bg-green-500' : product.stock > 0 ? 'bg-orange-500' : 'bg-red-500'}`}
-                        style={{ width: `${Math.min(100, product.stock)}%` }}
-                      ></div>
-                    </div>
+                    {(() => {
+                      const totalStock = product.variants?.length > 0 
+                        ? product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0)
+                        : (product.stock || 0);
+                      
+                      return (
+                        <>
+                          <p className={`font-bold ${totalStock > 0 ? 'text-gray-900' : 'text-red-500'}`}>
+                            {totalStock}
+                          </p>
+                          <div className="w-24 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full ${totalStock > 10 ? 'bg-green-500' : totalStock > 0 ? 'bg-orange-500' : 'bg-red-500'}`}
+                              style={{ width: `${Math.min(100, totalStock)}%` }}
+                            ></div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <Link 
+                        href={`/admin/products/${product._id}`}
+                        className="p-3 bg-surface text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                      >
+                        <FiEye size={16} />
+                      </Link>
                       <Link 
                         href={`/admin/products/edit/${product._id}`}
                         className="p-3 bg-surface text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"

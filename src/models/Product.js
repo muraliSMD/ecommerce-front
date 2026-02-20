@@ -31,6 +31,8 @@ const productSchema = new mongoose.Schema(
     // subCategory field is deprecated, using recursive category structure instead
     images: { type: [String], default: [] }, // general product images
     price: { type: Number, required: true }, // fallback price if no variants
+    hasVariants: { type: Boolean, default: false },
+    stock: { type: Number, default: 0 }, // global stock for single products
     variants: [variantSchema],
     reviews: [reviewSchema],
     averageRating: { type: Number, default: 0 },

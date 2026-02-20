@@ -20,7 +20,8 @@ import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
 
 export async function generateMetadata() {
   await dbConnect();
-  const settings = await Settings.findOne().lean() || {};
+  const settingsDoc = await Settings.findOne().lean();
+  const settings = settingsDoc ? JSON.parse(JSON.stringify(settingsDoc)) : {};
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://grabszy.com";
   
   return {
@@ -55,7 +56,8 @@ export async function generateMetadata() {
 
 export default async function RootLayout({ children }) {  
     await dbConnect();
-    const settings = await Settings.findOne().lean() || {};
+    const settingsDoc = await Settings.findOne().lean();
+    const settings = settingsDoc ? JSON.parse(JSON.stringify(settingsDoc)) : {};
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://grabszy.com";
 
     return (

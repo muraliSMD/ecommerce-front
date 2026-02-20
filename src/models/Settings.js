@@ -9,7 +9,6 @@ const settingsSchema = new mongoose.Schema({
   // Financial Settings
   currency: { type: String, default: "USD" },
   taxRate: { type: Number, default: 0 }, // Percentage
-  taxRate: { type: Number, default: 0 }, // Percentage
   shippingCharge: { type: Number, default: 0 }, // Flat rate
   signature: { type: String, default: "" }, // URL to signature image
   

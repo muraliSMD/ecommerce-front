@@ -52,7 +52,8 @@ export default function AddProduct() {
     category: "",
     images: [""],
     variants: [],
-    stock: 0
+    stock: 0,
+    hasVariants: false
   });
 
   const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", stock: "" });
@@ -110,11 +111,14 @@ export default function AddProduct() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (product.variants.length === 0) {
+    if (product.hasVariants && product.variants.length === 0) {
       return toast.error("Please add at least one variant");
     }
-    // Calculate total stock from variants
-    const totalStock = product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
+    // Calculate total stock from variants if variant-based product
+    const totalStock = product.hasVariants 
+        ? product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0)
+        : (Number(product.stock) || 0);
+
     addProductMutation.mutate({ ...product, stock: totalStock });
   };
 
@@ -237,6 +241,46 @@ export default function AddProduct() {
                   />
                 </div>
             </div>
+            
+            {/* Product Type Toggle */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+               <div>
+                 <p className="font-bold text-gray-900">Product Type</p>
+                 <p className="text-xs text-gray-500 mt-1">Does this product come in multiple variations like size or color?</p>
+               </div>
+               <div className="flex bg-white rounded-xl p-1 border border-gray-200">
+                 <button 
+                   type="button" 
+                   onClick={() => setProduct({...product, hasVariants: false})}
+                   className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${!product.hasVariants ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-gray-500 hover:bg-gray-50'}`}
+                 >
+                   Single Product
+                 </button>
+                 <button 
+                   type="button"
+                   onClick={() => setProduct({...product, hasVariants: true})}
+                   className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${product.hasVariants ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-gray-500 hover:bg-gray-50'}`}
+                 >
+                   Variant Product
+                 </button>
+               </div>
+            </div>
+
+            {/* Single Product Stock */}
+            {!product.hasVariants && (
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Available Stock</label>
+                  <input 
+                    type="number" 
+                    name="stock"
+                    value={product.stock}
+                    onChange={handleInputChange}
+                    placeholder="0"
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    required={!product.hasVariants}
+                  />
+                </div>
+            )}
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Description</label>
               <RichTextEditor 
@@ -309,6 +353,7 @@ export default function AddProduct() {
         </section>
 
         {/* Variants */}
+        {product.hasVariants && (
         <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-black/5 border border-gray-100">
           <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3">
             <FiGrid className="text-primary" /> Variants & Inventory
@@ -406,6 +451,7 @@ export default function AddProduct() {
             )}
           </div>
         </section>
+        )}
       </div>
     </div>
   );

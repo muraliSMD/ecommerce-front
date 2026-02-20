@@ -443,17 +443,25 @@ export default function ShopPage() {
                                             >
                                                 Select Options
                                             </Link>
-                                        ) : (
+                                        ) : (() => {
+                                            const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);
+                                            return (
                                             <button 
+                                                disabled={isOutOfStock}
                                                 onClick={() => {
                                                     const variant = product.variants?.length === 1 ? product.variants[0] : null;
                                                     handleAddToCart(product, 1, variant);
                                                 }}
-                                                className="bg-gray-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-gray-900/10 active:scale-95"
+                                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 ${
+                                                    isOutOfStock
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                                        : "bg-gray-900 text-white hover:bg-primary"
+                                                }`}
                                             >
-                                                Add to Cart
+                                                {isOutOfStock ? "Out of Stock" : "Add to Cart"}
                                             </button>
-                                        )}
+                                            );
+                                        })()}
                                         <Link href={`/product/${product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
                                             View Details
                                         </Link>

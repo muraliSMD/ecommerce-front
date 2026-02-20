@@ -4,11 +4,28 @@ import { signToken } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { rateLimit } from '@/lib/rateLimit';
+import { loginSchema } from '@/lib/validations/auth';
 
 export async function POST(request) {
   try {
+    // 1. Rate Limiting (Max 5 login attempts per minute per IP)
+    const rateLimitResponse = rateLimit(request, 5, 60000);
+    if (rateLimitResponse) return rateLimitResponse;
+
     await dbConnect();
-    const { email, password } = await request.json();
+    const body = await request.json();
+    
+    // 2. Schema Validation
+    const validation = loginSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json(
+            { message: "Validation failed", errors: validation.error.format() }, 
+            { status: 400 }
+        );
+    }
+
+    const { email, password } = validation.data;
 
     const user = await User.findOne({ email });
     if (!user) {
