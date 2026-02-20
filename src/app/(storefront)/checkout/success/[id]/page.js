@@ -37,8 +37,8 @@ export default function CheckoutSuccessPage() {
 
 
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-green-900/5 text-center border border-green-100">
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 pt-24 pb-12 bg-surface">
+      <div className="max-w-md w-full bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-green-900/5 text-center border border-green-100 relative z-10">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-in zoom-in duration-500">
           <FiCheckCircle className="text-5xl text-green-600" />
         </div>
@@ -69,6 +69,6 @@ export default function CheckoutSuccessPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
