@@ -44,6 +44,13 @@ export default function AdminSettings() {
       metaKeywords: "",
       ogImage: ""
     },
+    scripts: {
+      googleAnalyticsId: "",
+      googleTagManagerId: "",
+      facebookPixelId: "",
+      customHeadScripts: "",
+      customBodyScripts: ""
+    },
     marketing: {
       showOfferPopup: true,
       offerCode: "",
@@ -90,6 +97,13 @@ export default function AdminSettings() {
             metaKeywords: fetchedSettings.seo?.metaKeywords || "",
             ogImage: fetchedSettings.seo?.ogImage || ""
         },
+        scripts: {
+            googleAnalyticsId: fetchedSettings.scripts?.googleAnalyticsId || "",
+            googleTagManagerId: fetchedSettings.scripts?.googleTagManagerId || "",
+            facebookPixelId: fetchedSettings.scripts?.facebookPixelId || "",
+            customHeadScripts: fetchedSettings.scripts?.customHeadScripts || "",
+            customBodyScripts: fetchedSettings.scripts?.customBodyScripts || ""
+        },
         marketing: {
             showOfferPopup: fetchedSettings.marketing?.showOfferPopup ?? true,
             offerCode: fetchedSettings.marketing?.offerCode || "",
@@ -130,6 +144,12 @@ export default function AdminSettings() {
             ...settings,
             marketing: { ...settings.marketing, [field]: type === 'checkbox' ? checked : value }
         });
+    } else if (name.startsWith("scripts.")) {
+        const field = name.split(".")[1];
+        setSettings({
+            ...settings,
+            scripts: { ...settings.scripts, [field]: value }
+        });
     } else {
         setSettings({ 
           ...settings, 
@@ -168,6 +188,7 @@ export default function AdminSettings() {
     { id: "general", label: "General", icon: FiSettings },
     { id: "financial", label: "Financials", icon: FiDollarSign },
     { id: "seo", label: "SEO & Metadata", icon: FiSearch },
+    { id: "scripts", label: "Scripts & Tracking", icon: FiTag },
     { id: "marketing", label: "Marketing", icon: FiStar },
   ];
 
@@ -534,6 +555,90 @@ export default function AdminSettings() {
                         placeholder="https://..."
                         className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                     />
+                </div>
+            </div>
+            </section>
+        )}
+
+        {/* Scripts & Tracking Settings */}
+        {activeTab === "scripts" && (
+            <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-black/5 border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3">
+                <FiTag className="text-primary" /> Scripts & Tracking
+            </h2>
+            <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            Google Analytics ID
+                        </label>
+                        <input 
+                            type="text" 
+                            name="scripts.googleAnalyticsId"
+                            value={settings.scripts.googleAnalyticsId}
+                            onChange={handleInputChange}
+                            placeholder="G-XXXXXXXXXX"
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            Google Tag Manager ID
+                        </label>
+                        <input 
+                            type="text" 
+                            name="scripts.googleTagManagerId"
+                            value={settings.scripts.googleTagManagerId}
+                            onChange={handleInputChange}
+                            placeholder="GTM-XXXXXXX"
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            Facebook Pixel ID
+                        </label>
+                        <input 
+                            type="text" 
+                            name="scripts.facebookPixelId"
+                            value={settings.scripts.facebookPixelId}
+                            onChange={handleInputChange}
+                            placeholder="XXXXXXXXXXXXXXXX"
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-4 border-t border-gray-100 pt-8">
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            Custom Head Scripts
+                        </label>
+                        <textarea 
+                            name="scripts.customHeadScripts"
+                            value={settings.scripts.customHeadScripts}
+                            onChange={handleInputChange}
+                            rows={4}
+                            placeholder="<!-- Paste your custom HTML/JS here for <head> -->"
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all resize-none font-mono text-sm"
+                        />
+                        <p className="text-xs text-gray-400">These scripts will be injected before the closing &lt;/head&gt; tag.</p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            Custom Body Scripts
+                        </label>
+                        <textarea 
+                            name="scripts.customBodyScripts"
+                            value={settings.scripts.customBodyScripts}
+                            onChange={handleInputChange}
+                            rows={4}
+                            placeholder="<!-- Paste your custom HTML/JS here for <body> -->"
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all resize-none font-mono text-sm"
+                        />
+                        <p className="text-xs text-gray-400">These scripts will be injected after the opening &lt;body&gt; tag.</p>
+                    </div>
                 </div>
             </div>
             </section>

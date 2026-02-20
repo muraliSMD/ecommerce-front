@@ -24,12 +24,18 @@ export async function GET(request) {
 
     let filter = {};
     if (category && category !== "All") {
-        // If it's a valid ObjectId, use it directly
+        // 1. Check if it's a valid ObjectId
         if (category.match(/^[0-9a-fA-F]{24}$/)) {
             filter.category = category;
         } else {
-            // Find category by name (case-insensitive for robustness)
-            const catDoc = await Category.findOne({ name: { $regex: new RegExp(`^${category}$`, 'i') } });
+            // 2. Try looking up by slug first, then name
+            const catDoc = await Category.findOne({ 
+              $or: [
+                { slug: category },
+                { name: { $regex: new RegExp(`^${category}$`, 'i') } }
+              ]
+            });
+
             if (catDoc) {
                 // Find all categories that are descendants of this category
                 const descendants = await Category.find({ ancestors: catDoc._id });
@@ -39,8 +45,7 @@ export async function GET(request) {
                 
                 filter.category = { $in: categoryIds };
             } else {
-                 // Category name provided but not found -> return empty or ignore?
-                 // Let's force a no-match filter
+                 // Category not found
                  filter.category = null; 
             }
         }

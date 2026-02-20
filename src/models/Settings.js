@@ -30,6 +30,15 @@ const settingsSchema = new mongoose.Schema({
     ogImage: { type: String, default: "" },
   },
 
+  // Third-party Scripts & Tracking
+  scripts: {
+    googleAnalyticsId: { type: String, default: "" },
+    googleTagManagerId: { type: String, default: "" },
+    facebookPixelId: { type: String, default: "" },
+    customHeadScripts: { type: String, default: "" },
+    customBodyScripts: { type: String, default: "" },
+  },
+
   // Marketing & Support
   marketing: {
     showOfferPopup: { type: Boolean, default: true },
