@@ -50,32 +50,32 @@ export default function Home() {
                  {[...Array(16)].map((_, i) => <div key={i} className="aspect-square bg-gray-200 rounded-2xl animate-pulse"></div>)}
             </div>
         ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
-            {categories?.slice(0, 16).map((cat, i) => (
-                <Link href={`/shop?category=${cat.name}`} key={cat._id}>
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3 md:gap-4">
+            {categories?.filter(c => c.level > 0).slice(0, 16).map((cat, i) => (
+                <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id} className="group">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.03 }}
-                    className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all bg-gray-100"
+                    className="space-y-3"
                 >
-                    {cat.image ? (
-                        <Image 
-                        src={cat.image} 
-                        alt={cat.name} 
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110" 
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-bold text-lg">
-                            {cat.name}
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <h3 className="text-xl font-bold text-white text-center px-2 drop-shadow-md transform group-hover:scale-105 transition-transform">{cat.name}</h3>
+                    <div className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all bg-gray-100">
+                        {cat.image ? (
+                            <Image 
+                            src={cat.image} 
+                            alt={cat.name} 
+                            fill
+                            sizes="(max-width: 640px) 25vw, (max-width: 768px) 16.6vw, (max-width: 1024px) 12.5vw, 10vw"
+                            className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-bold text-lg">
+                                {cat.name}
+                            </div>
+                        )}
                     </div>
+                    <h3 className="text-xs md:text-sm font-bold text-gray-900 text-center truncate group-hover:text-primary transition-colors">{cat.name}</h3>
                 </motion.div>
                 </Link>
             ))}

@@ -60,7 +60,9 @@ export const useCartStore = create(
               (
                 // Both have variants and they match
                 (!isEmptyVariant(i.variant) && !isEmptyVariant(variant) && 
-                 i.variant.color === variant.color && i.variant.size === variant.size) ||
+                 i.variant.color === variant.color && 
+                 i.variant.size === variant.size &&
+                 i.variant.length === variant.length) ||
                 // Both are empty/null variants
                 (isEmptyVariant(i.variant) && isEmptyVariant(variant))
               )
@@ -119,7 +121,12 @@ export const useCartStore = create(
           const items = state.items.filter(
             (i) =>
               i.product._id !== product._id ||
-              (i.variant && variant && (i.variant.color !== variant.color || i.variant.size !== variant.size)) ||
+              (i.variant && variant && (
+                  i.variant.color !== variant.color || 
+                  i.variant.size !== variant.size ||
+                  i.variant.length !== variant.length
+              )) ||
+              (i.variant && !variant) ||
               (!i.variant && variant)
           );
           return { items };

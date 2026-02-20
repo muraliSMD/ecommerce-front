@@ -154,6 +154,8 @@ export default function Header() {
                         src={settings.logo} 
                         alt={settings.siteName || "Logo"} 
                         fill 
+                        sizes="160px"
+                        priority
                         className="object-cover object-left"
                     />
                 </div>
@@ -185,6 +187,7 @@ export default function Header() {
             </div>
 
             <Link href="/about" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>About</Link>
+            <Link href="/blog" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Blog</Link>
             <Link href="/contact" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Contact</Link>
           </nav>
 
@@ -456,13 +459,13 @@ export default function Header() {
                                             {cat.children?.length > 0 ? (
                                                 cat.children.map(sub => (
                                                     <li key={sub._id}>
-                                                        <Link href={`/shop?category=${sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
+                                                        <Link href={`/shop?category=${sub.slug || sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
                                                             <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> {sub.name}
                                                         </Link>
                                                     </li>
                                                 ))
                                             ) : (
-                                                <li><Link href={`/shop?category=${cat.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> View All</Link></li>
+                                                <li><Link href={`/shop?category=${cat.slug || cat.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> View All</Link></li>
                                             )}
                                          </ul>
                                     </div>
@@ -477,14 +480,14 @@ export default function Header() {
                                         <>
                                             <div className="col-span-1">
                                                 <h3 className="font-bold text-gray-900 mb-4 text-lg">{cat.name} collection</h3>
-                                                <Link href={`/shop?category=${cat.name}`} className="text-primary font-bold text-sm hover:underline">View All Products</Link>
+                                                <Link href={`/shop?category=${cat.slug || cat.name}`} className="text-primary font-bold text-sm hover:underline">View All Products</Link>
                                             </div>
                                             <div className="col-span-1">
                                                 <h3 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">Subcategories</h3>
                                                 <ul className="space-y-3">
                                                     {cat.children?.map(sub => (
                                                         <li key={sub._id}>
-                                                            <Link href={`/shop?category=${sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
+                                                            <Link href={`/shop?category=${sub.slug || sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
                                                                 <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> {sub.name}
                                                             </Link>
                                                         </li>
@@ -560,13 +563,13 @@ export default function Header() {
                            <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600">All Products</Link>
                            {categories?.map(cat => (
                                <div key={cat._id} className="space-y-1">
-                                   <Link href={`/shop?category=${cat.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-800 font-medium flex items-center justify-between">
+                                   <Link href={`/shop?category=${cat.slug || cat.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-800 font-medium flex items-center justify-between">
                                       {cat.name}
                                    </Link>
                                    {cat.children?.length > 0 && (
                                        <div className="pl-4 border-l border-gray-100 space-y-1">
                                            {cat.children.map(sub => (
-                                               <Link key={sub._id} href={`/shop?category=${sub.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-sm text-gray-500 hover:text-primary">
+                                               <Link key={sub._id} href={`/shop?category=${sub.slug || sub.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-sm text-gray-500 hover:text-primary">
                                                   {sub.name}
                                                </Link>
                                            ))}
@@ -577,6 +580,7 @@ export default function Header() {
                         </div>
                      </div>
                      <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">About</Link>
+                     <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Blog</Link>
                      <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Contact</Link>
                   </div>
                </div>

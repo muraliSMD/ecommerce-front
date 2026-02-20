@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { 
@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useQuery } from "@tanstack/react-query";
 import CategorySelector from "@/components/admin/CategorySelector";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 
 export default function AddProduct() {
@@ -28,6 +29,11 @@ export default function AddProduct() {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const getCurrencySymbol = useSettingsStore((state) => state.getCurrencySymbol);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const { data: categories } = useQuery({
     queryKey: ["admin-categories"],
@@ -46,10 +52,11 @@ export default function AddProduct() {
     category: "",
     images: [""],
     variants: [],
-    stock: 0
+    stock: 0,
+    hasVariants: false
   });
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", price: "", stock: "" });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", stock: "" });
 
   const addProductMutation = useMutation({
     mutationFn: async (data) => {
@@ -87,14 +94,14 @@ export default function AddProduct() {
   };
 
   const addVariant = () => {
-    if (!newVariant.color || !newVariant.size || !newVariant.price) {
-      return toast.error("Please fill color, size and price for variant");
+    if (!newVariant.color || (!newVariant.size && !newVariant.length) || !newVariant.price) {
+      return toast.error("Please fill color, size/length and price for variant");
     }
     setProduct({ 
       ...product, 
       variants: [...product.variants, { ...newVariant, stock: Number(newVariant.stock) || 0 }] 
     });
-    setNewVariant({ color: "", size: "", price: "", stock: "" });
+    setNewVariant({ color: "", size: "", length: "", price: "", stock: "" });
   };
 
   const removeVariant = (index) => {
@@ -104,11 +111,14 @@ export default function AddProduct() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (product.variants.length === 0) {
+    if (product.hasVariants && product.variants.length === 0) {
       return toast.error("Please add at least one variant");
     }
-    // Calculate total stock from variants
-    const totalStock = product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0);
+    // Calculate total stock from variants if variant-based product
+    const totalStock = product.hasVariants 
+        ? product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0)
+        : (Number(product.stock) || 0);
+
     addProductMutation.mutate({ ...product, stock: totalStock });
   };
 
@@ -219,7 +229,7 @@ export default function AddProduct() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Base Price ({getCurrencySymbol()})</label>
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Base Price ({mounted ? getCurrencySymbol() : "..."})</label>
                   <input 
                     type="number" 
                     name="price"
@@ -231,16 +241,60 @@ export default function AddProduct() {
                   />
                 </div>
             </div>
+            
+            {/* Product Type Toggle */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-gray-50 rounded-2xl border border-gray-100">
+               <div>
+                 <p className="font-bold text-gray-900">Product Type</p>
+                 <p className="text-xs text-gray-500 mt-1">Does this product come in multiple variations like size or color?</p>
+               </div>
+               <div className="flex bg-white rounded-xl p-1 border border-gray-200">
+                 <button 
+                   type="button" 
+                   onClick={() => setProduct({...product, hasVariants: false})}
+                   className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${!product.hasVariants ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-gray-500 hover:bg-gray-50'}`}
+                 >
+                   Single Product
+                 </button>
+                 <button 
+                   type="button"
+                   onClick={() => setProduct({...product, hasVariants: true})}
+                   className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${product.hasVariants ? 'bg-primary text-white shadow-md shadow-primary/20' : 'text-gray-500 hover:bg-gray-50'}`}
+                 >
+                   Variant Product
+                 </button>
+               </div>
+            </div>
+
+            {/* Single Product Stock */}
+            {!product.hasVariants && (
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Available Stock</label>
+                  <input 
+                    type="number" 
+                    name="stock"
+                    value={product.stock}
+                    onChange={handleInputChange}
+                    placeholder="0"
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    required={!product.hasVariants}
+                  />
+                </div>
+            )}
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Description</label>
-              <textarea 
-                name="description"
+              <RichTextEditor 
                 value={product.description}
-                onChange={handleInputChange}
+                onChange={(value) => setProduct({...product, description: value})}
                 placeholder="Describe the product features, fit and material..."
-                rows={4}
-                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all resize-none"
-                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Manufacturer Info</label>
+              <RichTextEditor 
+                value={product.manufacturerInfo || ""}
+                onChange={(value) => setProduct({...product, manufacturerInfo: value})}
+                placeholder="Details about manufacturer, care instructions, etc..."
               />
             </div>
           </div>
@@ -299,13 +353,14 @@ export default function AddProduct() {
         </section>
 
         {/* Variants */}
+        {product.hasVariants && (
         <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-black/5 border border-gray-100">
           <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3">
             <FiGrid className="text-primary" /> Variants & Inventory
           </h2>
           
           {/* New Variant Form */}
-          <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
               <input 
@@ -323,6 +378,16 @@ export default function AddProduct() {
                 value={newVariant.size}
                 onChange={(e) => setNewVariant({...newVariant, size: e.target.value})}
                 placeholder="e.g. XL"
+                className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-gray-400 uppercase">Length</label>
+              <input 
+                type="text" 
+                value={newVariant.length || ""}
+                onChange={(e) => setNewVariant({...newVariant, length: e.target.value})}
+                placeholder="e.g. 5m"
                 className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
               />
             </div>
@@ -366,8 +431,9 @@ export default function AddProduct() {
                     <div className="w-3 h-3 rounded-full bg-gray-900" style={{ backgroundColor: v.color.toLowerCase() }}></div>
                     <span className="font-bold text-gray-900">{v.color}</span>
                   </div>
-                  <span className="font-bold text-gray-500">Size: {v.size}</span>
-                  <span className="font-bold text-gray-900">{getCurrencySymbol()}{v.price}</span>
+                  {v.size && <span className="font-bold text-gray-500">Size: {v.size}</span>}
+                  {v.length && <span className="font-bold text-gray-500">Length: {v.length}</span>}
+                  <span className="font-bold text-gray-900">{mounted ? getCurrencySymbol() : ""}{v.price}</span>
                   <span className="text-gray-400">{v.stock} in stock</span>
                 </div>
                 <button 
@@ -385,6 +451,7 @@ export default function AddProduct() {
             )}
           </div>
         </section>
+        )}
       </div>
     </div>
   );

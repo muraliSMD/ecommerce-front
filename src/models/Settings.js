@@ -9,9 +9,14 @@ const settingsSchema = new mongoose.Schema({
   // Financial Settings
   currency: { type: String, default: "USD" },
   taxRate: { type: Number, default: 0 }, // Percentage
-  taxRate: { type: Number, default: 0 }, // Percentage
   shippingCharge: { type: Number, default: 0 }, // Flat rate
   signature: { type: String, default: "" }, // URL to signature image
+  
+  // Payment Methods
+  paymentMethods: {
+    cod: { type: Boolean, default: true },
+    online: { type: Boolean, default: true }
+  },
   
   // Feature Toggles (Extensible)
   maintenanceMode: { type: Boolean, default: false },
@@ -22,6 +27,15 @@ const settingsSchema = new mongoose.Schema({
     metaDescription: { type: String, default: "Shop the best products at GRABSZY." },
     metaKeywords: { type: String, default: "e-commerce, fashion, electronics" },
     ogImage: { type: String, default: "" },
+  },
+
+  // Third-party Scripts & Tracking
+  scripts: {
+    googleAnalyticsId: { type: String, default: "" },
+    googleTagManagerId: { type: String, default: "" },
+    facebookPixelId: { type: String, default: "" },
+    customHeadScripts: { type: String, default: "" },
+    customBodyScripts: { type: String, default: "" },
   },
 
   // Marketing & Support

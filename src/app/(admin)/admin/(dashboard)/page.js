@@ -207,22 +207,38 @@ export default function AdminDashboard() {
                         if (!p.variants || p.variants.length === 0) return p.stock < 10;
                         // Check if ANY variant is low stock
                         return p.variants.some(v => v.stock < 5);
-                    }).slice(0, 5).map(product => (
-                        <div key={product._id} className="flex items-center gap-4 p-4 bg-red-50/50 rounded-2xl border border-red-100">
-                            <div className="flex-1 min-w-0">
-                                <p className="font-bold text-sm truncate text-gray-900">{product.name}</p>
-                                <p className="text-xs text-red-500 font-bold mt-1">
-                                    {product.variants?.length > 0 
-                                        ? `${product.variants.filter(v => v.stock < 5).length} variants low`
-                                        : `${product.stock} items left`
-                                    }
-                                </p>
+                    }).sort((a, b) => {
+                        // Sort out-of-stock to the top
+                        const aOut = (!a.variants?.length ? a.stock === 0 : a.variants.some(v => v.stock === 0));
+                        const bOut = (!b.variants?.length ? b.stock === 0 : b.variants.some(v => v.stock === 0));
+                        if (aOut && !bOut) return -1;
+                        if (!aOut && bOut) return 1;
+                        return 0;
+                    }).slice(0, 5).map(product => {
+                        const isNoVariant = !product.variants || product.variants.length === 0;
+                        const isOutOfStock = isNoVariant ? product.stock === 0 : product.variants.some(v => v.stock === 0);
+                        const lowVariantsCount = product.variants?.filter(v => v.stock < 5).length || 0;
+
+                        return (
+                            <div key={product._id} className={`flex items-center gap-4 p-4 rounded-2xl border ${isOutOfStock ? 'bg-red-50 border-red-200' : 'bg-orange-50/50 border-orange-100'}`}>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <p className="font-bold text-sm truncate text-gray-900">{product.name}</p>
+                                        {isOutOfStock && <span className="text-[8px] font-black bg-red-500 text-white px-1.5 py-0.5 rounded uppercase">Out of Stock</span>}
+                                    </div>
+                                    <p className={`text-xs font-bold mt-1 ${isOutOfStock ? 'text-red-600' : 'text-orange-600'}`}>
+                                        {product.variants?.length > 0 
+                                            ? `${lowVariantsCount} variant${lowVariantsCount > 1 ? 's' : ''} ${isOutOfStock ? 'out/low' : 'low'}`
+                                            : `${product.stock} items left`
+                                        }
+                                    </p>
+                                </div>
+                                <Link href={`/admin/products/edit/${product._id}`} className={`text-xs px-3 py-2 rounded-lg border font-bold transition-colors ${isOutOfStock ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50'}`}>
+                                    Restock
+                                </Link>
                             </div>
-                            <Link href={`/admin/products/edit/${product._id}`} className="text-xs bg-white text-gray-900 px-3 py-2 rounded-lg border border-gray-200 font-bold hover:bg-gray-50">
-                                Restock
-                            </Link>
-                        </div>
-                    ))}
+                        );
+                    })}
                     {(!products || products.filter(p => !p.variants?.length ? p.stock < 10 : p.variants.some(v => v.stock < 5)).length === 0) && (
                         <p className="text-center text-gray-400 text-sm py-4">All stock levels are healthy!</p>
                     )}

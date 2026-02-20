@@ -18,22 +18,23 @@ import {
   FiList 
 } from "react-icons/fi";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
 // Helper to separate render
 const CategoryButton = ({ category, selectedCategory, setSelectedCategory, level = 0 }) => (
     <>
         <button
-          onClick={() => setSelectedCategory(category.name)}
+          onClick={() => setSelectedCategory(category.slug || category.name)}
           className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-between ${
-            selectedCategory === category.name
+            selectedCategory === (category.slug || category.name)
               ? "bg-primary text-white shadow-lg shadow-primary/20"
               : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
           }`}
           style={{ paddingLeft: `${level * 1 + 1}rem` }}
         >
           {category.name}
-          {selectedCategory === category.name && <FiX className="ml-2" onClick={(e) => { e.stopPropagation(); setSelectedCategory("All"); }} />}
+          {selectedCategory === (category.slug || category.name) && <FiX className="ml-2" onClick={(e) => { e.stopPropagation(); setSelectedCategory("All"); }} />}
         </button>
         {category.children?.map(child => (
             <CategoryButton 
@@ -118,6 +119,9 @@ const FilterContent = ({
   );
 
 export default function ShopPage() {
+  const searchParams = useSearchParams();
+  const urlCategory = searchParams.get("category");
+
   // State
   const [viewMode, setViewMode] = useState("grid"); // grid | list
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -125,9 +129,18 @@ export default function ShopPage() {
   // Filters
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory || "All");
   const [sort, setSort] = useState("newest");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+
+  // Sync with URL category if it changes
+  useEffect(() => {
+    if (urlCategory) {
+      setSelectedCategory(urlCategory);
+    } else {
+      setSelectedCategory("All");
+    }
+  }, [urlCategory]);
 
   const addToCart = useCartStore((state) => state.addToCart);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
@@ -430,17 +443,25 @@ export default function ShopPage() {
                                             >
                                                 Select Options
                                             </Link>
-                                        ) : (
+                                        ) : (() => {
+                                            const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);
+                                            return (
                                             <button 
+                                                disabled={isOutOfStock}
                                                 onClick={() => {
                                                     const variant = product.variants?.length === 1 ? product.variants[0] : null;
                                                     handleAddToCart(product, 1, variant);
                                                 }}
-                                                className="bg-gray-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-gray-900/10 active:scale-95"
+                                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 ${
+                                                    isOutOfStock
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                                        : "bg-gray-900 text-white hover:bg-primary"
+                                                }`}
                                             >
-                                                Add to Cart
+                                                {isOutOfStock ? "Out of Stock" : "Add to Cart"}
                                             </button>
-                                        )}
+                                            );
+                                        })()}
                                         <Link href={`/product/${product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
                                             View Details
                                         </Link>

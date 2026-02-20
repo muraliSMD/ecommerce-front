@@ -18,7 +18,7 @@ export default function ProductCard({ product, onAddToCart }) {
           src={product.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"}
           alt={product.name.toString()}
           fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -45,19 +45,26 @@ export default function ProductCard({ product, onAddToCart }) {
           <Link href={`/product/${product.slug || product._id}`} className="mt-2 flex items-center justify-center gap-1.5 w-full bg-gray-900 text-white py-1.5 rounded-lg text-[10px] font-bold hover:bg-primary transition-all active:scale-95">
             Details <FiArrowRight size={10} />
           </Link>
-        ) : (
+        ) : (() => {
+          const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);
+          return (
           <button
-            className="mt-2 flex items-center justify-center gap-1.5 w-full bg-white text-gray-900 border border-gray-200 py-1.5 rounded-lg text-[10px] font-bold hover:bg-primary hover:text-white hover:border-primary transition-all active:scale-95 shadow-sm"
+            disabled={isOutOfStock}
+            className={`mt-2 flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm border ${
+              isOutOfStock 
+                ? "bg-gray-50 text-gray-400 border-gray-100 cursor-not-allowed" 
+                : "bg-white text-gray-900 border-gray-200 hover:bg-primary hover:text-white hover:border-primary"
+            }`}
             onClick={(e) => {
-              e.preventDefault(); // Prevent link click if wrapped
-              // If single variant exists, pass it. If no variants, pass null/undefined.
+              e.preventDefault();
               const variant = product.variants?.length === 1 ? product.variants[0] : null;
               onAddToCart(product, 1, variant);
             }}
           >
-            <FiPlus size={10} /> Add
+            {isOutOfStock ? "Out of Stock" : <><FiPlus size={10} /> Add</>}
           </button>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

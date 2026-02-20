@@ -1,6 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
@@ -12,25 +11,28 @@ import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus } from "react-icons/f
 import Image from "next/image";
 import { useSettingsStore } from "@/store/settingsStore";
 import { motion } from "framer-motion";
+import ProductCard from "@/components/ProductCard";
 import ReviewsSection from "@/components/ReviewsSection";
 import { useWishlistStore } from "@/store/wishlistStore";
 
-export default function ProductDetailPage() {
-  const { id } = useParams();
+export default function ProductDetails({ initialProduct }) {
+  const slug = initialProduct?.slug;
   const addToCart = useCartStore((state) => state.addToCart);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const { addItem, removeItem, isInWishlist } = useWishlistStore();
 
   const { data: product, isLoading, refetch } = useQuery({
-    queryKey: ["product", id],
+    queryKey: ["product", slug],
     queryFn: async () => {
-      const { data } = await api.get(`/products/${id}`);
+      const { data } = await api.get(`/products/${slug}`);
       return data;
     },
+    initialData: initialProduct,
   });
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
+  const [selectedLength, setSelectedLength] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -44,31 +46,49 @@ export default function ProductDetailPage() {
     () => [...new Set(variants.map((v) => v.size).filter(Boolean))],
     [variants]
   );
+  const allLengths = useMemo(
+    () => [...new Set(variants.map((v) => v.length).filter(Boolean))],
+    [variants]
+  );
 
   const availableSizesForColor = useMemo(() => {
     if (!selectedColor) return allSizes;
-    return variants.filter((v) => v.color === selectedColor).map((v) => v.size);
+    return variants.filter((v) => v.color === selectedColor && v.size).map((v) => v.size);
   }, [variants, selectedColor, allSizes]);
+
+  const availableLengthsForColor = useMemo(() => {
+    if (!selectedColor) return allLengths;
+    return variants.filter((v) => v.color === selectedColor && v.length).map((v) => v.length);
+  }, [variants, selectedColor, allLengths]);
 
   useEffect(() => {
     let variant = variants.find(
-      (v) => v.color === selectedColor && v.size === selectedSize
+      (v) => v.color === selectedColor && (v.size === selectedSize || v.length === selectedLength)
     );
 
     if (!variant && selectedColor) {
-      variant = variants.find((v) => v.color === selectedColor);
-      if (variant) setSelectedSize(variant.size);
+        variant = variants.find(v => v.color === selectedColor);
+        if (variant) {
+            if (variant.size) {
+                setSelectedSize(variant.size);
+                setSelectedLength("");
+            } else if (variant.length) {
+                setSelectedLength(variant.length);
+                setSelectedSize("");
+            }
+        }
     }
 
     setSelectedVariant(variant || null);
     setSelectedImage(variant?.images?.[0] || product?.images?.[0] || null);
     setQuantity(1);
-  }, [selectedColor, selectedSize, variants, product]);
+  }, [selectedColor, selectedSize, selectedLength, variants, product]);
 
   useEffect(() => {
     if (variants.length) {
       setSelectedColor(variants[0].color);
-      setSelectedSize(variants[0].size);
+      if (variants[0].size) setSelectedSize(variants[0].size);
+      if (variants[0].length) setSelectedLength(variants[0].length);
       setSelectedVariant(variants[0]);
       setSelectedImage(variants[0].images?.[0] || product?.images?.[0] || null);
     } else if (product?.images?.length) {
@@ -76,22 +96,19 @@ export default function ProductDetailPage() {
     }
   }, [product, variants]);
 
-  // Update Browser Tab Title
-  useEffect(() => {
-    if (product?.name) {
-      document.title = `${product.name} | Grabszy`;
-    }
-  }, [product]);
-
-  if (isLoading) return (
+  if (isLoading && !product) return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
     </div>
   );
   if (!product) return <p className="text-center mt-20 text-2xl font-display">Product not found</p>;
 
-  const isOutOfStock = !selectedVariant || selectedVariant.stock === 0;
-  const stock = selectedVariant?.stock ?? 0;
+  const hasVariants = variants.length > 0;
+  const isOutOfStock = hasVariants 
+    ? (!selectedVariant || selectedVariant.stock === 0)
+    : (product.stock === 0);
+  
+  const stock = hasVariants ? (selectedVariant?.stock ?? 0) : (product.stock ?? 0);
   const canAdd = !isOutOfStock && quantity > 0 && quantity <= stock;
 
   const gallery =
@@ -106,8 +123,9 @@ export default function ProductDetailPage() {
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
-              { label: "Store", href: "/" },
-              { label: product.name, href: `/product/${product._id}` },
+              { label: "Store", href: "/shop" },
+              { label: product.category?.name || "Shop", href: `/shop?category=${product.category?.slug || product.category?.name || ""}` },
+              { label: product.name, href: `/product/${slug}` },
             ]}
           />
         </div>
@@ -186,10 +204,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            <p className="text-gray-500 leading-relaxed text-base md:text-lg">
-              {product.description || "The ultimate statement piece for your wardrobe. Crafted with precision and style in mind."}
-            </p>
-
             <div className="h-px bg-gray-200 w-full" />
 
             {/* Colors */}
@@ -225,7 +239,7 @@ export default function ProductDetailPage() {
                       <button
                         key={size}
                         disabled={disabled}
-                        onClick={() => setSelectedSize(size)}
+                        onClick={() => { setSelectedSize(size); setSelectedLength(""); }}
                         className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
                           disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
                           selectedSize === size
@@ -234,6 +248,33 @@ export default function ProductDetailPage() {
                         }`}
                       >
                         {size}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Lengths */}
+            {allLengths.length > 0 && (
+              <div className="space-y-4">
+                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Length</p>
+                <div className="flex gap-2.5 flex-wrap">
+                  {allLengths.map((length) => {
+                    const disabled = !availableLengthsForColor.includes(length);
+                    return (
+                      <button
+                        key={length}
+                        disabled={disabled}
+                        onClick={() => { setSelectedLength(length); setSelectedSize(""); }}
+                        className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
+                          disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                          selectedLength === length
+                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                            : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                        }`}
+                      >
+                        {length}
                       </button>
                     );
                   })}
@@ -297,24 +338,102 @@ export default function ProductDetailPage() {
                 <FiHeart size={24} className={isInWishlist(product._id) ? "fill-current" : ""} />
               </button>
             </div>
-            
-            <div className="flex items-center gap-6 pt-4">
-              <button className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors font-medium">
-                <FiShare2 /> Share
-              </button>
-              <button className="flex items-center gap-2 text-sm text-gray-400 hover:text-primary transition-colors font-medium underline underline-offset-4 decoration-primary/30">
-                Size Guide
-              </button>
-            </div>
           </div>
         </div>
+        
         <div className="mt-16 md:mt-24">
-        <div className="mt-16 md:mt-24">
-          <ReviewsSection product={product} refetch={refetch} />
+            <ProductTabs product={product} refetch={refetch} />
         </div>
+
+        <div className="mt-16 md:mt-24">
+            <RelatedProducts categoryId={product.category?._id || product.category} currentProductId={product._id} />
         </div>
       </div>
     </main>
   );
 }
 
+function ProductTabs({ product, refetch }) {
+    const [activeTab, setActiveTab] = useState("description");
+
+    const tabs = [
+        { id: "description", label: "Description" },
+        { id: "reviews", label: `Reviews (${product.numReviews || 0})` },
+        { id: "manufacturer", label: "Manufacturer Info" },
+    ];
+
+    return (
+        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
+            <div className="flex gap-8 border-b border-gray-100 mb-8 overflow-x-auto pb-4 md:pb-0">
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`font-bold text-lg pb-4 border-b-2 transition-all whitespace-nowrap ${
+                            activeTab === tab.id 
+                            ? "text-primary border-primary" 
+                            : "text-gray-400 border-transparent hover:text-gray-600"
+                        }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            <div className="min-h-[200px]">
+                {activeTab === "description" && (
+                     <div 
+                        className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary"
+                        dangerouslySetInnerHTML={{ __html: product.description }}
+                     />
+                )}
+                {activeTab === "reviews" && (
+                    <ReviewsSection product={product} refetch={refetch} />
+                )}
+                {activeTab === "manufacturer" && (
+                    <div className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary">
+                        {product.manufacturerInfo ? (
+                            <div dangerouslySetInnerHTML={{ __html: product.manufacturerInfo }} />
+                        ) : (
+                            <p className="italic text-gray-400">No manufacturer information available.</p>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function RelatedProducts({ categoryId, currentProductId }) {
+    const { addToCart } = useCartStore();
+    
+    const { data: relatedProducts, isLoading } = useQuery({
+        queryKey: ['related-products', categoryId, currentProductId],
+        queryFn: async () => {
+            if (!categoryId) return [];
+            const { data } = await api.get(`/products/related?category=${categoryId}&exclude=${currentProductId}`);
+            return data;
+        },
+        enabled: !!categoryId
+    });
+
+    if (isLoading || !relatedProducts?.length) return null;
+
+    return (
+        <section>
+            <h2 className="text-3xl font-display font-bold text-gray-900 mb-8">Related Products</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+                {relatedProducts.map(product => (
+                    <ProductCard 
+                        key={product._id} 
+                        product={product}
+                        onAddToCart={(p, q, v) => {
+                             addToCart(p, q, v);
+                             toast.success("Added to cart");
+                        }}
+                    />
+                ))}
+            </div>
+        </section>
+    );
+}

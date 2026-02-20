@@ -12,7 +12,8 @@ const reviewSchema = new mongoose.Schema(
 
 const variantSchema = new mongoose.Schema({
   color: { type: String, required: true },
-  size: { type: String, required: true },
+  size: { type: String },
+  length: { type: String },
   stock: { type: Number, default: 0 },  // stock per variant
   price: { type: Number, required: true },
   images: { type: [String], default: [] }, // variant-specific images
@@ -25,10 +26,13 @@ const productSchema = new mongoose.Schema(
     slug: { type: String, unique: true },
     sku: { type: String, unique: true, sparse: true },
     description: String,
+    manufacturerInfo: String,
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     // subCategory field is deprecated, using recursive category structure instead
     images: { type: [String], default: [] }, // general product images
     price: { type: Number, required: true }, // fallback price if no variants
+    hasVariants: { type: Boolean, default: false },
+    stock: { type: Number, default: 0 }, // global stock for single products
     variants: [variantSchema],
     reviews: [reviewSchema],
     averageRating: { type: Number, default: 0 },

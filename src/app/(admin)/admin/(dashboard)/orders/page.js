@@ -203,34 +203,35 @@ export default function AdminOrders() {
                        </>
                   ) : (
                       <>
-                        <button 
-                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Processing' })}
-                            disabled={order.orderStatus === 'Processing' || order.orderStatus === 'Cancelled'}
-                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Processing' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
-                        >
-                            <FiClock /> <span className="text-[10px] font-bold uppercase">Proc.</span>
-                        </button>
-                        <button 
-                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Shipped' })}
-                            disabled={order.orderStatus === 'Shipped' || order.orderStatus === 'Cancelled'}
-                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Shipped' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}
-                        >
-                            <FiTruck /> <span className="text-[10px] font-bold uppercase">Ship.</span>
-                        </button>
-                        <button 
-                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Delivered' })}
-                            disabled={order.orderStatus === 'Delivered' || order.orderStatus === 'Cancelled'}
-                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Delivered' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
-                        >
-                            <FiCheckCircle /> <span className="text-[10px] font-bold uppercase">Deliv.</span>
-                        </button>
-                        <button 
-                            onClick={() => updateStatusMutation.mutate({ id: order._id, status: 'Cancelled' })}
-                            disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}
-                            className={`p-3 rounded-xl transition-colors flex items-center justify-center gap-2 ${order.orderStatus === 'Cancelled' ? 'bg-red-600 text-white shadow-lg shadow-red-600/20' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}
-                        >
-                            <FiCheckCircle className="rotate-45" /> <span className="text-[10px] font-bold uppercase">Canc.</span>
-                        </button>
+                      <>
+                        <div className="relative col-span-2">
+                            <select
+                                value={order.orderStatus}
+                                onChange={(e) => updateStatusMutation.mutate({ id: order._id, status: e.target.value })}
+                                disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}
+                                className={`w-full p-3 rounded-xl appearance-none outline-none font-bold text-xs uppercase tracking-wider border-2 transition-all cursor-pointer ${
+                                    order.orderStatus === 'Pending' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' :
+                                    order.orderStatus === 'Processing' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                    order.orderStatus === 'Shipped' ? 'bg-purple-50 text-purple-600 border-purple-100' :
+                                    order.orderStatus === 'Delivered' ? 'bg-green-50 text-green-600 border-green-100' :
+                                    'bg-gray-50 text-gray-600 border-gray-100'
+                                }`}
+                            >
+                                <option value="Pending" className="text-yellow-600 bg-yellow-50">Pending</option>
+                                <option value="Processing" className="text-blue-600 bg-blue-50">Processing</option>
+                                <option value="Shipped" className="text-purple-600 bg-purple-50">Shipped</option>
+                                <option value="Delivered" className="text-green-600 bg-green-50">Delivered</option>
+                                <option value="Cancelled" className="text-red-600 bg-red-50">Cancelled</option>
+                            </select>
+                            <FiFilter className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 ${
+                                 order.orderStatus === 'Pending' ? 'text-yellow-600' :
+                                 order.orderStatus === 'Processing' ? 'text-blue-600' :
+                                 order.orderStatus === 'Shipped' ? 'text-purple-600' :
+                                 order.orderStatus === 'Delivered' ? 'text-green-600' :
+                                 'text-gray-600'
+                            }`} />
+                        </div>
+                      </>
                       </>
                   )}
                   <button 

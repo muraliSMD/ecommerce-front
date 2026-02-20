@@ -9,6 +9,7 @@ import CouponUsage from '@/models/CouponUsage';
 import { NextResponse } from 'next/server';
 import { getFullUserFromRequest, isAdmin, getUserFromRequest } from '@/lib/auth';
 import webpush from 'web-push';
+import logger from '@/lib/logger';
 
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
     webpush.setVapidDetails(
@@ -40,15 +41,37 @@ export async function GET(request) {
 
     return NextResponse.json(orders);
   } catch (error) {
+    logger.error("Failed to fetch orders", { error: error.message, stack: error.stack });
     return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
   }
 }
 
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
+import { rateLimit } from '@/lib/rateLimit';
+import { checkoutSchema } from '@/lib/validations/order';
+
 export async function POST(request) {
   try {
+    // 1. Rate Limiting (Max 5 orders per minute per IP to prevent spam/card testing)
+    const rateLimitResponse = rateLimit(request, 5, 60000);
+    if (rateLimitResponse) return rateLimitResponse;
+
     await dbConnect();
     const userPayload = await getUserFromRequest(request);
-    const body = await request.json();
+    
+    // Parse JSON
+    const rawBody = await request.json();
+
+    // 2. Schema Validation
+    const validation = checkoutSchema.safeParse(rawBody);
+    if (!validation.success) {
+         return NextResponse.json(
+            { message: "Validation failed", errors: validation.error.format() }, 
+            { status: 400 }
+         );
+    }
+    
+    const body = validation.data;
     
     let items = [];
     const userId = userPayload ? userPayload.userId : null;
@@ -164,17 +187,48 @@ export async function POST(request) {
         }
     }
 
-    // 2. Reduce stock
+    // 2. Reduce stock (with Optimistic Concurrency Control)
     for (const i of items) {
-      if (i.variant && i.variant.color && i.variant.size) {
-        // Reduce stock from specific variant
-        await Product.findOneAndUpdate(
-          { _id: i.product, "variants.color": i.variant.color, "variants.size": i.variant.size },
-          { $inc: { "variants.$.stock": -i.quantity } }
+      let updatedProduct = null;
+
+      if (i.variant && (i.variant.color || i.variant.size || i.variant.length)) {
+        // Build the match object dynamically
+        const variantMatch = { stock: { $gte: i.quantity } };
+        if (i.variant.color) variantMatch.color = i.variant.color;
+        if (i.variant.size) variantMatch.size = i.variant.size;
+        if (i.variant.length) variantMatch.length = i.variant.length;
+
+        // Reduce stock from specific variant ONLY if enough stock is available
+        updatedProduct = await Product.findOneAndUpdate(
+          { 
+             _id: i.product, 
+             "variants": { $elemMatch: variantMatch } 
+          },
+          { $inc: { "variants.$.stock": -i.quantity } },
+          { new: true }
         );
-      } else {
-        // Fallback: Reduce global stock if no variant
-        await Product.findByIdAndUpdate(i.product, { $inc: { stock: -i.quantity } });
+      }
+      
+      // Fallback 1: Try to reduce the first available variant that has enough stock
+      if (!updatedProduct) {
+        updatedProduct = await Product.findOneAndUpdate(
+            { _id: i.product, "variants": { $elemMatch: { stock: { $gte: i.quantity } } } },
+            { $inc: { "variants.$.stock": -i.quantity } },
+            { new: true }
+        );
+      }
+
+      // Fallback 2: Global stock (legacy or non-variant products)
+      if (!updatedProduct) {
+        updatedProduct = await Product.findOneAndUpdate(
+            { _id: i.product, stock: { $gte: i.quantity } },
+            { $inc: { stock: -i.quantity } },
+            { new: true }
+        );
+      }
+
+      if (!updatedProduct) {
+          logger.warn(`Concurrency issue: Product or Variant out of stock during checkout`, { product: i.product, variant: i.variant });
       }
     }
 

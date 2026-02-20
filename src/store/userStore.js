@@ -19,8 +19,7 @@ export const useUserStore = create(
         set({ isAuthModalOpen: isOpen, authMode: mode }),
       
       login: (userInfo, token) => {
-        // Set cookie for server-side auth (next/headers)
-        document.cookie = `token=${token}; path=/; max-age=${30 * 24 * 60 * 60}; SameSite=Lax`;
+        // Cookie is now set by the server (HttpOnly)
         set({ token, userInfo, isAuthModalOpen: false });
         
         // Sync Cart & Wishlist
@@ -30,9 +29,13 @@ export const useUserStore = create(
         useWishlistStore.getState().setUserId(userInfo._id);
         useWishlistStore.getState().syncWithBackend();
       },
-      logout: () => {
-        // Clear cookie
-        document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      logout: async () => {
+        try {
+            await fetch('/api/users/logout', { method: 'POST' });
+        } catch (err) {
+            console.error("Logout failed", err);
+        }
+        
         set({ token: null, userInfo: null });
 
         // Clear/Reset Cart & Wishlist User State
@@ -46,7 +49,7 @@ export const useUserStore = create(
     {
       name: "user-storage",
       version: 1,
-      partialize: (state) => ({ token: state.token, userInfo: state.userInfo }),
+      partialize: (state) => ({ userInfo: state.userInfo }),
       onRehydrateStorage: () => (state) => {
         state.setHydrated();
       },

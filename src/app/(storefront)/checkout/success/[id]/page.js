@@ -34,7 +34,7 @@ export default function CheckoutSuccessPage() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!mounted) return null;
+
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">

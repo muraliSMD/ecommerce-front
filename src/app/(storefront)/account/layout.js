@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiGrid, FiPackage, FiMapPin, FiUser, FiCreditCard, FiLogOut } from "react-icons/fi";
+import { FiGrid, FiPackage, FiMapPin, FiUser, FiCreditCard, FiLogOut, FiMessageSquare } from "react-icons/fi";
 import { useUserStore } from "@/store/userStore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -25,6 +25,7 @@ export default function AccountLayout({ children }) {
   const links = [
     { href: "/account", label: "Overview", icon: FiGrid },
     { href: "/account/orders", label: "My Orders", icon: FiPackage },
+    { href: "/account/tickets", label: "Support Tickets", icon: FiMessageSquare },
     { href: "/account/addresses", label: "Addresses", icon: FiMapPin },
     { href: "/account/profile", label: "Profile", icon: FiUser },
     // { href: "/account/wallet", label: "Saved Cards", icon: FiCreditCard }, // Future
