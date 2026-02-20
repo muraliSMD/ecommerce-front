@@ -44,6 +44,8 @@ export async function GET(request) {
   }
 }
 
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
+
 export async function POST(request) {
   try {
     await dbConnect();

@@ -109,6 +109,24 @@ export default function CheckoutPage() {
     }
   }, [userAddresses, selectedAddressId]);
 
+  // Update payment method based on settings
+  useEffect(() => {
+     if (settings.paymentMethods) {
+         const codEnabled = settings.paymentMethods.cod ?? true;
+         const onlineEnabled = settings.paymentMethods.online ?? true;
+
+         if (!codEnabled && paymentMethod === 'COD') {
+             if (onlineEnabled) setPaymentMethod('Online');
+             else setPaymentMethod(""); // Both disabled
+         }
+         
+         if (!onlineEnabled && paymentMethod === 'Online') {
+             if (codEnabled) setPaymentMethod('COD');
+             else setPaymentMethod("");
+         }
+     }
+  }, [settings.paymentMethods, paymentMethod]);
+
   const handleInputChange = (e) => {
      setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -274,11 +292,12 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!userInfo) {
-      toast.error("Please login to place an order");
-      setAuthModalOpen(true, "login");
-      return;
-    }
+    // Guest checkout allowed
+    // if (!userInfo) {
+    //   toast.error("Please login to place an order");
+    //   setAuthModalOpen(true, "login");
+    //   return;
+    // }
 
     const hasLegacyAddress = !!billingDetail.address;
     const hasNewAddress = billingDetail.address1 && billingDetail.city && billingDetail.pincode;
@@ -296,6 +315,8 @@ export default function CheckoutPage() {
         submitOrderToBackend({});
     }
   };
+
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
   const submitOrderToBackend = async (extraPaymentInfo = {}) => {
       try {
@@ -334,18 +355,20 @@ export default function CheckoutPage() {
 
         if (response.ok) {
             const data = await response.json();
+            setIsOrderPlaced(true); // SET THIS BEFORE CLEARING CART
             toast.success("Order placed successfully!");
             clearCart();
             router.push(`/checkout/success/${data._id}`);
         } else {
             const data = await response.json();
             toast.error(data.message || "Failed to place order.");
+            setIsSubmitting(false); // Only reset if failed
         }
       } catch (err) {
           toast.error("Failed to submit order to backend");
-      } finally {
           setIsSubmitting(false);
-      }
+      } 
+      // Do not reset submitting in finally if success, to prevent UI flicker
   };
 
   const { width, height } = useWindowSize();
@@ -358,7 +381,7 @@ export default function CheckoutPage() {
     </div>
   );
 
-  if (!items.length) return (
+  if (!items.length && !isOrderPlaced) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
       <h2 className="text-3xl font-display font-bold">Your cart is empty</h2>
       <Link href="/" className="bg-primary text-white px-8 py-3 rounded-2xl font-bold hover:bg-secondary transition-all">
@@ -612,35 +635,45 @@ export default function CheckoutPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                  onClick={() => setPaymentMethod("COD")}
-                  className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
-                    paymentMethod === "COD" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
-                  }`}
-                >
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "COD" ? "border-primary" : "border-gray-300"}`}>
-                    {paymentMethod === "COD" && <div className="w-3 h-3 bg-primary rounded-full" />}
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-gray-900">Cash on Delivery</p>
-                    <p className="text-sm text-gray-400">Pay when you receive</p>
-                  </div>
-                </button>
+                {(settings.paymentMethods?.cod ?? true) && (
+                    <button
+                    onClick={() => setPaymentMethod("COD")}
+                    className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
+                        paymentMethod === "COD" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
+                    }`}
+                    >
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "COD" ? "border-primary" : "border-gray-300"}`}>
+                        {paymentMethod === "COD" && <div className="w-3 h-3 bg-primary rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                        <p className="font-bold text-gray-900">Cash on Delivery</p>
+                        <p className="text-sm text-gray-400">Pay when you receive</p>
+                    </div>
+                    </button>
+                )}
 
-                <button
-                  onClick={() => setPaymentMethod("Online")}
-                  className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
-                    paymentMethod === "Online" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
-                  }`}
-                >
-                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" ? "border-primary" : "border-gray-300"}`}>
-                    {paymentMethod === "Online" && <div className="w-3 h-3 bg-primary rounded-full" />}
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-gray-900">Online Payment</p>
-                    <p className="text-sm text-gray-400">Secure Stripe payment</p>
-                  </div>
-                </button>
+                {(settings.paymentMethods?.online ?? true) && (
+                    <button
+                    onClick={() => setPaymentMethod("Online")}
+                    className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
+                        paymentMethod === "Online" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
+                    }`}
+                    >
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" ? "border-primary" : "border-gray-300"}`}>
+                        {paymentMethod === "Online" && <div className="w-3 h-3 bg-primary rounded-full" />}
+                    </div>
+                    <div className="text-left">
+                        <p className="font-bold text-gray-900">Online Payment</p>
+                        <p className="text-sm text-gray-400">Secure Stripe payment</p>
+                    </div>
+                    </button>
+                )}
+
+                {(!items.length || (!(settings.paymentMethods?.cod ?? true) && !(settings.paymentMethods?.online ?? true))) && (
+                     <div className="col-span-2 p-4 bg-red-50 text-red-600 rounded-xl text-center text-sm font-bold">
+                        No payment methods available. Please contact support.
+                     </div>
+                )}
               </div>
             </section>
           </div>

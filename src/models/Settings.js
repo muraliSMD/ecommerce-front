@@ -13,6 +13,12 @@ const settingsSchema = new mongoose.Schema({
   shippingCharge: { type: Number, default: 0 }, // Flat rate
   signature: { type: String, default: "" }, // URL to signature image
   
+  // Payment Methods
+  paymentMethods: {
+    cod: { type: Boolean, default: true },
+    online: { type: Boolean, default: true }
+  },
+  
   // Feature Toggles (Extensible)
   maintenanceMode: { type: Boolean, default: false },
 

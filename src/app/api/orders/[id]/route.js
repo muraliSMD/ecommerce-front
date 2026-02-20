@@ -6,6 +6,7 @@ import User from '@/models/User';
 import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import webpush from 'web-push';
+import { sendWhatsAppMessage } from "@/lib/whatsapp";
 
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
     webpush.setVapidDetails(
@@ -31,12 +32,16 @@ export async function GET(request, { params }) {
     }
 
     // Check if user owns the order or is admin
-    if (order.user.toString() !== user._id.toString() && !isAdmin(user)) {
+    const orderUserId = order.user ? order.user.toString() : null;
+    const isOwner = orderUserId === user._id.toString();
+    
+    if (!isOwner && !isAdmin(user)) {
       return NextResponse.json({ message: "Access denied" }, { status: 403 });
     }
 
     return NextResponse.json(order);
   } catch (error) {
+    console.error("GET Order Error:", error);
     return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
   }
 }
@@ -50,9 +55,11 @@ export async function PUT(request, { params }) {
     }
 
     const { id } = await params;
-    const { orderStatus, rejectionReason } = await request.json();
+    const { orderStatus, rejectionReason, paymentStatus } = await request.json();
     
-    const updateData = { orderStatus };
+    const updateData = {};
+    if (orderStatus) updateData.orderStatus = orderStatus;
+    if (paymentStatus) updateData.paymentStatus = paymentStatus;
     if (rejectionReason) {
         updateData.rejectionReason = rejectionReason;
     }
@@ -89,6 +96,12 @@ export async function PUT(request, { params }) {
                 link: `/account/orders/${order._id}`,
                 isRead: false
             });
+            
+             // Send WhatsApp Notification
+            if (order.shippingAddress?.phone) {
+                const message = `Update: Your order #${order._id.toString().slice(-6)} is now ${orderStatus}. Track here: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/account/orders/${order._id}`;
+                sendWhatsAppMessage(order.shippingAddress.phone, message);
+            }
 
             // Push to User
             if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {

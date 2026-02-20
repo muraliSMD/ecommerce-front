@@ -185,6 +185,7 @@ export default function Header() {
             </div>
 
             <Link href="/about" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>About</Link>
+            <Link href="/blog" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Blog</Link>
             <Link href="/contact" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Contact</Link>
           </nav>
 
@@ -577,6 +578,7 @@ export default function Header() {
                         </div>
                      </div>
                      <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">About</Link>
+                     <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Blog</Link>
                      <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Contact</Link>
                   </div>
                </div>

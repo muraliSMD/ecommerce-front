@@ -61,6 +61,7 @@ export default function Footer() {
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Best Sellers</Link></li>
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Summer &apos;26</Link></li>
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Sustainable Line</Link></li>
+              <li><Link href="/blog" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Our Blog</Link></li>
             </ul>
           </div>
 

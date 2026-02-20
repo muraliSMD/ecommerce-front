@@ -31,14 +31,13 @@ export async function GET(request) {
             // Find category by name (case-insensitive for robustness)
             const catDoc = await Category.findOne({ name: { $regex: new RegExp(`^${category}$`, 'i') } });
             if (catDoc) {
-                // If it's a parent, we might want to include children? 
-                // For now, strict match or maybe children inclusion logic later.
-                // Simple strict match:
-                filter.category = catDoc._id;
+                // Find all categories that are descendants of this category
+                const descendants = await Category.find({ ancestors: catDoc._id });
                 
-                // OPTIONAL: Include all subcategories
-                // const descendants = await Category.find({ ancestors: catDoc._id });
-                // filter.category = { $in: [catDoc._id, ...descendants.map(d => d._id)] };
+                // Include the selected category and all its descendants in the filter
+                const categoryIds = [catDoc._id, ...descendants.map(d => d._id)];
+                
+                filter.category = { $in: categoryIds };
             } else {
                  // Category name provided but not found -> return empty or ignore?
                  // Let's force a no-match filter

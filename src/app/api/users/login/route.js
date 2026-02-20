@@ -3,6 +3,7 @@ import User from '@/models/User';
 import { signToken } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function POST(request) {
   try {
@@ -29,12 +30,23 @@ export async function POST(request) {
 
     const token = signToken({ userId: user._id });
 
+    // Set HttpOnly Cookie
+    const cookieStore = await cookies();
+    cookieStore.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60, // 30 days
+      path: '/',
+    });
+
     // Return user without password
     const userResponse = user.toObject();
     delete userResponse.password;
 
-    return NextResponse.json({ user: userResponse, token });
+    return NextResponse.json({ user: userResponse, token }); // Token still sent for client store but cookie is primary
   } catch (error) {
+    console.error("Login Error:", error);
     return NextResponse.json({ message: "Server Error", error: error.message }, { status: 500 });
   }
 }

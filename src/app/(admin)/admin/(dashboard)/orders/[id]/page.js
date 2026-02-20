@@ -49,11 +49,16 @@ export default function AdminOrderDetails() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async (variables) => {
-      const status = typeof variables === 'object' ? variables.status : variables;
-      const reason = typeof variables === 'object' ? variables.rejectionReason : null;
+      // Support multiple update types
+      const payload = {};
       
-      const payload = { orderStatus: status };
-      if (reason) payload.rejectionReason = reason;
+      if (typeof variables === 'string') {
+          payload.orderStatus = variables;
+      } else {
+          if (variables.status) payload.orderStatus = variables.status;
+          if (variables.rejectionReason) payload.rejectionReason = variables.rejectionReason;
+          if (variables.paymentStatus) payload.paymentStatus = variables.paymentStatus;
+      }
 
       await api.put(`/orders/${id}`, payload);
     },
@@ -247,9 +252,19 @@ export default function AdminOrderDetails() {
                   </div>
                   <div>
                      <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Status</p>
-                     <p className={`font-bold ${order.paymentStatus === 'Paid' ? 'text-green-600' : 'text-orange-500'}`}>
-                        {order.paymentStatus || 'Pending'}
-                     </p>
+                     <div className="flex items-center gap-2">
+                         <p className={`font-bold ${order.paymentStatus === 'Paid' ? 'text-green-600' : 'text-orange-500'}`}>
+                            {order.paymentStatus || 'Pending'}
+                         </p>
+                         {order.paymentMethod === 'COD' && order.paymentStatus !== 'Paid' && (
+                             <button
+                                onClick={() => updateStatusMutation.mutate({ paymentStatus: 'Paid' })}
+                                className="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold uppercase rounded-lg border border-green-100 hover:bg-green-100 transition-colors"
+                             >
+                                Mark as Paid
+                             </button>
+                         )}
+                     </div>
                   </div>
                   <div className="col-span-2">
                      <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Transaction ID</p>

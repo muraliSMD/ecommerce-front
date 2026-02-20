@@ -27,6 +27,11 @@ export default function EditProduct({ params }) {
   const queryClient = useQueryClient();
   const { id } = use(params);
   const getCurrencySymbol = useSettingsStore((state) => state.getCurrencySymbol);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   
   const [product, setProduct] = useState({
     name: "",
@@ -40,7 +45,7 @@ export default function EditProduct({ params }) {
     stock: 0
   });
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", price: "", stock: "" });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", stock: "" });
 
   const { data: categories } = useQuery({
     queryKey: ["admin-categories"],
@@ -108,14 +113,14 @@ export default function EditProduct({ params }) {
   };
 
   const addVariant = () => {
-    if (!newVariant.color || !newVariant.size || !newVariant.price) {
-      return toast.error("Please fill color, size and price for variant");
+    if (!newVariant.color || (!newVariant.size && !newVariant.length) || !newVariant.price) {
+      return toast.error("Please fill color, size/length and price for variant");
     }
     setProduct({ 
       ...product, 
       variants: [...product.variants, { ...newVariant, stock: Number(newVariant.stock) || 0, price: Number(newVariant.price) }] 
     });
-    setNewVariant({ color: "", size: "", price: "", stock: "" });
+    setNewVariant({ color: "", size: "", length: "", price: "", stock: "" });
   };
 
   const removeVariant = (index) => {
@@ -247,7 +252,7 @@ export default function EditProduct({ params }) {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Base Price ({getCurrencySymbol()})</label>
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Base Price ({mounted ? getCurrencySymbol() : "..."})</label>
                   <input 
                     type="number" 
                     name="price"
@@ -261,14 +266,18 @@ export default function EditProduct({ params }) {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Description</label>
-              <textarea 
-                name="description"
+              <RichTextEditor 
                 value={product.description}
-                onChange={handleInputChange}
+                onChange={(value) => setProduct({...product, description: value})}
                 placeholder="Describe the product features, fit and material..."
-                rows={4}
-                className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all resize-none"
-                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Manufacturer Info</label>
+              <RichTextEditor 
+                value={product.manufacturerInfo || ""}
+                onChange={(value) => setProduct({...product, manufacturerInfo: value})}
+                placeholder="Details about manufacturer, care instructions, etc..."
               />
             </div>
           </div>
@@ -333,7 +342,7 @@ export default function EditProduct({ params }) {
           </h2>
           
           {/* New Variant Form */}
-          <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="space-y-2">
               <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
               <input 
@@ -348,9 +357,19 @@ export default function EditProduct({ params }) {
               <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
               <input 
                 type="text" 
-                value={newVariant.size}
+                value={newVariant.size || ""}
                 onChange={(e) => setNewVariant({...newVariant, size: e.target.value})}
                 placeholder="e.g. XL"
+                className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-gray-400 uppercase">Length</label>
+              <input 
+                type="text" 
+                value={newVariant.length || ""}
+                onChange={(e) => setNewVariant({...newVariant, length: e.target.value})}
+                placeholder="e.g. 5m"
                 className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
               />
             </div>
@@ -394,12 +413,13 @@ export default function EditProduct({ params }) {
                     <div className="w-3 h-3 rounded-full bg-gray-900" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
                     <span className="font-bold text-gray-900">{v.color}</span>
                   </div>
-                  <span className="font-bold text-gray-500 min-w-[60px]">Size: {v.size}</span>
+                  {v.size && <span className="font-bold text-gray-500 min-w-[60px]">Size: {v.size}</span>}
+                  {v.length && <span className="font-bold text-gray-500 min-w-[60px]">Length: {v.length}</span>}
                   
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-gray-400 uppercase">Price</span>
                     <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{getCurrencySymbol()}</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{mounted ? getCurrencySymbol() : ""}</span>
                         <input 
                             type="number" 
                             value={v.price} 
