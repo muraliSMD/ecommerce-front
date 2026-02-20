@@ -154,6 +154,8 @@ export default function Header() {
                         src={settings.logo} 
                         alt={settings.siteName || "Logo"} 
                         fill 
+                        sizes="160px"
+                        priority
                         className="object-cover object-left"
                     />
                 </div>

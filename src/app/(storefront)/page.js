@@ -51,7 +51,7 @@ export default function Home() {
             </div>
         ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
-            {categories?.slice(0, 16).map((cat, i) => (
+            {categories?.filter(c => c.level > 0).slice(0, 16).map((cat, i) => (
                 <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id}>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -65,6 +65,7 @@ export default function Home() {
                         src={cat.image} 
                         alt={cat.name} 
                         fill
+                        sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 16vw, 12.5vw"
                         className="object-cover transition-transform duration-700 group-hover:scale-110" 
                         />
                     ) : (
