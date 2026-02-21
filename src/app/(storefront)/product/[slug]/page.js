@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/db";
 import Product from "@/models/Product";
+import "@/models/Category";
 import ProductDetails from "./ProductDetails";
 import ProductJsonLd from "@/components/ProductJsonLd";
 import { notFound } from "next/navigation";

@@ -8,7 +8,7 @@ export default function AboutPage() {
   return (
     <div className="bg-white pt-28 md:pt-28">
       {/* Hero Section */}
-      <section className="relative py-20 md:py-28 overflow-hidden bg-gray-900 text-white">
+      <section className="relative py-16 md:py-20 overflow-hidden bg-gray-900 text-white">
         <div className="absolute inset-0 z-0 opacity-20">
             <Image 
                 src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop"
@@ -30,7 +30,7 @@ export default function AboutPage() {
       </section>
 
       {/* Our Story */}
-      <section className="py-16 md:py-24">
+      <section className="py-10 md:py-16">
         <div className="container mx-auto px-4 md:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div className="relative h-[400px] md:h-[500px] rounded-[2.5rem] overflow-hidden shadow-2xl skew-y-2 md:skew-y-0 md:-rotate-2 border-4 border-white">
@@ -68,7 +68,7 @@ export default function AboutPage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 md:py-24 bg-gray-50">
+      <section className="py-10 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-4">Why Shop With Us?</h2>
@@ -108,7 +108,7 @@ export default function AboutPage() {
       </section>
 
       {/* Online Launch */}
-      <section className="py-16 md:py-24 overflow-hidden">
+      <section className="py-10 md:py-16 overflow-hidden">
         <div className="container mx-auto px-4 md:px-8">
             <div className="bg-gray-900 rounded-[3rem] p-8 md:p-16 relative overflow-hidden">
                 {/* Decorative Elements */}

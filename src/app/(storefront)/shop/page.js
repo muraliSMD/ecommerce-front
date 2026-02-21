@@ -234,9 +234,9 @@ export default function ShopPage() {
   };
 
   return (
-    <main className="bg-surface min-h-screen pb-20 pt-32">
+    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="mb-6">
+        <div className="mb-4">
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
@@ -394,8 +394,10 @@ export default function ShopPage() {
                         viewMode === "grid" ? (
                             <motion.div
                                 layout
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.4 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 key={product._id}
                             >
@@ -408,8 +410,10 @@ export default function ShopPage() {
                             <motion.div 
                                 layout
                                 key={product._id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: -20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ duration: 0.4 }}
                                 exit={{ opacity: 0 }}
                                 className="bg-white p-4 rounded-[2rem] border border-gray-100 flex flex-col sm:flex-row gap-6 items-start sm:items-center group hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all"
                             >

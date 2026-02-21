@@ -59,9 +59,9 @@ export default function CartPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-20 pt-32">
+    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="py-6">
+        <div className="py-4">
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
@@ -70,7 +70,7 @@ export default function CartPage() {
           />
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-display font-bold mb-12">Shopping Cart</h1>
+        <h1 className="text-3xl md:text-4xl font-display font-bold mb-8">Shopping Cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Cart Items */}
@@ -95,9 +95,13 @@ export default function CartPage() {
             </AnimatePresence>
           </div>
 
-          {/* Summary */}
           <div className="lg:col-span-4">
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 sticky top-28">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 sticky top-28"
+            >
               <h2 className="text-2xl font-display font-bold mb-8">Order Summary</h2>
               
               <div className="space-y-4 mb-8">
@@ -126,7 +130,7 @@ export default function CartPage() {
               <p className="text-center text-xs text-gray-400 mt-6 px-4">
                 Prices are in {settings.currency}. Shipping and taxes calculated at checkout.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

@@ -104,7 +104,7 @@ export default function AdminTicketsPage() {
                 {filteredTickets?.length === 0 && (
                     <tr>
                         <td colSpan={6} className="p-12 text-center text-gray-500">
-                            No tickets found with status "{filter}".
+                            No tickets found with status &quot;{filter}&quot;.
                         </td>
                     </tr>
                 )}

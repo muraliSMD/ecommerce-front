@@ -126,21 +126,17 @@ export default function Header() {
     }
   };
 
-  const isHome = pathname === "/";
-  // Force scrolled styles on non-home pages so content is visible against light backgrounds
-  const effectiveScrolled = isScrolled || !isHome;
-
-  const textColor = effectiveScrolled ? "text-gray-600" : "text-white";
-  const hoverColor = effectiveScrolled ? "hover:text-primary" : "hover:text-white/80";
-  const logoColor = effectiveScrolled ? "text-gray-900" : "text-white";
-  const iconColor = effectiveScrolled ? "text-gray-600" : "text-white";
+  const textColor = "text-gray-600";
+  const hoverColor = "hover:text-primary";
+  const logoColor = "text-gray-900";
+  const iconColor = "text-gray-600";
 
   return (
     <>
     <header 
       onMouseLeave={() => setActiveCategory(null)}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        effectiveScrolled ? "bg-white/80 backdrop-blur-md shadow-sm py-4" : "bg-transparent py-6"
+        isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm py-2 lg:py-3" : "bg-white py-3 lg:py-4"
       }`}
     >
       <div className="container mx-auto px-4 md:px-8">

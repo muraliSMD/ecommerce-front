@@ -1,16 +1,21 @@
 import "../styles/globals.css";
 import { Toaster } from "react-hot-toast";
 import QueryProvider from "./QueryProvider";
-import { Outfit } from "next/font/google";
+import { Montserrat, Open_Sans } from "next/font/google";
 import AuthModal from "@/components/AuthModal";
 import SettingsInitializer from "@/components/SettingsInitializer";
 import PopupManager from "@/components/popups/PopupManager";
 import ChatWidget from "@/components/ChatWidget";
 import PushNotificationManager from "@/components/PushNotificationManager";
 
-const outfit = Outfit({
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-montserrat",
+});
+
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-open-sans",
 });
 
 import dbConnect from "@/lib/db";
@@ -62,7 +67,7 @@ export default async function RootLayout({ children }) {
 
     return (
     <html lang="en">
-      <body className={`${outfit.variable} font-sans bg-surface min-h-screen antialiased`} suppressHydrationWarning={true}>
+      <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-surface min-h-screen antialiased`} suppressHydrationWarning={true}>
         <QueryProvider>
           <SettingsInitializer />
           <AuthModal />

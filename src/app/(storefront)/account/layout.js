@@ -32,7 +32,7 @@ export default function AccountLayout({ children }) {
   ];
 
   return (
-    <main className="bg-surface min-h-screen pb-20 pt-32">
+    <main className="bg-surface min-h-screen pb-12 pt-32">
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}

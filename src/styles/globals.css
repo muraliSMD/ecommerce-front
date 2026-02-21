@@ -10,8 +10,8 @@
   --color-surface: oklch(0.99 0.005 260); /* Very light cool gray */
   --color-surface-dark: oklch(0.96 0.01 260);
   
-  --font-sans: "Outfit", ui-sans-serif, system-ui;
-  --font-display: "Clash Display", ui-sans-serif, system-ui;
+  --font-sans: var(--font-open-sans), "Open Sans", ui-sans-serif, system-ui;
+  --font-display: var(--font-montserrat), "Montserrat", ui-sans-serif, system-ui;
 
   --animate-float: float 6s ease-in-out infinite;
   @keyframes float {
@@ -110,4 +110,9 @@ a, button, .transition-all-custom {
 /* Utilities */
 .container-padding {
   @apply px-4 md:px-8 lg:px-12;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }

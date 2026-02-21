@@ -13,8 +13,7 @@ const blogSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-// Index for slug lookup
-blogSchema.index({ slug: 1 });
+// Index for slug lookup// blogSchema.index({ slug: 1 }); // Removed to prevent Mongoose duplicate index warning
 
 // Prevent model overwrite error in development
 if (process.env.NODE_ENV === "development") {
