@@ -16,6 +16,8 @@ const variantSchema = new mongoose.Schema({
   length: { type: String },
   stock: { type: Number, default: 0 },  // stock per variant
   price: { type: Number, required: true },
+  mrp: { type: Number }, // Base price / Original price
+  discount: { type: Number }, // Discount percentage
   images: { type: [String], default: [] }, // variant-specific images
 });
 
@@ -31,6 +33,8 @@ const productSchema = new mongoose.Schema(
     // subCategory field is deprecated, using recursive category structure instead
     images: { type: [String], default: [] }, // general product images
     price: { type: Number, required: true }, // fallback price if no variants
+    mrp: { type: Number }, // fallback base price
+    discount: { type: Number }, // fallback discount
     hasVariants: { type: Boolean, default: false },
     stock: { type: Number, default: 0 }, // global stock for single products
     variants: [variantSchema],

@@ -202,10 +202,32 @@ export default function ProductDetails({ initialProduct }) {
                 {product.name}
               </h1>
               
-              <div className="flex items-center gap-6">
-                <p className="text-3xl font-bold text-gray-900">
-                  {mounted ? formatPrice(selectedVariant?.price ?? product.price) : `$${(selectedVariant?.price ?? product.price).toFixed(2)}`}
-                </p>
+              <div className="flex items-center gap-4">
+                {(() => {
+                  const currentPrice = selectedVariant?.price ?? product.price;
+                  const mrp = selectedVariant?.mrp ?? product.mrp;
+                  const discount = selectedVariant?.discount ?? product.discount ?? (mrp > currentPrice ? Math.round(((mrp - currentPrice) / mrp) * 100) : 0);
+                  
+                  return (
+                    <>
+                      {discount > 0 && (
+                        <div className="flex items-center gap-1 text-[#008a48] font-bold text-2xl">
+                          <span className="text-3xl">↓</span>
+                          <span>{discount}%</span>
+                        </div>
+                      )}
+                      {Number(mrp) > Number(currentPrice) && (
+                        <p className="text-2xl text-gray-400 line-through">
+                          {mounted ? formatPrice(mrp).replace(/[^\d,.₹$]/g, '') : mrp}
+                        </p>
+                      )}
+                      <p className="text-3xl font-bold text-gray-900">
+                        {mounted ? formatPrice(currentPrice) : currentPrice}
+                      </p>
+                    </>
+                  );
+                })()}
+                
                 {stock < 10 && stock > 0 && (
                   <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full animate-pulse">
                     Only {stock} left!

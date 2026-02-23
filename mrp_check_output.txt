@@ -1,0 +1,41 @@
+Connected to MongoDB
+Found 13 collections:
+  subcategories: 0 documents
+  users: 3 documents
+  orders: 6 documents
+  products: 1 documents
+  carts: 0 documents
+  categories: 7 documents
+  blogs: 0 documents
+  tickets: 0 documents
+  notifications: 22 documents
+  couponusages: 1 documents
+  coupons: 1 documents
+  heroslides: 1 documents
+  settings: 1 documents
+Sample Product from raw collection:
+{
+  "_id": "698e3eff5a5ddaf3ed056942",
+  "name": "Mens Lungi Blue color checked with 2.15 mtrs",
+  "description": "<p>Experience&nbsp;allday&nbsp;comfort&nbsp;and&nbsp;timeless&nbsp;tradition&nbsp;with&nbsp;our&nbsp;premium&nbsp;Men’s&nbsp;Cotton&nbsp;Lungi.&nbsp;Crafted&nbsp;from&nbsp;100%&nbsp;soft,&nbsp;breathable&nbsp;cotton,&nbsp;this&nbsp;lungi&nbsp;is&nbsp;designed&nbsp;to&nbsp;keep&nbsp;you&nbsp;cool&nbsp;and&nbsp;comfortable&nbsp;in&nbsp;every&nbsp;season.&nbsp;The&nbsp;lightweight&nbsp;fabric&nbsp;ensures&nbsp;excellent&nbsp;air&nbsp;circulation,&nbsp;making&nbsp;it&nbsp;perfect&nbsp;for&nbsp;daily&nbsp;wear,&nbsp;home&nbsp;use,&nbsp;sleepwear,&nbsp;temple&nbsp;visits,&nbsp;and&nbsp;traditional&nbsp;occasions.</p>",
+  "category": "698f72105949e71738941286",
+  "images": [
+    "https://res.cloudinary.com/dz0nfvkc7/image/upload/v1770961065/ecommerce-products/zdvblrohqxxo6fyvu5sb.jpg",
+    "https://res.cloudinary.com/dz0nfvkc7/image/upload/v1770961080/ecommerce-products/xysbrookdrcbvn7z4yle.jpg"
+  ],
+  "price": 120,
+  "variants": [],
+  "averageRating": 0,
+  "numReviews": 0,
+  "isFeatured": false,
+  "reviews": [],
+  "createdAt": "2026-02-12T20:58:39.164Z",
+  "updatedAt": "2026-02-21T07:39:46.434Z",
+  "__v": 0,
+  "slug": "mens-lungi-blue-color-checked",
+  "sku": "MENS-LUNGI-001",
+  "hasVariants": false,
+  "stock": 19,
+  "mrp": 240,
+  "discount": 50
+}

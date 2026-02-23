@@ -38,16 +38,7 @@ export default function Home() {
       {/* Categories Section */}
       <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
         <div className="text-center mb-6">
-          <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Collections</span>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl md:text-3xl font-display font-bold mt-2 text-gray-900"
-          >
-            Shop by Category
-          </motion.h2>
+          <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Shop by Category</span>
         </div>
         
         {isCategoriesLoading ? (
@@ -137,20 +128,19 @@ export default function Home() {
           </section>
       )}
 
-      {/* New Arrivals Section */}
-      <section className="bg-white/30 backdrop-blur-xl py-6 md:py-10 border-y border-white/50">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="text-center mb-8">
-            <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Fresh Drops</span>
-            <motion.h2 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="text-2xl md:text-3xl font-display font-bold mt-2 text-gray-900"
+      {/* New Arrivals (Fresh Drops) Section */}
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
+        <div className="bg-[#dbeafe] rounded-[2.5rem] p-6 md:p-8 border border-blue-200 shadow-sm">
+          <div className="flex justify-between items-center mb-6 px-2">
+            <h2 className="text-xl md:text-2xl font-display font-bold text-gray-900">
+              Fresh Drops
+            </h2>
+            <Link 
+              href="/shop" 
+              className="w-10 h-10 md:w-12 md:h-12 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
             >
-                New Arrivals
-            </motion.h2>
+              <FiArrowRight className="text-lg md:text-xl" />
+            </Link>
           </div>
 
           {isNewArrivalsLoading ? (
@@ -177,12 +167,6 @@ export default function Home() {
               ))}
             </div>
           )}
-          
-          <div className="mt-8 text-center">
-             <Link href="/shop" className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-primary transition-colors shadow-xl shadow-gray-900/20 active:scale-95">
-                View All Products <FiArrowRight />
-             </Link>
-          </div>
         </div>
       </section>
 
