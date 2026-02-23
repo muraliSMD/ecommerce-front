@@ -49,6 +49,8 @@ export default function AddProduct() {
     sku: "",
     description: "",
     price: "",
+    mrp: "",
+    discount: "",
     category: "",
     images: [""],
     variants: [],
@@ -56,7 +58,7 @@ export default function AddProduct() {
     hasVariants: false
   });
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", stock: "" });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "" });
 
   const addProductMutation = useMutation({
     mutationFn: async (data) => {
@@ -75,7 +77,24 @@ export default function AddProduct() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
+    let updatedProduct = { ...product, [name]: value };
+
+    // Auto-calculate logic for single product
+    if (name === "price" || name === "mrp") {
+      const price = name === "price" ? Number(value) : Number(product.price);
+      const mrp = name === "mrp" ? Number(value) : Number(product.mrp);
+      if (mrp > 0 && price > 0) {
+        updatedProduct.discount = Math.round(((mrp - price) / mrp) * 100);
+      }
+    } else if (name === "discount") {
+      const discount = Number(value);
+      const mrp = Number(product.mrp);
+      if (mrp > 0 && discount >= 0) {
+        updatedProduct.price = Math.round(mrp * (1 - discount / 100));
+      }
+    }
+
+    setProduct(updatedProduct);
   };
 
   const handleImageChange = (index, value) => {
@@ -99,9 +118,15 @@ export default function AddProduct() {
     }
     setProduct({ 
       ...product, 
-      variants: [...product.variants, { ...newVariant, stock: Number(newVariant.stock) || 0 }] 
+      variants: [...product.variants, { 
+        ...newVariant, 
+        stock: Number(newVariant.stock) || 0,
+        price: Number(newVariant.price) || 0,
+        mrp: Number(newVariant.mrp) || undefined,
+        discount: Number(newVariant.discount) || undefined
+      }] 
     });
-    setNewVariant({ color: "", size: "", length: "", price: "", stock: "" });
+    setNewVariant({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "" });
   };
 
   const removeVariant = (index) => {
@@ -119,7 +144,22 @@ export default function AddProduct() {
         ? product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0)
         : (Number(product.stock) || 0);
 
-    addProductMutation.mutate({ ...product, stock: totalStock });
+    const formattedProduct = {
+      ...product,
+      price: Number(product.price) || 0,
+      mrp: Number(product.mrp) || undefined,
+      discount: Number(product.discount) || undefined,
+      stock: totalStock,
+      variants: product.variants.map(v => ({
+        ...v,
+        price: Number(v.price) || 0,
+        mrp: Number(v.mrp) || undefined,
+        discount: Number(v.discount) || undefined,
+        stock: Number(v.stock) || 0
+      }))
+    };
+
+    addProductMutation.mutate(formattedProduct);
   };
 
   const [uploading, setUploading] = useState(false);
@@ -229,7 +269,7 @@ export default function AddProduct() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Base Price ({mounted ? getCurrencySymbol() : "..."})</label>
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Selling Price ({mounted ? getCurrencySymbol() : "..."})</label>
                   <input 
                     type="number" 
                     name="price"
@@ -238,6 +278,28 @@ export default function AddProduct() {
                     placeholder="0.00"
                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                     required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Base Price / MRP ({mounted ? getCurrencySymbol() : "..."})</label>
+                  <input 
+                    type="number" 
+                    name="mrp"
+                    value={product.mrp}
+                    onChange={handleInputChange}
+                    placeholder="0.00"
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Discount (%)</label>
+                  <input 
+                    type="number" 
+                    name="discount"
+                    value={product.discount}
+                    onChange={handleInputChange}
+                    placeholder="e.g. 10"
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                   />
                 </div>
             </div>
@@ -391,14 +453,40 @@ export default function AddProduct() {
                 className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
               />
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Price</label>
                 <input 
                   type="number" 
                   value={newVariant.price}
-                  onChange={(e) => setNewVariant({...newVariant, price: e.target.value})}
+                  onChange={(e) => {
+                    const price = Number(e.target.value);
+                    const mrp = Number(newVariant.mrp);
+                    let discount = newVariant.discount;
+                    if (mrp > 0 && price > 0) {
+                      discount = Math.round(((mrp - price) / mrp) * 100);
+                    }
+                    setNewVariant({...newVariant, price: e.target.value, discount});
+                  }}
                   placeholder="29"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">MRP</label>
+                <input 
+                  type="number" 
+                  value={newVariant.mrp}
+                  onChange={(e) => {
+                    const mrp = Number(e.target.value);
+                    const price = Number(newVariant.price);
+                    let discount = newVariant.discount;
+                    if (mrp > 0 && price > 0) {
+                      discount = Math.round(((mrp - price) / mrp) * 100);
+                    }
+                    setNewVariant({...newVariant, mrp: e.target.value, discount});
+                  }}
+                  placeholder="39"
                   className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
                 />
               </div>
@@ -412,6 +500,24 @@ export default function AddProduct() {
                   className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
                 />
               </div>
+            </div>
+            <div className="md:col-span-1 space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Discount (%)</label>
+                <input 
+                  type="number" 
+                  value={newVariant.discount || ""}
+                  onChange={(e) => {
+                    const discount = Number(e.target.value);
+                    const mrp = Number(newVariant.mrp);
+                    let price = newVariant.price;
+                    if (mrp > 0 && discount >= 0) {
+                      price = Math.round(mrp * (1 - discount / 100));
+                    }
+                    setNewVariant({...newVariant, discount: e.target.value, price});
+                  }}
+                  placeholder="0"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
+                />
             </div>
             <button 
               type="button" 
@@ -434,6 +540,7 @@ export default function AddProduct() {
                   {v.size && <span className="font-bold text-gray-500">Size: {v.size}</span>}
                   {v.length && <span className="font-bold text-gray-500">Length: {v.length}</span>}
                   <span className="font-bold text-gray-900">{mounted ? getCurrencySymbol() : ""}{v.price}</span>
+                  {v.mrp && <span className="text-gray-400 line-through text-xs">{mounted ? getCurrencySymbol() : ""}{v.mrp}</span>}
                   <span className="text-gray-400">{v.stock} in stock</span>
                 </div>
                 <button 

@@ -142,10 +142,17 @@ export default function AdminProducts() {
                     </span>
                   </td>
                   <td className="px-8 py-6">
-                    <p className="font-bold text-gray-900">{formatPrice(product.price)}</p>
-                    {product.variants?.length > 1 && (
-                      <p className="text-[10px] text-gray-400">{product.variants.length} Variants</p>
-                    )}
+                    <div className="flex flex-col">
+                      <p className="font-bold text-gray-900">{formatPrice(product.price)}</p>
+                      {Number(product.mrp) > Number(product.price) && (
+                        <p className="text-[10px] text-gray-400 line-through">
+                          {formatPrice(product.mrp)}
+                        </p>
+                      )}
+                      {product.variants?.length > 1 && (
+                        <p className="text-[10px] text-gray-400">{product.variants.length} Variants</p>
+                      )}
+                    </div>
                   </td>
                   <td className="px-8 py-6">
                     {(() => {

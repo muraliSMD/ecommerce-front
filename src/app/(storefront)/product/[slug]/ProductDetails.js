@@ -36,6 +36,11 @@ export default function ProductDetails({ initialProduct }) {
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const variants = useMemo(() => product?.variants || [], [product]);
   const allColors = useMemo(
@@ -117,9 +122,9 @@ export default function ProductDetails({ initialProduct }) {
       : product.images) || [];
 
   return (
-    <main className="bg-surface min-h-screen pb-20 pt-32">
+    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="mb-6">
+        <div className="mb-4">
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
@@ -130,7 +135,7 @@ export default function ProductDetails({ initialProduct }) {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           {/* Gallery Sidebar */}
           <div className="lg:col-span-1 hidden lg:flex flex-col gap-4">
             {gallery.map((img, i) => (
@@ -156,7 +161,7 @@ export default function ProductDetails({ initialProduct }) {
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="aspect-square md:aspect-auto md:h-[600px] rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-2xl shadow-black/5 relative"
+              className="aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-xl shadow-black/5 relative border border-gray-100"
             >
               <ZoomImage src={selectedImage} zoomAmount={250} height={600} />
             </motion.div>
@@ -183,19 +188,46 @@ export default function ProductDetails({ initialProduct }) {
           </div>
 
           {/* Product Details */}
-          <div className="lg:col-span-5 space-y-6 md:space-y-8">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="lg:col-span-5 space-y-6 md:space-y-8"
+          >
             <div className="space-y-4">
               <span className="text-primary font-bold tracking-widest uppercase text-sm">
                 {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
               </span>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-gray-900 leading-tight">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
               
-              <div className="flex items-center gap-6">
-                <p className="text-3xl font-bold text-gray-900">
-                  {formatPrice(selectedVariant?.price ?? product.price)}
-                </p>
+              <div className="flex items-center gap-4">
+                {(() => {
+                  const currentPrice = selectedVariant?.price ?? product.price;
+                  const mrp = selectedVariant?.mrp ?? product.mrp;
+                  const discount = selectedVariant?.discount ?? product.discount ?? (mrp > currentPrice ? Math.round(((mrp - currentPrice) / mrp) * 100) : 0);
+                  
+                  return (
+                    <>
+                      {discount > 0 && (
+                        <div className="flex items-center gap-1 text-[#008a48] font-bold text-2xl">
+                          <span className="text-3xl">↓</span>
+                          <span>{discount}%</span>
+                        </div>
+                      )}
+                      {Number(mrp) > Number(currentPrice) && (
+                        <p className="text-2xl text-gray-400 line-through">
+                          {mounted ? formatPrice(mrp).replace(/[^\d,.₹$]/g, '') : mrp}
+                        </p>
+                      )}
+                      <p className="text-3xl font-bold text-gray-900">
+                        {mounted ? formatPrice(currentPrice) : currentPrice}
+                      </p>
+                    </>
+                  );
+                })()}
+                
                 {stock < 10 && stock > 0 && (
                   <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full animate-pulse">
                     Only {stock} left!
@@ -338,14 +370,14 @@ export default function ProductDetails({ initialProduct }) {
                 <FiHeart size={24} className={isInWishlist(product._id) ? "fill-current" : ""} />
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
         
-        <div className="mt-16 md:mt-24">
+        <div className="mt-10 md:mt-16">
             <ProductTabs product={product} refetch={refetch} />
         </div>
 
-        <div className="mt-16 md:mt-24">
+        <div className="mt-10 md:mt-16">
             <RelatedProducts categoryId={product.category?._id || product.category} currentProductId={product._id} />
         </div>
       </div>
@@ -363,7 +395,13 @@ function ProductTabs({ product, refetch }) {
     ];
 
     return (
-        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100"
+        >
             <div className="flex gap-8 border-b border-gray-100 mb-8 overflow-x-auto pb-4 md:pb-0">
                 {tabs.map(tab => (
                     <button
@@ -380,10 +418,10 @@ function ProductTabs({ product, refetch }) {
                 ))}
             </div>
 
-            <div className="min-h-[200px]">
+            <div className="min-h-[200px] pt-4">
                 {activeTab === "description" && (
                      <div 
-                        className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary"
+                        className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary [&_*]:break-words [&_*]:whitespace-normal"
                         dangerouslySetInnerHTML={{ __html: product.description }}
                      />
                 )}
@@ -391,7 +429,7 @@ function ProductTabs({ product, refetch }) {
                     <ReviewsSection product={product} refetch={refetch} />
                 )}
                 {activeTab === "manufacturer" && (
-                    <div className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary">
+                    <div className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary [&_*]:break-words [&_*]:whitespace-normal">
                         {product.manufacturerInfo ? (
                             <div dangerouslySetInnerHTML={{ __html: product.manufacturerInfo }} />
                         ) : (
@@ -400,7 +438,7 @@ function ProductTabs({ product, refetch }) {
                     </div>
                 )}
             </div>
-        </div>
+        </motion.div>
     );
 }
 
@@ -420,8 +458,13 @@ function RelatedProducts({ categoryId, currentProductId }) {
     if (isLoading || !relatedProducts?.length) return null;
 
     return (
-        <section>
-            <h2 className="text-3xl font-display font-bold text-gray-900 mb-8">Related Products</h2>
+        <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.5 }}
+        >
+            <h2 className="text-3xl font-display font-bold text-gray-900 mb-8 animate-fade-in-up">Related Products</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 {relatedProducts.map(product => (
                     <ProductCard 
@@ -434,6 +477,6 @@ function RelatedProducts({ categoryId, currentProductId }) {
                     />
                 ))}
             </div>
-        </section>
+        </motion.section>
     );
 }

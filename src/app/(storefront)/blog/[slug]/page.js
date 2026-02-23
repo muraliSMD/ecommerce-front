@@ -33,7 +33,7 @@ export default function BlogPostPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-20 pt-32 lg:pt-36">
+    <main className="bg-surface min-h-screen pb-12 pt-32 lg:pt-36">
         {/* Hero Section */}
         <div className="container mx-auto px-4 md:px-8 max-w-4xl">
             <div className="mb-8">

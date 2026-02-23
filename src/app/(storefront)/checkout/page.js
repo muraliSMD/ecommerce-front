@@ -391,9 +391,9 @@ export default function CheckoutPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-20 pt-32 lg:pt-36">
+    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28 lg:pt-32">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="py-6">
+        <div className="py-4">
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
@@ -403,12 +403,16 @@ export default function CheckoutPage() {
           />
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-display font-bold mb-12">Checkout</h1>
+        <h1 className="text-3xl md:text-4xl font-display font-bold mb-8">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Form */}
           <div className="lg:col-span-7 space-y-8">
-            <section className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
+            <motion.section 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.4 }}
+               className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100"
+            >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
@@ -624,9 +628,14 @@ export default function CheckoutPage() {
                         </div>
                   </div>
               )}
-            </section>
+            </motion.section>
 
-            <section className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100">
+            <motion.section 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.4, delay: 0.1 }}
+               className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100"
+            >
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
                   <FiCreditCard size={24} />
@@ -675,12 +684,17 @@ export default function CheckoutPage() {
                      </div>
                 )}
               </div>
-            </section>
+            </motion.section>
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-5">
-            <div className="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl sticky top-28">
+            <motion.div 
+               initial={{ opacity: 0, x: 20 }}
+               animate={{ opacity: 1, x: 0 }}
+               transition={{ duration: 0.4, delay: 0.2 }}
+               className="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl sticky top-28"
+            >
               <h2 className="text-2xl font-display font-bold mb-8">Your Order</h2>
               
               <div className="space-y-6 mb-8 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
@@ -786,7 +800,7 @@ export default function CheckoutPage() {
                 <FiShield />
                 <span>Your data is protected by industry standard encryption</span>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
         

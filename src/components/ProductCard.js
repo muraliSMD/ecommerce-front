@@ -38,7 +38,14 @@ export default function ProductCard({ product, onAddToCart }) {
             </p>
             <h3 className="text-xs font-display font-bold text-gray-900 truncate" title={product.name}>{product.name}</h3>
           </div>
-          <p className="text-xs font-bold text-gray-900 whitespace-nowrap">{formatPrice(product.price)}</p>
+          <div className="text-right">
+            <p className="text-xs font-bold text-gray-900 whitespace-nowrap">{formatPrice(product.price)}</p>
+            {Number(product.mrp) > Number(product.price) && (
+              <p className="text-[10px] text-gray-400 line-through">
+                {formatPrice(product.mrp)}
+              </p>
+            )}
+          </div>
         </div>
 
         {hasVariants ? (

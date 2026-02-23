@@ -155,7 +155,8 @@ export default function EditBlogPage() {
                     <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden group">
                          {formData.coverImage ? (
                             <>
-                                <img src={formData.coverImage} className="absolute inset-0 w-full h-full object-cover" />
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={formData.coverImage} alt="Blog Cover" className="absolute inset-0 w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white font-bold">
                                     Change Image
                                 </div>

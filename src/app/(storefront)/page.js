@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import HeroSlider from "@/components/HeroSlider";
 import ProductCard from "@/components/ProductCard";
 import Image from "next/image";
@@ -12,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export default function Home() {
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const addToCart = useCartStore((state) => state.addToCart);
 
   // Fetch Categories
@@ -30,19 +32,13 @@ export default function Home() {
   const { data: newArrivals, isLoading: isNewArrivalsLoading } = useProducts({ sort: 'newest', limit: 10 });
 
   return (
-    <main className="bg-surface min-h-screen">
+    <main className="bg-surface min-h-screen pt-28 md:pt-32">
       <HeroSlider />
 
       {/* Categories Section */}
-      <section className="container mx-auto py-16 md:py-24 px-4 md:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10 gap-4">
-          <div className="text-center md:text-left">
-            <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Collections</span>
-            <h2 className="text-3xl md:text-5xl font-display font-bold mt-2 text-gray-900">Shop by Category</h2>
-          </div>
-          <Link href="/shop" className="text-primary font-bold flex items-center gap-2 hover:gap-3 transition-all">
-            View All Categories <FiArrowRight />
-          </Link>
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
+        <div className="text-center mb-6">
+          <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Shop by Category</span>
         </div>
         
         {isCategoriesLoading ? (
@@ -51,7 +47,7 @@ export default function Home() {
             </div>
         ) : (
             <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3 md:gap-4">
-            {categories?.filter(c => c.level > 0).slice(0, 16).map((cat, i) => (
+            {categories?.filter(c => c.level > 0).slice(0, showAllCategories ? undefined : 16).map((cat, i) => (
                 <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id} className="group">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -81,15 +77,34 @@ export default function Home() {
             ))}
             </div>
         )}
+        
+        {categories?.filter(c => c.level > 0).length > 16 && (
+          <div className="mt-8 text-center">
+            <button 
+              onClick={() => setShowAllCategories(!showAllCategories)}
+              className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-primary transition-colors shadow-xl shadow-gray-900/20 active:scale-95"
+            >
+              {showAllCategories ? "Show Less" : "View All Categories"} <FiArrowRight className={showAllCategories ? "-scale-x-100 transition-transform" : "transition-transform"} />
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Featured Products Section */}
       {featuredProducts?.length > 0 && (
-          <section className="bg-white py-16 md:py-24">
+          <section className="bg-white py-6 md:py-10">
             <div className="container mx-auto px-4 md:px-8">
-                <div className="text-center mb-16">
+                <div className="text-center mb-8">
                     <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Don&apos;t Miss Out</span>
-                    <h2 className="text-3xl md:text-5xl font-display font-bold mt-2 text-gray-900">Featured Products</h2>
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        className="text-2xl md:text-3xl font-display font-bold mt-2 text-gray-900"
+                    >
+                        Featured Products
+                    </motion.h2>
                 </div>
                 
                 
@@ -113,12 +128,19 @@ export default function Home() {
           </section>
       )}
 
-      {/* New Arrivals Section */}
-      <section className="bg-white/30 backdrop-blur-xl py-16 md:py-24 border-y border-white/50">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="text-center mb-16">
-            <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Fresh Drops</span>
-            <h2 className="text-3xl md:text-5xl font-display font-bold mt-2 text-gray-900">New Arrivals</h2>
+      {/* New Arrivals (Fresh Drops) Section */}
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
+        <div className="bg-[#dbeafe] rounded-[2.5rem] p-6 md:p-8 border border-blue-200 shadow-sm">
+          <div className="flex justify-between items-center mb-6 px-2">
+            <h2 className="text-xl md:text-2xl font-display font-bold text-gray-900">
+              Fresh Drops
+            </h2>
+            <Link 
+              href="/shop" 
+              className="w-10 h-10 md:w-12 md:h-12 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
+            >
+              <FiArrowRight className="text-lg md:text-xl" />
+            </Link>
           </div>
 
           {isNewArrivalsLoading ? (
@@ -145,23 +167,25 @@ export default function Home() {
               ))}
             </div>
           )}
-          
-          <div className="mt-16 text-center">
-             <Link href="/shop" className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-primary transition-colors shadow-xl shadow-gray-900/20 active:scale-95">
-                View All Products <FiArrowRight />
-             </Link>
-          </div>
         </div>
       </section>
 
       {/* Newsletter Section */}
-      <section className="container mx-auto py-16 md:py-24 px-4 md:px-8">
-        <div className="bg-gray-900 rounded-[2.5rem] p-8 md:p-20 text-center text-white relative overflow-hidden shadow-2xl shadow-gray-900/30">
+      <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
+        <div className="bg-gray-900 rounded-[2.5rem] p-6 md:p-12 text-center text-white relative overflow-hidden shadow-2xl shadow-gray-900/30">
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/30 rounded-full blur-[100px] -mr-48 -mt-48" />
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/30 rounded-full blur-[100px] -ml-48 -mb-48" />
           
           <div className="relative z-10 max-w-2xl mx-auto space-y-6 md:space-y-8">
-            <h2 className="text-3xl md:text-5xl font-display font-bold leading-tight">Join the GRABSZY Club</h2>
+            <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="text-2xl md:text-3xl font-display font-bold leading-tight"
+            >
+                Join the GRABSZY Club
+            </motion.h2>
             <p className="text-gray-400 text-base md:text-lg">Subscribe to receive updates, access to exclusive deals, and more.</p>
             
             <div className="flex flex-col md:flex-row gap-4 max-w-md mx-auto w-full">
