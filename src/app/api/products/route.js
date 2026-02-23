@@ -105,7 +105,8 @@ export async function GET(request) {
 
     return NextResponse.json(products);
   } catch (error) {
-    return NextResponse.json({ message: "Server Error", error }, { status: 500 });
+    logger.error("Failed to fetch products", { error: error.message, stack: error.stack });
+    return NextResponse.json({ message: "Server Error", error: error.message }, { status: 500 });
   }
 }
 

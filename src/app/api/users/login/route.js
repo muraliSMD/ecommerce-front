@@ -7,6 +7,8 @@ import { cookies } from 'next/headers';
 import { rateLimit } from '@/lib/rateLimit';
 import { loginSchema } from '@/lib/validations/auth';
 
+import logger from '@/lib/logger';
+
 export async function POST(request) {
   try {
     // 1. Rate Limiting (Max 5 login attempts per minute per IP)
@@ -29,15 +31,18 @@ export async function POST(request) {
 
     const user = await User.findOne({ email });
     if (!user) {
+      logger.warn(`Failed login attempt: User not found`, { email });
       return NextResponse.json({ message: "Invalid credentials" }, { status: 400 });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      logger.warn(`Failed login attempt: Invalid password`, { email, userId: user._id });
       return NextResponse.json({ message: "Invalid credentials" }, { status: 400 });
     }
 
     if (user.isBanned) {
+        logger.warn(`Login attempt for banned user`, { email, userId: user._id });
         return NextResponse.json({ message: "Your account has been suspended." }, { status: 403 });
     }
 
@@ -61,9 +66,10 @@ export async function POST(request) {
     const userResponse = user.toObject();
     delete userResponse.password;
 
+    logger.info(`User logged in successfully`, { email, userId: user._id, role: user.role });
     return NextResponse.json({ user: userResponse, token }); // Token still sent for client store but cookie is primary
   } catch (error) {
-    console.error("Login Error:", error);
+    logger.error("Login Error:", { error: error.message, stack: error.stack });
     return NextResponse.json({ message: "Server Error", error: error.message }, { status: 500 });
   }
 }

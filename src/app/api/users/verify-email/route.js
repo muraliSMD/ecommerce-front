@@ -2,8 +2,15 @@ import dbConnect from '@/lib/db';
 import User from '@/models/User';
 import { NextResponse } from 'next/server';
 
+import { rateLimit } from '@/lib/rateLimit';
+import logger from '@/lib/logger';
+
 export async function GET(request) {
   try {
+    // Rate limit: 5 requests per minute per IP
+    const rateLimitResponse = rateLimit(request, 5, 60000);
+    if (rateLimitResponse) return rateLimitResponse;
+
     await dbConnect();
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
