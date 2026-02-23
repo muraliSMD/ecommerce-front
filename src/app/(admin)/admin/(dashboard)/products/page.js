@@ -3,16 +3,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { 
-  FiPlus, 
   FiSearch, 
-  FiFilter, 
+  FiPlus, 
+  FiChevronLeft, 
+  FiChevronRight, 
+  FiImage, 
   FiEdit2, 
   FiTrash2, 
   FiEye, 
-  FiMoreVertical 
+  FiFilter,
+  FiMoreVertical,
+  FiShoppingBag,
+  FiPackage,
+  FiInfo,
+  FiCopy
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -20,6 +28,7 @@ import { SectionLoader } from "@/components/Loader";
 import { useSettingsStore } from "@/store/settingsStore";
 
 export default function AdminProducts() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
@@ -34,19 +43,33 @@ export default function AdminProducts() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      await api.delete(`/products/${id}`);
-    },
+  const deleteProductMutation = useMutation({
+    mutationFn: (id) => api.delete(`/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries(["admin-products"]);
       toast.success("Product deleted successfully");
-      setProductToDelete(null);
+      setProductToDelete(null); // Clear productToDelete after successful deletion
     },
     onError: () => {
       toast.error("Failed to delete product");
     }
   });
+
+  const duplicateProductMutation = useMutation({
+    mutationFn: (id) => api.post(`/products/${id}/duplicate`),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries(["admin-products"]);
+      toast.success("Product duplicated successfully");
+      router.push(`/admin/products/edit/${response.data._id}`);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to duplicate product");
+    }
+  });
+
+  const handleDuplicate = (id) => {
+    duplicateProductMutation.mutate(id);
+  };
 
   const getCategoryName = (product) => product.category?.name || product.category || "Uncategorized";
 
@@ -186,12 +209,22 @@ export default function AdminProducts() {
                       <Link 
                         href={`/admin/products/edit/${product._id}`}
                         className="p-3 bg-surface text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                        title="Edit Product"
                       >
                         <FiEdit2 size={16} />
                       </Link>
                       <button 
+                        onClick={() => handleDuplicate(product._id)}
+                        className="p-3 bg-surface text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-xl transition-all"
+                        title="Duplicate Product"
+                        disabled={duplicateProductMutation.isPending}
+                      >
+                        <FiCopy size={16} className={duplicateProductMutation.isPending ? "animate-pulse" : ""} />
+                      </button>
+                      <button 
                         onClick={() => setProductToDelete(product)}
                         className="p-3 bg-surface text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        title="Delete Product"
                       >
                         <FiTrash2 size={16} />
                       </button>
@@ -217,10 +250,10 @@ export default function AdminProducts() {
         <ConfirmationModal 
           isOpen={!!productToDelete}
           onClose={() => setProductToDelete(null)}
-          onConfirm={() => deleteMutation.mutate(productToDelete._id)}
+          onConfirm={() => deleteProductMutation.mutate(productToDelete._id)}
           title="Delete Product"
           message={`Are you sure you want to delete "${productToDelete.name}"? This action cannot be undone.`}
-          confirmText={deleteMutation.isPending ? "Deleting..." : "Delete Product"}
+          confirmText={deleteProductMutation.isPending ? "Deleting..." : "Delete Product"}
         />
       )}
     </div>
