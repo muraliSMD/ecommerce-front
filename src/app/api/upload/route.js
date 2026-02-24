@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
+// Add configuration to allow for larger payloads and longer execution on Vercel
+export const maxDuration = 60; // 60 seconds
+export const dynamic = 'force-dynamic';
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME,
@@ -47,7 +51,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Upload error details:', error);
     return NextResponse.json(
-      { message: 'Error uploading file to Cloudinary' },
+      { message: 'Error uploading file to Cloudinary', details: error.message || error.toString() },
       { status: 500 }
     );
   }
