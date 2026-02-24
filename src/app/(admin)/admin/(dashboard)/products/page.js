@@ -106,7 +106,7 @@ export default function AdminProducts() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-display font-bold text-gray-900">Products</h1>
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Products</h1>
           <p className="text-gray-500 mt-2">Manage your catalog and inventory.</p>
         </div>
         <Link 
@@ -149,7 +149,7 @@ export default function AdminProducts() {
       <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
+            <thead className="whitespace-nowrap">
               <tr className="bg-surface/50 text-gray-400 text-[10px] font-bold uppercase tracking-widest border-b border-gray-100">
                 <th className="px-8 py-6">Product</th>
                 <th className="px-8 py-6">Category</th>
@@ -159,7 +159,7 @@ export default function AdminProducts() {
                 <th className="px-8 py-6 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 whitespace-nowrap">
               {filteredProducts.map((product) => (
                 <tr key={product._id} className="group hover:bg-gray-50/50 transition-colors">
                   <td className="px-8 py-6">

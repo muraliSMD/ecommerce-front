@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }) {
   return (
     <div className="flex bg-[#f9fafb] min-h-screen">
       <AdminSidebar />
-      <main className="flex-grow transition-all duration-300 md:ml-72 ml-0 p-4 md:p-8">
+      <main className="flex-grow transition-all duration-300 md:ml-72 ml-0 p-4 pt-20 md:p-8">
         <div className="container mx-auto">
           {children}
         </div>

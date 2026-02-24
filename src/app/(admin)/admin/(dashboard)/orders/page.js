@@ -78,7 +78,7 @@ export default function AdminOrders() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-display font-bold text-gray-900">Orders</h1>
+        <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Orders</h1>
         <p className="text-gray-500 mt-2">Manage customer purchases and fulfillment.</p>
       </div>
 
@@ -168,7 +168,7 @@ export default function AdminOrders() {
               </div>
 
               {/* Status Controls */}
-              <div className="lg:w-64 flex flex-col justify-center border-l border-gray-50 pl-8 space-y-4">
+              <div className="lg:w-64 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-gray-50 pt-6 lg:pt-0 lg:pl-8 space-y-4">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Update Status</p>
                 <div className="grid grid-cols-2 gap-2">
                   {order.orderStatus === 'Cancellation Requested' ? (
