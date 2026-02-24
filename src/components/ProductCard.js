@@ -14,9 +14,9 @@ export default function ProductCard({ product, onAddToCart }) {
     <div className="group card-hover p-2 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/50 overflow-hidden relative">
       {/* ... keeping existing JSX ... */}
       <Link href={`/product/${product.slug || product._id}`} className="block relative aspect-square overflow-hidden rounded-xl bg-surface">
-        {product.videos?.length > 0 ? (
+        {product.videos?.filter(v => typeof v === 'string' && v.trim() !== '').length > 0 ? (
           <video
-            src={product.videos[0]}
+            src={product.videos.filter(v => typeof v === 'string' && v.trim() !== '')[0]}
             autoPlay
             muted
             loop
@@ -25,7 +25,7 @@ export default function ProductCard({ product, onAddToCart }) {
           />
         ) : (
           <Image
-            src={product.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"}
+            src={product.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"}
             alt={product.name?.toString() || "Product"}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"

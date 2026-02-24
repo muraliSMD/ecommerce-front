@@ -79,7 +79,7 @@ export default function MyOrdersPage() {
                         {order.items.slice(0, 3).map((item, i) => (
                             <div key={i} className="w-14 h-14 rounded-xl border-2 border-white bg-gray-100 overflow-hidden relative shadow-sm">
                                 <Image 
-                                    src={item.product?.images?.[0] || "/placeholder.jpg"} 
+                                    src={item.product?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                                     alt="Product" 
                                     width={56}
                                     height={56}

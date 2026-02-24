@@ -55,13 +55,16 @@ export async function PUT(request, { params }) {
     }
 
     const { id } = await params;
-    const { orderStatus, rejectionReason, paymentStatus } = await request.json();
+    const { orderStatus, rejectionReason, paymentStatus, adminNotes } = await request.json();
     
     const updateData = {};
     if (orderStatus) updateData.orderStatus = orderStatus;
     if (paymentStatus) updateData.paymentStatus = paymentStatus;
     if (rejectionReason) {
         updateData.rejectionReason = rejectionReason;
+    }
+    if (adminNotes !== undefined) {
+        updateData.adminNotes = adminNotes;
     }
 
     const order = await Order.findByIdAndUpdate(id, updateData, { new: true });

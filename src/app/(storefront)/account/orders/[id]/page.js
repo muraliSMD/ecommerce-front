@@ -63,6 +63,11 @@ export default function OrderDetailsPage() {
   if (isLoading) return <div className="h-96 bg-white rounded-3xl animate-pulse" />;
   if (!order) return <div>Order not found</div>;
 
+  const totalQuantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
+  const estimatedDays = totalQuantity <= 3 ? 4 : 10;
+  const estimatedDeliveryDate = new Date(order.createdAt);
+  estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + estimatedDays);
+
 
 
   const handleInvoiceDownload = () => {
@@ -79,6 +84,11 @@ export default function OrderDetailsPage() {
         <div>
             <h1 className="text-3xl font-display font-bold text-gray-900">Order #{order._id.slice(-6).toUpperCase()}</h1>
             <p className="text-gray-500">Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</p>
+            {['Pending', 'Processing', 'Shipped'].includes(order.orderStatus) && (
+              <p className="text-primary font-bold mt-1 inline-flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full text-sm">
+                <FiTruck /> Estimated Delivery: {estimatedDeliveryDate.toLocaleDateString()}
+              </p>
+            )}
         </div>
         <div className="flex items-center gap-3">
              <button 
@@ -120,12 +130,23 @@ export default function OrderDetailsPage() {
       </div>
 
       {order.rejectionReason && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-900">
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-900 mb-8">
               <h3 className="font-bold flex items-center gap-2 mb-2">
                   <FiTruck /> Request Update
               </h3>
               <p className="text-sm">
                   <span className="font-bold">Admin Note:</span> {order.rejectionReason}
+              </p>
+          </div>
+      )}
+
+      {order.adminNotes && (
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 text-blue-900 mb-8">
+              <h3 className="font-bold flex items-center gap-2 mb-2">
+                  <FiTruck /> Note from Support
+              </h3>
+              <p className="text-sm whitespace-pre-wrap">
+                  {order.adminNotes}
               </p>
           </div>
       )}
@@ -140,12 +161,21 @@ export default function OrderDetailsPage() {
                          <div key={i} className="flex flex-col gap-4 border-b border-gray-100 last:border-0 pb-6 last:pb-0">
                              <div className="flex gap-4 items-center">
                                 <div className="w-20 h-20 bg-gray-100 rounded-2xl overflow-hidden relative flex-shrink-0">
-                                    <Image 
-                                        src={item.product?.images?.[0] || item.variant?.images?.[0] || "/placeholder.jpg"} 
-                                        alt="Product" 
-                                        fill 
-                                        className="object-cover" 
-                                    />
+                                    {(() => {
+                                        let imgUrl = item.product?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070";
+                                        if (item.variant?.color && item.product?.variants) {
+                                            const matchedV = item.product.variants.find(v => v.color === item.variant.color);
+                                            if (matchedV?.images?.[0]) imgUrl = matchedV.images[0];
+                                        }
+                                        return (
+                                            <Image 
+                                                src={imgUrl} 
+                                                alt="Product" 
+                                                fill 
+                                                className="object-cover" 
+                                            />
+                                        );
+                                    })()}
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="font-bold text-gray-900">{item.product?.name || "Product"}</h4>

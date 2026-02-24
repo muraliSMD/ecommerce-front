@@ -226,7 +226,7 @@ export default function Header() {
                                             >
                                                 <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden relative flex-shrink-0">
                                                     <Image 
-                                                        src={product.images?.[0] || "/placeholder.jpg"} 
+                                                        src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                                                         alt={product.name} 
                                                         fill 
                                                         className="object-cover"
@@ -393,7 +393,7 @@ export default function Header() {
                                                 >
                                                     <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 relative">
                                                         <Image 
-                                                            src={product.images?.[0] || "/placeholder.jpg"} 
+                                                            src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                                                             alt={product.name} 
                                                             fill 
                                                             className="object-cover"

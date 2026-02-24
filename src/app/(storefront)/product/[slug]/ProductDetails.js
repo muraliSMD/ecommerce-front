@@ -86,10 +86,13 @@ export default function ProductDetails({ initialProduct }) {
 
     setSelectedVariant(variant || null);
     
-    if (product?.videos?.length) {
-        setSelectedMedia({ url: product.videos[0], type: 'video' });
+    const variantVideos = variant?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
+    const validVideos = variantVideos.length > 0 ? variantVideos : (product?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || []);
+    
+    if (validVideos.length > 0) {
+        setSelectedMedia({ url: validVideos[0], type: 'video' });
     } else {
-        const img = variant?.images?.[0] || product?.images?.[0] || null;
+        const img = variant?.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || product?.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || null;
         if (img) setSelectedMedia({ url: img, type: 'image' });
         else setSelectedMedia(null);
     }
@@ -104,16 +107,22 @@ export default function ProductDetails({ initialProduct }) {
       if (variants[0].length) setSelectedLength(variants[0].length);
       setSelectedVariant(variants[0]);
       
-      if (product?.videos?.length) {
-          setSelectedMedia({ url: product.videos[0], type: 'video' });
+      const variantVideos = variants[0].videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
+      const validVideos = variantVideos.length > 0 ? variantVideos : (product?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || []);
+      
+      if (validVideos.length > 0) {
+          setSelectedMedia({ url: validVideos[0], type: 'video' });
       } else {
-          const img = variants[0].images?.[0] || product?.images?.[0] || null;
+          const img = variants[0].images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || product?.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || null;
           if (img) setSelectedMedia({ url: img, type: 'image' });
       }
-    } else if (product?.videos?.length) {
-        setSelectedMedia({ url: product.videos[0], type: 'video' });
-    } else if (product?.images?.length) {
-        setSelectedMedia({ url: product.images[0], type: 'image' });
+    } else {
+      const validVideos = product?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
+      if (validVideos.length > 0) {
+          setSelectedMedia({ url: validVideos[0], type: 'video' });
+      } else if (product?.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.length) {
+          setSelectedMedia({ url: product.images.filter(i => typeof i === 'string' && i.trim() !== '')[0], type: 'image' });
+      }
     }
   }, [product, variants]);
 
@@ -132,11 +141,16 @@ export default function ProductDetails({ initialProduct }) {
   const stock = hasVariants ? (selectedVariant?.stock ?? 0) : (product.stock ?? 0);
   const canAdd = !isOutOfStock && quantity > 0 && quantity <= stock;
 
+  const validVariantVideos = selectedVariant && selectedVariant.videos?.filter(v => typeof v === 'string' && v.trim() !== '');
+  const variantHasVideos = validVariantVideos && validVariantVideos.length > 0;
+  
   const gallery = [
-    ...(product.videos?.map(v => ({ url: v, type: 'video' })) || []),
-    ...((selectedVariant && selectedVariant.images?.length
-      ? selectedVariant.images
-      : product.images) || []).map(img => ({ url: img, type: 'image' }))
+    ...(variantHasVideos 
+      ? validVariantVideos.map(v => ({ url: v, type: 'video' }))
+      : (product.videos?.filter(v => typeof v === 'string' && v.trim() !== '').map(v => ({ url: v, type: 'video' })) || [])),
+    ...((selectedVariant && selectedVariant.images?.filter(i => typeof i === 'string' && i.trim() !== '').length > 0
+      ? selectedVariant.images.filter(i => typeof i === 'string' && i.trim() !== '')
+      : product.images?.filter(i => typeof i === 'string' && i.trim() !== '')) || []).map(img => ({ url: img, type: 'image' }))
   ];
 
   return (
@@ -307,21 +321,38 @@ export default function ProductDetails({ initialProduct }) {
             {/* Colors */}
             {allColors.length > 0 && (
               <div className="space-y-4">
-                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Color</p>
+                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">
+                  Colour: <span className="text-gray-900 ml-2">{selectedColor}</span>
+                </p>
                 <div className="flex gap-3 flex-wrap">
-                  {allColors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`px-4 py-2 md:px-6 md:py-2.5 rounded-full border-2 transition-all font-medium text-sm md:text-base ${
-                        selectedColor === color
-                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                          : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                      }`}
-                    >
-                      {color}
-                    </button>
-                  ))}
+                  {allColors.map((color) => {
+                    const colorVariantWithImage = variants.find(v => v.color === color && v.images && v.images.length > 0);
+                    const colorImage = colorVariantWithImage ? colorVariantWithImage.images[0] : null;
+                    
+                    return (
+                      <button
+                        key={color}
+                        title={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`transition-all font-medium text-sm md:text-base relative flex items-center justify-center overflow-hidden ${
+                          colorImage ? 'w-14 h-18 md:w-16 md:h-20 rounded-xl' : 'px-4 py-2 md:px-6 md:py-2.5 rounded-full'
+                        } ${
+                          selectedColor === color
+                            ? "border-2 border-primary ring-2 ring-primary/20 shadow-lg"
+                            : "border-2 border-gray-100 bg-white text-gray-600 hover:border-gray-300"
+                        }`}
+                      >
+                        {colorImage ? (
+                          <>
+                            <Image src={colorImage} alt={color} fill className="object-cover" />
+                            <div className={`absolute inset-0 bg-black/20 ${selectedColor === color ? 'bg-black/0' : 'group-hover:bg-black/10'} transition-colors`} />
+                          </>
+                        ) : (
+                          <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{color}</span>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}

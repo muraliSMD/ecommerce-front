@@ -27,6 +27,7 @@ const orderSchema = new mongoose.Schema({
     cancellationReason: { type: String },
     returnReason: { type: String },
     rejectionReason: { type: String },
+    adminNotes: { type: String, default: "" },
     shippingAddress:{
         name: String,
         address: String, // Keep for backward compatibility
