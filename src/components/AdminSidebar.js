@@ -59,13 +59,23 @@ export default function AdminSidebar() {
 
   return (
     <>
-    {/* Mobile Toggle */}
-    <button 
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed bottom-6 right-6 z-[60] md:hidden w-14 h-14 bg-black text-white rounded-full shadow-2xl flex items-center justify-center"
-    >
-        {isMobileOpen ? <FiChevronLeft size={24} /> : <FiMenu size={24} />}
-    </button>
+    {/* Mobile Top Navigation Bar */}
+    <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900 text-white z-[40] flex items-center justify-between px-4 sm:px-6 shadow-md">
+      <div className="flex items-center gap-3">
+        <div className="bg-primary w-8 h-8 rounded-xl flex items-center justify-center font-bold text-lg">S</div>
+        <span className="text-xl font-display font-bold tracking-tight">GRABSZY <span className="text-primary font-normal text-xs uppercase tracking-widest ml-1">Admin</span></span>
+      </div>
+      
+      <div className="flex items-center gap-4">
+        <NotificationBell className="text-white" align="right" />
+        <button 
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            className="p-2 -mr-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors"
+        >
+            {isMobileOpen ? <FiChevronLeft size={24} /> : <FiMenu size={24} />}
+        </button>
+      </div>
+    </header>
 
     {/* Backdrop */}
     {isMobileOpen && (
@@ -76,13 +86,13 @@ export default function AdminSidebar() {
     )}
 
     <aside 
-      className={`bg-gray-900 text-white transition-all duration-300 flex flex-col fixed h-screen z-50 ${
+      className={`bg-gray-900 text-white transition-all duration-300 flex flex-col fixed h-screen z-50 top-0 bottom-0 ${
         isCollapsed ? "md:w-20" : "md:w-72"
       } w-72 ${isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
     >
 
-      {/* Brand */}
-      <div className="p-6 mb-8 flex items-center justify-between">
+      {/* Brand (Desktop Only) */}
+      <div className="hidden md:flex p-6 mb-8 items-center justify-between">
         {!isCollapsed && (
           <div className="flex items-center gap-3">
             <div className="bg-primary w-8 h-8 rounded-xl flex items-center justify-center font-bold text-lg">S</div>
@@ -96,6 +106,17 @@ export default function AdminSidebar() {
         >
           {isCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
         </button>
+      </div>
+      
+      {/* Mobile Branding inside Sidebar (Optional, keeps parity) */}
+      <div className="md:hidden p-6 mb-4 flex items-center justify-between border-b border-white/10 pt-8">
+         <span className="text-sm font-bold text-gray-500 uppercase tracking-widest">Navigation</span>
+         <button 
+          onClick={() => setIsMobileOpen(false)}
+          className="p-2 bg-white/10 rounded-xl transition-colors"
+         >
+          <FiChevronLeft size={20} />
+         </button>
       </div>
 
       {/* Navigation */}

@@ -59,7 +59,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-4xl font-display font-bold text-gray-900">Store Overview</h1>
+        <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Store Overview</h1>
         <p className="text-gray-500 mt-2">Welcome back, Admin. Here&apos;s what&apos;s happening today.</p>
       </div>
 
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead>
+              <thead className="whitespace-nowrap">
                 <tr className="text-gray-400 text-xs font-bold uppercase tracking-widest border-b border-gray-50">
                   <th className="pb-4">Order ID</th>
                   <th className="pb-4">Customer</th>
@@ -121,7 +121,7 @@ export default function AdminDashboard() {
                   <th className="pb-4">Date</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 whitespace-nowrap">
                 {recentOrders?.map((order) => (
                   <tr key={order._id} className="group hover:bg-gray-50/50 transition-colors">
                     <td className="py-5 font-mono text-xs text-gray-400">#{order._id.slice(-8)}</td>
