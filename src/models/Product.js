@@ -42,6 +42,9 @@ const productSchema = new mongoose.Schema(
     averageRating: { type: Number, default: 0 },
     numReviews: { type: Number, default: 0 },
     isFeatured: { type: Boolean, default: false },
+    metaTitle: { type: String },
+    metaDescription: { type: String },
+    metaKeywords: { type: String },
   },
   { timestamps: true }
 );

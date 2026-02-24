@@ -13,7 +13,8 @@ import {
   FiTag, 
   FiDollarSign, 
   FiGrid,
-  FiUpload
+  FiUpload,
+  FiGlobe
 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -46,7 +47,10 @@ export default function EditProduct({ params }) {
     images: [""],
     variants: [],
     stock: 0,
-    hasVariants: false
+    hasVariants: false,
+    metaTitle: "",
+    metaDescription: "",
+    metaKeywords: ""
   });
 
   const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "" });
@@ -79,7 +83,10 @@ export default function EditProduct({ params }) {
         hasVariants: fetchedProduct.hasVariants || false,
         stock: fetchedProduct.stock || 0,
         mrp: fetchedProduct.mrp || "",
-        discount: fetchedProduct.discount || ""
+        discount: fetchedProduct.discount || "",
+        metaTitle: fetchedProduct.metaTitle || "",
+        metaDescription: fetchedProduct.metaDescription || "",
+        metaKeywords: fetchedProduct.metaKeywords || ""
       });
     }
   }, [fetchedProduct]);
@@ -462,6 +469,51 @@ export default function EditProduct({ params }) {
             ))}
           </div>
           <p className="text-xs text-gray-400 mt-6">Paste direct links or upload images.</p>
+        </section>
+
+        {/* SEO & Visibility */}
+        <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-black/5 border border-gray-100">
+          <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3">
+            <FiGlobe className="text-primary" /> SEO & Visibility
+          </h2>
+          <div className="space-y-6 bg-surface p-6 rounded-3xl border border-gray-100">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Meta Title</label>
+              <input 
+                type="text" 
+                name="metaTitle"
+                value={product.metaTitle}
+                onChange={handleInputChange}
+                placeholder="Leave blank to use product name"
+                className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+              />
+              <p className="text-xs text-gray-400">Search engines will use this title. Max 60 characters recommended.</p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Meta Description</label>
+              <textarea 
+                name="metaDescription"
+                value={product.metaDescription}
+                onChange={handleInputChange}
+                placeholder="Briefly describe the product for search engine results..."
+                rows={3}
+                className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all resize-none"
+              />
+              <p className="text-xs text-gray-400">Search engines will use this description. Expected between 150-160 characters.</p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Meta Keywords</label>
+              <input 
+                type="text" 
+                name="metaKeywords"
+                value={product.metaKeywords}
+                onChange={handleInputChange}
+                placeholder="e.g. t-shirt, cotton, black, oversized"
+                className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+              />
+              <p className="text-xs text-gray-400">Comma-separated tags for better indexing.</p>
+            </div>
+          </div>
         </section>
 
         {/* Variants */}
