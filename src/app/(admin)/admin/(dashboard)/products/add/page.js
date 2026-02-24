@@ -54,6 +54,7 @@ export default function AddProduct() {
     discount: "",
     category: "",
     images: [""],
+    videos: [""],
     variants: [],
     stock: 0,
     hasVariants: false,
@@ -116,6 +117,21 @@ export default function AddProduct() {
     setProduct({ ...product, images: newImages.length ? newImages : [""] });
   };
 
+  const handleVideoChange = (index, value) => {
+    const newVideos = [...product.videos];
+    newVideos[index] = value;
+    setProduct({ ...product, videos: newVideos });
+  };
+
+  const addVideoField = () => {
+    setProduct({ ...product, videos: [...product.videos, ""] });
+  };
+
+  const removeVideoField = (index) => {
+    const newVideos = product.videos.filter((_, i) => i !== index);
+    setProduct({ ...product, videos: newVideos.length ? newVideos : [""] });
+  };
+
   const addVariant = () => {
     if (!newVariant.color || (!newVariant.size && !newVariant.length) || !newVariant.price) {
       return toast.error("Please fill color, size/length and price for variant");
@@ -167,15 +183,18 @@ export default function AddProduct() {
   };
 
   const [uploading, setUploading] = useState(false);
+  const [videoUploading, setVideoUploading] = useState(false);
 
-  const handleFileUpload = async (e, index) => {
+  const handleFileUpload = async (e, index, type = 'image') => {
     const file = e.target.files[0];
     if (!file) return;
 
     const formData = new FormData();
     formData.append("file", file);
 
-    setUploading(true);
+    if (type === 'video') setVideoUploading(true);
+    else setUploading(true);
+    
     try {
       // Use standard fetch or api wrapper if it supports formData automatically settings Content-Type to multipart/form-data
       // Generally axios/api wrapper needs header hints or auto-detects FormData
@@ -186,15 +205,21 @@ export default function AddProduct() {
       const data = await res.json();
       
       if (res.ok) {
-          handleImageChange(index, data.url);
-          toast.success("Image uploaded!");
+          if (type === 'video') {
+              handleVideoChange(index, data.url);
+              toast.success("Video uploaded!");
+          } else {
+              handleImageChange(index, data.url);
+              toast.success("Image uploaded!");
+          }
       } else {
-          toast.error("Failed to upload image");
+          toast.error(`Failed to upload ${type}`);
       }
     } catch (error) {
-      toast.error("Failed to upload image");
+      toast.error(`Failed to upload ${type}`);
     } finally {
-      setUploading(false);
+      if (type === 'video') setVideoUploading(false);
+      else setUploading(false);
     }
   };
 
@@ -416,6 +441,58 @@ export default function AddProduct() {
             ))}
           </div>
           <p className="text-xs text-gray-400 mt-6">Paste direct links or upload images.</p>
+        </section>
+
+        {/* Videos */}
+        <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-black/5 border border-gray-100">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-display font-bold flex items-center gap-3">
+              <FiImage className="text-primary" /> Product Videos
+            </h2>
+            <button 
+              type="button" 
+              onClick={addVideoField}
+              className="text-primary font-bold text-sm flex items-center gap-2 hover:underline"
+            >
+              <FiPlus /> Add Video URL
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {product.videos.map((vid, idx) => (
+              <div key={idx} className="space-y-2">
+                <div className="relative group">
+                  <input 
+                    type="text" 
+                    value={vid}
+                    onChange={(e) => handleVideoChange(idx, e.target.value)}
+                    placeholder="https://..."
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all pr-12"
+                  />
+                  <button 
+                    onClick={() => removeVideoField(idx)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <FiTrash2 size={18} />
+                  </button>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                    <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-gray-200">
+                        <FiUpload /> Upload Video
+                        <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="video/*"
+                            onChange={(e) => handleFileUpload(e, idx, 'video')}
+                            disabled={videoUploading}
+                        />
+                    </label>
+                    {videoUploading && <span className="text-xs text-primary animate-pulse">Uploading...</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400 mt-6">Paste direct links or upload videos (mp4, webm, etc).</p>
         </section>
 
         {/* SEO & Visibility */}

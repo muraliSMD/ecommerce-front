@@ -7,7 +7,7 @@ import { useState, useEffect, useMemo } from "react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ZoomImage from "@/components/ZoomImage";
 import toast from "react-hot-toast";
-import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus } from "react-icons/fi";
+import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle } from "react-icons/fi";
 import Image from "next/image";
 import { useSettingsStore } from "@/store/settingsStore";
 import { motion } from "framer-motion";
@@ -35,7 +35,7 @@ export default function ProductDetails({ initialProduct }) {
   const [selectedLength, setSelectedLength] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedMedia, setSelectedMedia] = useState(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -85,7 +85,15 @@ export default function ProductDetails({ initialProduct }) {
     }
 
     setSelectedVariant(variant || null);
-    setSelectedImage(variant?.images?.[0] || product?.images?.[0] || null);
+    
+    if (product?.videos?.length) {
+        setSelectedMedia({ url: product.videos[0], type: 'video' });
+    } else {
+        const img = variant?.images?.[0] || product?.images?.[0] || null;
+        if (img) setSelectedMedia({ url: img, type: 'image' });
+        else setSelectedMedia(null);
+    }
+    
     setQuantity(1);
   }, [selectedColor, selectedSize, selectedLength, variants, product]);
 
@@ -95,9 +103,17 @@ export default function ProductDetails({ initialProduct }) {
       if (variants[0].size) setSelectedSize(variants[0].size);
       if (variants[0].length) setSelectedLength(variants[0].length);
       setSelectedVariant(variants[0]);
-      setSelectedImage(variants[0].images?.[0] || product?.images?.[0] || null);
+      
+      if (product?.videos?.length) {
+          setSelectedMedia({ url: product.videos[0], type: 'video' });
+      } else {
+          const img = variants[0].images?.[0] || product?.images?.[0] || null;
+          if (img) setSelectedMedia({ url: img, type: 'image' });
+      }
+    } else if (product?.videos?.length) {
+        setSelectedMedia({ url: product.videos[0], type: 'video' });
     } else if (product?.images?.length) {
-      setSelectedImage(product.images[0]);
+        setSelectedMedia({ url: product.images[0], type: 'image' });
     }
   }, [product, variants]);
 
@@ -116,10 +132,12 @@ export default function ProductDetails({ initialProduct }) {
   const stock = hasVariants ? (selectedVariant?.stock ?? 0) : (product.stock ?? 0);
   const canAdd = !isOutOfStock && quantity > 0 && quantity <= stock;
 
-  const gallery =
-    (selectedVariant && selectedVariant.images?.length
+  const gallery = [
+    ...(product.videos?.map(v => ({ url: v, type: 'video' })) || []),
+    ...((selectedVariant && selectedVariant.images?.length
       ? selectedVariant.images
-      : product.images) || [];
+      : product.images) || []).map(img => ({ url: img, type: 'image' }))
+  ];
 
   return (
     <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
@@ -138,20 +156,27 @@ export default function ProductDetails({ initialProduct }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           {/* Gallery Sidebar */}
           <div className="lg:col-span-1 hidden lg:flex flex-col gap-4">
-            {gallery.map((img, i) => (
+            {gallery.map((media, i) => (
               <button
                 key={i}
-                onClick={() => setSelectedImage(img)}
-                className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all relative ${
-                  selectedImage === img ? "border-primary shadow-lg scale-105" : "border-transparent hover:border-gray-200"
+                onClick={() => setSelectedMedia(media)}
+                className={`aspect-square bg-gray-50 rounded-2xl overflow-hidden border-2 transition-all relative flex items-center justify-center ${
+                  selectedMedia?.url === media.url ? "border-primary shadow-lg scale-105" : "border-transparent hover:border-gray-200"
                 }`}
               >
-                <Image 
-                    src={img} 
-                    alt="" 
-                    fill
-                    className="object-cover" 
-                />
+                {media.type === 'video' ? (
+                   <>
+                      <video src={media.url} className="object-cover w-full h-full opacity-60" />
+                      <FiPlayCircle className="absolute text-4xl text-gray-900 bg-white/50 backdrop-blur-sm rounded-full p-1" />
+                   </>
+                ) : (
+                  <Image 
+                      src={media.url} 
+                      alt="" 
+                      fill
+                      className="object-cover" 
+                  />
+                )}
               </button>
             ))}
           </div>
@@ -159,29 +184,48 @@ export default function ProductDetails({ initialProduct }) {
           {/* Main Image */}
           <div className="lg:col-span-6 relative">
             <motion.div 
+              key={selectedMedia?.url}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-xl shadow-black/5 relative border border-gray-100"
+              className="aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-xl shadow-black/5 relative border border-gray-100 flex items-center justify-center"
             >
-              <ZoomImage src={selectedImage} zoomAmount={250} height={600} />
+              {selectedMedia?.type === 'video' ? (
+                  <video 
+                    src={selectedMedia.url} 
+                    autoPlay 
+                    muted 
+                    loop 
+                    playsInline
+                    className="w-full h-full object-cover" 
+                  />
+              ) : (
+                  <ZoomImage src={selectedMedia?.url} zoomAmount={250} height={600} />
+              )}
             </motion.div>
             
             {/* Mobile Thumbnails */}
             <div className="flex lg:hidden gap-3 mt-4 overflow-x-auto pb-2 px-2 snap-x snap-mandatory">
-              {gallery.map((img, i) => (
+              {gallery.map((media, i) => (
                 <button
                   key={i}
-                  onClick={() => setSelectedImage(img)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden relative border-2 snap-start ${
-                    selectedImage === img ? "border-primary" : "border-transparent"
+                  onClick={() => setSelectedMedia(media)}
+                  className={`flex-shrink-0 w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden relative border-2 snap-start flex items-center justify-center ${
+                    selectedMedia?.url === media.url ? "border-primary" : "border-transparent"
                   }`}
                 >
-                  <Image 
-                    src={img} 
-                    alt="" 
-                    fill
-                    className="object-cover" 
-                  />
+                  {media.type === 'video' ? (
+                     <>
+                        <video src={media.url} className="object-cover w-full h-full opacity-60" />
+                        <FiPlayCircle className="absolute text-2xl text-gray-900 bg-white/50 backdrop-blur-sm rounded-full p-1" />
+                     </>
+                  ) : (
+                    <Image 
+                        src={media.url} 
+                        alt="" 
+                        fill
+                        className="object-cover" 
+                    />
+                  )}
                 </button>
               ))}
             </div>
@@ -202,7 +246,7 @@ export default function ProductDetails({ initialProduct }) {
                 {product.name}
               </h1>
               
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 mt-2">
                 {(() => {
                   const currentPrice = selectedVariant?.price ?? product.price;
                   const mrp = selectedVariant?.mrp ?? product.mrp;
@@ -233,6 +277,28 @@ export default function ProductDetails({ initialProduct }) {
                     Only {stock} left!
                   </span>
                 )}
+              </div>
+
+              {/* Star Rating Summary */}
+              <div className="flex items-center gap-2 mt-4">
+                <div className="flex gap-1 text-yellow-400 text-sm">
+                  {[...Array(5)].map((_, i) => (
+                     <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-gray-300"} />
+                  ))}
+                </div>
+                <span className="text-sm text-gray-500 font-medium">({product.averageRating?.toFixed(1) || 0})</span>
+                <button 
+                  onClick={() => {
+                      const tabsElement = document.getElementById("product-tabs");
+                      if (tabsElement) {
+                          tabsElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                          window.dispatchEvent(new CustomEvent('switchTab', { detail: 'reviews' }));
+                      }
+                  }}
+                  className="text-sm text-primary font-bold hover:underline"
+                >
+                  {product.numReviews || 0} Reviews
+                </button>
               </div>
             </div>
 
@@ -385,8 +451,14 @@ export default function ProductDetails({ initialProduct }) {
   );
 }
 
-function ProductTabs({ product, refetch }) {
+export function ProductTabs({ product, refetch }) {
     const [activeTab, setActiveTab] = useState("description");
+
+    useEffect(() => {
+        const handleSwitchTab = (e) => setActiveTab(e.detail);
+        window.addEventListener('switchTab', handleSwitchTab);
+        return () => window.removeEventListener('switchTab', handleSwitchTab);
+    }, []);
 
     const tabs = [
         { id: "description", label: "Description" },
@@ -396,6 +468,7 @@ function ProductTabs({ product, refetch }) {
 
     return (
         <motion.div 
+            id="product-tabs"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
@@ -442,7 +515,7 @@ function ProductTabs({ product, refetch }) {
     );
 }
 
-function RelatedProducts({ categoryId, currentProductId }) {
+export function RelatedProducts({ categoryId, currentProductId }) {
     const { addToCart } = useCartStore();
     
     const { data: relatedProducts, isLoading } = useQuery({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import HeroSlider from "@/components/HeroSlider";
 import ProductCard from "@/components/ProductCard";
 import Image from "next/image";
@@ -8,13 +8,21 @@ import { useProducts } from "@/hooks/useProducts";
 import { useCartStore } from "@/store/cartStore";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
 export default function Home() {
-  const [showAllCategories, setShowAllCategories] = useState(false);
   const addToCart = useCartStore((state) => state.addToCart);
+  const categorySliderRef = useRef(null);
+
+  const scrollCategories = (direction) => {
+    if (categorySliderRef.current) {
+      const { scrollLeft, clientWidth } = categorySliderRef.current;
+      const scrollTo = direction === 'left' ? scrollLeft - (clientWidth / 2) : scrollLeft + (clientWidth / 2);
+      categorySliderRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  };
 
   // Fetch Categories
   const { data: categories, isLoading: isCategoriesLoading } = useQuery({
@@ -37,57 +45,70 @@ export default function Home() {
 
       {/* Categories Section */}
       <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
-        <div className="text-center mb-6">
-          <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Shop by Category</span>
-        </div>
-        
-        {isCategoriesLoading ? (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
-                 {[...Array(16)].map((_, i) => <div key={i} className="aspect-square bg-gray-200 rounded-2xl animate-pulse"></div>)}
+        <div className="bg-[#bfdbfe] rounded-[2.5rem] p-6 md:p-8 border border-blue-300 shadow-sm relative overflow-hidden">
+          <div className="flex justify-between items-center mb-6 px-2">
+            <h2 className="text-xl md:text-2xl font-display font-bold text-gray-900">
+              Shop by Category
+            </h2>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => scrollCategories('left')}
+                className="w-10 h-10 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm active:scale-95"
+                title="Scroll Left"
+              >
+                <FiChevronLeft className="text-lg" />
+              </button>
+              <button 
+                onClick={() => scrollCategories('right')}
+                className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
+                title="Scroll Right"
+              >
+                <FiChevronRight className="text-lg" />
+              </button>
             </div>
-        ) : (
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3 md:gap-4">
-            {categories?.filter(c => c.level > 0).slice(0, showAllCategories ? undefined : 16).map((cat, i) => (
-                <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id} className="group">
+          </div>
+          
+          {isCategoriesLoading ? (
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">
+                 {[...Array(8)].map((_, i) => <div key={i} className="min-w-[96px] md:min-w-[128px] aspect-square bg-white/50 rounded-2xl animate-pulse"></div>)}
+            </div>
+          ) : (
+            <div 
+              ref={categorySliderRef}
+              className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+            {categories?.filter(c => c.level > 0).map((cat, i) => (
+                <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id} className="group w-[96px] sm:w-[112px] md:w-[128px] lg:w-[144px] flex-shrink-0 snap-start">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: i * 0.03 }}
-                    className="space-y-3"
+                    transition={{ delay: i * 0.05 }}
+                    className="space-y-3 w-full"
                 >
-                    <div className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all bg-gray-100">
+                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all bg-white">
                         {cat.image ? (
                             <Image 
                             src={cat.image} 
                             alt={cat.name} 
                             fill
-                            sizes="(max-width: 640px) 25vw, (max-width: 768px) 16.6vw, (max-width: 1024px) 12.5vw, 10vw"
+                            sizes="(max-width: 640px) 96px, (max-width: 768px) 128px, 144px"
                             className="object-cover transition-transform duration-700 group-hover:scale-110" 
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400 font-bold text-lg">
+                            <div className="w-full h-full flex items-center justify-center bg-white text-gray-400 font-bold text-lg text-center p-2">
                                 {cat.name}
                             </div>
                         )}
                     </div>
-                    <h3 className="text-xs md:text-sm font-bold text-gray-900 text-center truncate group-hover:text-primary transition-colors">{cat.name}</h3>
+                    <h3 title={cat.name} className="text-sm md:text-base font-bold text-gray-900 text-center truncate group-hover:text-primary transition-colors w-full">{cat.name}</h3>
                 </motion.div>
                 </Link>
             ))}
             </div>
-        )}
-        
-        {categories?.filter(c => c.level > 0).length > 16 && (
-          <div className="mt-8 text-center">
-            <button 
-              onClick={() => setShowAllCategories(!showAllCategories)}
-              className="inline-flex items-center gap-2 bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-primary transition-colors shadow-xl shadow-gray-900/20 active:scale-95"
-            >
-              {showAllCategories ? "Show Less" : "View All Categories"} <FiArrowRight className={showAllCategories ? "-scale-x-100 transition-transform" : "transition-transform"} />
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </section>
 
       {/* Featured Products Section */}

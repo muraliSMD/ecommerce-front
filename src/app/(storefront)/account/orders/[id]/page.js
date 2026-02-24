@@ -10,6 +10,7 @@ import Image from "next/image";
 import ReviewModal from "@/components/ReviewModal";
 import { FiStar, FiDownload } from "react-icons/fi";
 import { generateInvoice } from "@/lib/invoiceGenerator";
+import InlineOrderReview from "@/components/InlineOrderReview";
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,18 +26,6 @@ export default function OrderDetailsPage() {
   const [modalType, setModalType] = useState(null); // 'cancel' or 'return'
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [reviewProduct, setReviewProduct] = useState(null);
-
-  const openReviewModal = (item) => {
-      setReviewProduct({
-          id: item.product._id,
-          name: item.product.name,
-          image: item.product.images?.[0] || item.variant?.images?.[0] || "/placeholder.jpg"
-      });
-      setReviewModalOpen(true);
-  };
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", id],
@@ -148,35 +137,35 @@ export default function OrderDetailsPage() {
                 <h3 className="font-bold text-xl mb-6">Items</h3>
                 <div className="space-y-6">
                     {order.items.map((item, i) => (
-                         <div key={i} className="flex gap-4 items-center">
-                            <div className="w-20 h-20 bg-gray-100 rounded-2xl overflow-hidden relative flex-shrink-0">
-                                <Image 
-                                    src={item.product?.images?.[0] || item.variant?.images?.[0] || "/placeholder.jpg"} 
-                                    alt="Product" 
-                                    fill 
-                                    className="object-cover" 
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <h4 className="font-bold text-gray-900">{item.product?.name || "Product"}</h4>
-                                {item.variant && (
-                                    <p className="text-sm text-gray-500">
-                                        {item.variant.color} / {item.variant.size}
-                                    </p>
-                                )}
-                                    <p className="text-sm text-gray-900 font-bold mt-1">Qty: {item.quantity}</p>
-                                    
-                                    {order.orderStatus === 'Delivered' && (
-                                        <button 
-                                            onClick={() => openReviewModal(item)}
-                                            className="mt-2 text-primary text-sm font-bold flex items-center gap-1 hover:underline underline-offset-2"
-                                        >
-                                            <FiStar size={14} className="fill-current" /> Write a Review
-                                        </button>
-                                    )}
+                         <div key={i} className="flex flex-col gap-4 border-b border-gray-100 last:border-0 pb-6 last:pb-0">
+                             <div className="flex gap-4 items-center">
+                                <div className="w-20 h-20 bg-gray-100 rounded-2xl overflow-hidden relative flex-shrink-0">
+                                    <Image 
+                                        src={item.product?.images?.[0] || item.variant?.images?.[0] || "/placeholder.jpg"} 
+                                        alt="Product" 
+                                        fill 
+                                        className="object-cover" 
+                                    />
                                 </div>
-                                <p className="font-bold text-lg">{formatPrice(item.price * item.quantity)}</p>
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-gray-900">{item.product?.name || "Product"}</h4>
+                                    {item.variant && (
+                                        <p className="text-sm text-gray-500">
+                                            {item.variant.color} / {item.variant.size}
+                                        </p>
+                                    )}
+                                        <p className="text-sm text-gray-900 font-bold mt-1">Qty: {item.quantity}</p>
+                                    </div>
+                                    <p className="font-bold text-lg">{formatPrice(item.price * item.quantity)}</p>
                              </div>
+                             
+                             {order.orderStatus === 'Delivered' && item.product && (
+                                 <InlineOrderReview 
+                                    product={item.product} 
+                                    onReviewSubmitted={() => queryClient.invalidateQueries(["order", id])} 
+                                 />
+                             )}
+                         </div>
                     ))}
                 </div>
             </div>
@@ -287,15 +276,6 @@ export default function OrderDetailsPage() {
               </div>
           </div>
       )}
-
-      {/* Review Modal */}
-      <ReviewModal 
-        isOpen={reviewModalOpen} 
-        onClose={() => setReviewModalOpen(false)}
-        productId={reviewProduct?.id}
-        productName={reviewProduct?.name}
-        productImage={reviewProduct?.image}
-      />
     </div>
   );
 }

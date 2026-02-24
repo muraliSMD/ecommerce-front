@@ -38,7 +38,7 @@ export default function AdminProducts() {
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
-      const { data } = await api.get("/products");
+      const { data } = await api.get("/products?admin=true");
       return data;
     },
   });
@@ -69,6 +69,24 @@ export default function AdminProducts() {
 
   const handleDuplicate = (id) => {
     duplicateProductMutation.mutate(id);
+  };
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, isActive }) => {
+      const { data } = await api.put(`/products/${id}`, { isActive });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["admin-products"]);
+      toast.success("Product visibility updated");
+    },
+    onError: () => {
+      toast.error("Failed to update product visibility");
+    }
+  });
+
+  const handleToggleVisibility = (id, currentStatus) => {
+    toggleVisibilityMutation.mutate({ id, isActive: !currentStatus });
   };
 
   const getCategoryName = (product) => product.category?.name || product.category || "Uncategorized";
@@ -137,6 +155,7 @@ export default function AdminProducts() {
                 <th className="px-8 py-6">Category</th>
                 <th className="px-8 py-6">Price</th>
                 <th className="px-8 py-6">Stock</th>
+                <th className="px-8 py-6">Status</th>
                 <th className="px-8 py-6 text-right">Actions</th>
               </tr>
             </thead>
@@ -197,6 +216,28 @@ export default function AdminProducts() {
                         </>
                       );
                     })()}
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => handleToggleVisibility(product._id, product.isActive !== false)}
+                        disabled={toggleVisibilityMutation.isPending}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                          product.isActive !== false ? 'bg-green-500' : 'bg-gray-300'
+                        }`}
+                        title={product.isActive !== false ? "Disable product" : "Enable product"}
+                      >
+                        <span className="sr-only">Toggle Active status</span>
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            product.isActive !== false ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <span className={`ml-3 text-xs font-bold ${product.isActive !== false ? 'text-green-600' : 'text-gray-500'}`}>
+                          {product.isActive !== false ? "Active" : "Disabled"}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">

@@ -24,6 +24,20 @@ export async function GET(request, { params }) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });
     }
     
+    const { searchParams } = new URL(request.url);
+    const isAdminFetch = searchParams.get('admin') === 'true';
+    let isAdminUser = false;
+    
+    if (isAdminFetch) {
+      const user = await getFullUserFromRequest(request);
+      isAdminUser = !!user && isAdmin(user);
+    }
+    
+    // If the product is disabled and the user is not an admin, return 404
+    if (product.isActive === false && !isAdminUser) {
+        return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+    
     return NextResponse.json(product);
   } catch (error) {
     return NextResponse.json({ message: "Server Error", error }, { status: 500 });

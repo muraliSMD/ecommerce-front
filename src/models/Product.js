@@ -32,6 +32,7 @@ const productSchema = new mongoose.Schema(
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     // subCategory field is deprecated, using recursive category structure instead
     images: { type: [String], default: [] }, // general product images
+    videos: { type: [String], default: [] }, // product videos
     price: { type: Number, required: true }, // fallback price if no variants
     mrp: { type: Number }, // fallback base price
     discount: { type: Number }, // fallback discount
@@ -45,6 +46,7 @@ const productSchema = new mongoose.Schema(
     metaTitle: { type: String },
     metaDescription: { type: String },
     metaKeywords: { type: String },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
@@ -54,6 +56,5 @@ productSchema.index({ name: 'text', category: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ createdAt: -1 });
 productSchema.index({ isFeatured: 1 });
-productSchema.index({ slug: 1 });
 
 export default mongoose.models.Product || mongoose.model("Product", productSchema);

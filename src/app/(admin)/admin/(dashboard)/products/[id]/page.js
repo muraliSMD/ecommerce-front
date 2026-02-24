@@ -8,11 +8,13 @@ import {
   FiEdit2, 
   FiTag, 
   FiDollarSign, 
-  FiGrid, 
+  FiGrid,
   FiBox,
   FiInfo,
   FiImage,
-  FiGlobe
+  FiVideo,
+  FiGlobe,
+  FiPlayCircle
 } from "react-icons/fi";
 import Link from "next/link";
 import Image from "next/image";
@@ -22,7 +24,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 export default function ProductDetailsAdmin({ params }) {
   const { id } = use(params);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
-  const [activeImage, setActiveImage] = useState(0);
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["admin-product", id],
@@ -46,6 +48,13 @@ export default function ProductDetailsAdmin({ params }) {
     ? product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0)
     : (product.stock || 0);
 
+  const gallery = [
+    ...(product.videos?.map(v => ({ url: v, type: 'video' })) || []),
+    ...(product.images?.map(img => ({ url: img, type: 'image' })) || [])
+  ];
+
+  const activeMedia = gallery[activeMediaIndex] || { url: "/placeholder.png", type: 'image' };
+
   return (
     <div className="max-w-6xl mx-auto pb-20 space-y-8">
       {/* Header */}
@@ -65,24 +74,42 @@ export default function ProductDetailsAdmin({ params }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Images */}
+        {/* Left Column: Media Gallery */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="aspect-square bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-xl shadow-black/5 relative">
-            <Image 
-              src={product.images?.[activeImage] || "/placeholder.png"} 
-              alt={product.name}
-              fill
-              className="object-cover"
-            />
+          <div className="aspect-square bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-xl shadow-black/5 relative flex items-center justify-center">
+            {activeMedia.type === 'video' ? (
+                <video 
+                  src={activeMedia.url}
+                  autoPlay 
+                  muted 
+                  loop 
+                  playsInline
+                  className="w-full h-full object-contain bg-black"
+                />
+            ) : (
+                <Image 
+                  src={activeMedia.url} 
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                />
+            )}
           </div>
           <div className="grid grid-cols-4 gap-4">
-            {product.images?.map((img, idx) => (
+            {gallery.map((media, idx) => (
               <button 
                 key={idx}
-                onClick={() => setActiveImage(idx)}
-                className={`aspect-square rounded-2xl overflow-hidden border-2 transition-all ${activeImage === idx ? 'border-primary ring-4 ring-primary/10' : 'border-gray-100 hover:border-gray-300'}`}
+                onClick={() => setActiveMediaIndex(idx)}
+                className={`aspect-square bg-gray-50 rounded-2xl overflow-hidden border-2 transition-all relative flex items-center justify-center ${activeMediaIndex === idx ? 'border-primary ring-4 ring-primary/10 scale-105' : 'border-transparent hover:border-gray-200'}`}
               >
-                <Image src={img} alt="" width={100} height={100} className="w-full h-full object-cover" />
+                {media.type === 'video' ? (
+                   <>
+                      <video src={media.url} className="w-full h-full object-cover opacity-60" />
+                      <FiPlayCircle className="absolute text-3xl text-gray-900 bg-white/50 backdrop-blur-sm rounded-full p-1" />
+                   </>
+                ) : (
+                   <Image src={media.url} alt="" width={100} height={100} className="w-full h-full object-cover" />
+                )}
               </button>
             ))}
           </div>
@@ -131,7 +158,7 @@ export default function ProductDetailsAdmin({ params }) {
                 <FiInfo className="text-primary" /> Description
               </h3>
               <div 
-                className="prose prose-sm max-w-none text-gray-600"
+                className="prose prose-sm max-w-none text-gray-600 break-words overflow-hidden"
                 dangerouslySetInnerHTML={{ __html: product.description }}
               />
             </div>
@@ -142,7 +169,7 @@ export default function ProductDetailsAdmin({ params }) {
                   <FiBox className="text-primary" /> Manufacturer Details
                 </h3>
                 <div 
-                  className="prose prose-sm max-w-none text-gray-600"
+                  className="prose prose-sm max-w-none text-gray-600 break-words overflow-hidden"
                   dangerouslySetInnerHTML={{ __html: product.manufacturerInfo }}
                 />
               </div>
