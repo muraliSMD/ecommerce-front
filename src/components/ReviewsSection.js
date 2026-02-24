@@ -3,16 +3,15 @@
 
 import { FiStar, FiUser } from "react-icons/fi";
 import { format } from "date-fns";
-import ReviewForm from "./ReviewForm";
 
 export default function ReviewsSection({ product, refetch }) {
   return (
     <div className="max-w-4xl mx-auto px-4 py-16">
         <h2 className="font-display font-bold text-3xl text-gray-900 mb-8 text-center">Customer Reviews</h2>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="flex justify-center mb-12">
             {/* Rating Summary */}
-            <div className="md:col-span-1 bg-white rounded-3xl p-8 shadow-sm border border-gray-100 text-center h-fit">
+            <div className="w-full max-w-sm bg-white rounded-3xl p-8 shadow-sm border border-gray-100 text-center h-fit">
                 <div className="text-5xl font-bold text-gray-900 mb-2">{product.averageRating?.toFixed(1) || 0}</div>
                 <div className="flex justify-center gap-1 text-yellow-400 mb-2">
                      {[...Array(5)].map((_, i) => (
@@ -20,11 +19,6 @@ export default function ReviewsSection({ product, refetch }) {
                      ))}
                 </div>
                 <p className="text-gray-500 font-medium">{product.numReviews || 0} Reviews</p>
-            </div>
-            
-            {/* Review Form */}
-            <div className="md:col-span-2">
-                <ReviewForm productId={product._id} onReviewSubmitted={refetch} />
             </div>
         </div>
 

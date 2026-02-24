@@ -5,8 +5,15 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
+import { rateLimit } from "@/lib/rateLimit";
+import logger from "@/lib/logger";
+
 export async function POST(request) {
   try {
+    // Rate limit: 5 requests per hour per IP
+    const rateLimitResponse = rateLimit(request, 5, 3600000);
+    if (rateLimitResponse) return rateLimitResponse;
+
     await dbConnect();
     const { token, password } = await request.json();
 

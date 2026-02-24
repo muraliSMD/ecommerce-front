@@ -8,6 +8,8 @@ import { sendVerificationEmail } from '@/lib/email';
 import { rateLimit } from '@/lib/rateLimit';
 import { registerSchema } from '@/lib/validations/auth';
 
+import logger from '@/lib/logger';
+
 export async function POST(request) {
   try {
     // 1. Rate Limiting (Max 3 registrations per minute per IP)
@@ -57,12 +59,14 @@ export async function POST(request) {
     delete userResponse.verificationToken;
     delete userResponse.verificationTokenExpire;
 
+    logger.info(`New user registered`, { email, userId: newUser._id });
     return NextResponse.json({ 
         message: "Registration successful. Please verify your email.",
         user: userResponse, 
         token 
     }, { status: 201 });
   } catch (error) {
+    logger.error("Registration Error", { error: error.message, stack: error.stack });
     return NextResponse.json({ message: "Server Error", error: error.message }, { status: 500 });
   }
 }

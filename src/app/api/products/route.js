@@ -23,6 +23,19 @@ export async function GET(request) {
     const minRating = searchParams.get('minRating');
 
     let filter = {};
+    
+    // Admin checking for disabled products visibility
+    const isAdminFetch = searchParams.get('admin') === 'true';
+    let isAdminUser = false;
+    
+    if (isAdminFetch) {
+      const user = await getFullUserFromRequest(request);
+      isAdminUser = !!user && isAdmin(user);
+    }
+    
+    if (!isAdminUser) {
+      filter.isActive = { $ne: false }; // Show only true or undefined (legacy)
+    }
     if (category && category !== "All") {
         // 1. Check if it's a valid ObjectId
         if (category.match(/^[0-9a-fA-F]{24}$/)) {
@@ -105,7 +118,8 @@ export async function GET(request) {
 
     return NextResponse.json(products);
   } catch (error) {
-    return NextResponse.json({ message: "Server Error", error }, { status: 500 });
+    logger.error("Failed to fetch products", { error: error.message, stack: error.stack });
+    return NextResponse.json({ message: "Server Error", error: error.message }, { status: 500 });
   }
 }
 

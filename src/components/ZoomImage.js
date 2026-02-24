@@ -10,9 +10,8 @@ export default function ZoomImage({ src, zoomAmount = 200, height = 450 }) {
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-2xl shadow-lg bg-white transition-transform duration-300 hover:scale-105 cursor-zoom-in"
+      className="relative w-full h-full cursor-zoom-in"
       style={{
-        height: `${height}px`,
         cursor: isZoomed ? "zoom-out" : "zoom-in",
       }}
       onMouseMove={(e) => {
@@ -40,7 +39,7 @@ export default function ZoomImage({ src, zoomAmount = 200, height = 450 }) {
       {/* Zoom overlay */}
       {isZoomed && (
         <div
-          className="absolute inset-0 z-10" // Added z-10 to ensure it's on top
+          className="absolute inset-0 z-10 bg-white" // Added z-10 and bg-white
           style={{
             backgroundImage: `url(${src})`,
             backgroundRepeat: "no-repeat",

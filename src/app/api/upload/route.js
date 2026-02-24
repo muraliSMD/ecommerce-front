@@ -28,6 +28,7 @@ export async function POST(request) {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'ecommerce-products', // Optional: organize uploads into a folder
+          resource_type: 'auto', // Allow video uploads as well
         },
         (error, result) => {
           if (error) reject(error);

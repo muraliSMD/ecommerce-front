@@ -3,16 +3,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { 
-  FiPlus, 
   FiSearch, 
-  FiFilter, 
+  FiPlus, 
+  FiChevronLeft, 
+  FiChevronRight, 
+  FiImage, 
   FiEdit2, 
   FiTrash2, 
   FiEye, 
-  FiMoreVertical 
+  FiFilter,
+  FiMoreVertical,
+  FiShoppingBag,
+  FiPackage,
+  FiInfo,
+  FiCopy
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -20,6 +28,7 @@ import { SectionLoader } from "@/components/Loader";
 import { useSettingsStore } from "@/store/settingsStore";
 
 export default function AdminProducts() {
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
@@ -29,24 +38,56 @@ export default function AdminProducts() {
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
     queryFn: async () => {
-      const { data } = await api.get("/products");
+      const { data } = await api.get("/products?admin=true");
       return data;
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      await api.delete(`/products/${id}`);
-    },
+  const deleteProductMutation = useMutation({
+    mutationFn: (id) => api.delete(`/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries(["admin-products"]);
       toast.success("Product deleted successfully");
-      setProductToDelete(null);
+      setProductToDelete(null); // Clear productToDelete after successful deletion
     },
     onError: () => {
       toast.error("Failed to delete product");
     }
   });
+
+  const duplicateProductMutation = useMutation({
+    mutationFn: (id) => api.post(`/products/${id}/duplicate`),
+    onSuccess: (response) => {
+      queryClient.invalidateQueries(["admin-products"]);
+      toast.success("Product duplicated successfully");
+      router.push(`/admin/products/edit/${response.data._id}`);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to duplicate product");
+    }
+  });
+
+  const handleDuplicate = (id) => {
+    duplicateProductMutation.mutate(id);
+  };
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, isActive }) => {
+      const { data } = await api.put(`/products/${id}`, { isActive });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["admin-products"]);
+      toast.success("Product visibility updated");
+    },
+    onError: () => {
+      toast.error("Failed to update product visibility");
+    }
+  });
+
+  const handleToggleVisibility = (id, currentStatus) => {
+    toggleVisibilityMutation.mutate({ id, isActive: !currentStatus });
+  };
 
   const getCategoryName = (product) => product.category?.name || product.category || "Uncategorized";
 
@@ -114,6 +155,7 @@ export default function AdminProducts() {
                 <th className="px-8 py-6">Category</th>
                 <th className="px-8 py-6">Price</th>
                 <th className="px-8 py-6">Stock</th>
+                <th className="px-8 py-6">Status</th>
                 <th className="px-8 py-6 text-right">Actions</th>
               </tr>
             </thead>
@@ -175,6 +217,28 @@ export default function AdminProducts() {
                       );
                     })()}
                   </td>
+                  <td className="px-8 py-6">
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => handleToggleVisibility(product._id, product.isActive !== false)}
+                        disabled={toggleVisibilityMutation.isPending}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                          product.isActive !== false ? 'bg-green-500' : 'bg-gray-300'
+                        }`}
+                        title={product.isActive !== false ? "Disable product" : "Enable product"}
+                      >
+                        <span className="sr-only">Toggle Active status</span>
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            product.isActive !== false ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <span className={`ml-3 text-xs font-bold ${product.isActive !== false ? 'text-green-600' : 'text-gray-500'}`}>
+                          {product.isActive !== false ? "Active" : "Disabled"}
+                      </span>
+                    </div>
+                  </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Link 
@@ -186,12 +250,22 @@ export default function AdminProducts() {
                       <Link 
                         href={`/admin/products/edit/${product._id}`}
                         className="p-3 bg-surface text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                        title="Edit Product"
                       >
                         <FiEdit2 size={16} />
                       </Link>
                       <button 
+                        onClick={() => handleDuplicate(product._id)}
+                        className="p-3 bg-surface text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-xl transition-all"
+                        title="Duplicate Product"
+                        disabled={duplicateProductMutation.isPending}
+                      >
+                        <FiCopy size={16} className={duplicateProductMutation.isPending ? "animate-pulse" : ""} />
+                      </button>
+                      <button 
                         onClick={() => setProductToDelete(product)}
                         className="p-3 bg-surface text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        title="Delete Product"
                       >
                         <FiTrash2 size={16} />
                       </button>
@@ -217,10 +291,10 @@ export default function AdminProducts() {
         <ConfirmationModal 
           isOpen={!!productToDelete}
           onClose={() => setProductToDelete(null)}
-          onConfirm={() => deleteMutation.mutate(productToDelete._id)}
+          onConfirm={() => deleteProductMutation.mutate(productToDelete._id)}
           title="Delete Product"
           message={`Are you sure you want to delete "${productToDelete.name}"? This action cannot be undone.`}
-          confirmText={deleteMutation.isPending ? "Deleting..." : "Delete Product"}
+          confirmText={deleteProductMutation.isPending ? "Deleting..." : "Delete Product"}
         />
       )}
     </div>

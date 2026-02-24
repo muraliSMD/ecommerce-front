@@ -234,7 +234,7 @@ export default function ShopPage() {
   };
 
   return (
-    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
+    <main className="bg-white min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-4">
           <Breadcrumbs
@@ -318,11 +318,11 @@ export default function ShopPage() {
 
 
           {/* Product Grid */}
-          <div className="flex-1">
+          <div className="flex-1 bg-[#dbeafe] rounded-[2.5rem] p-6 md:p-8 border border-blue-200 shadow-sm relative overflow-hidden">
             {/* Top Bar */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-              <p className="text-gray-500 font-medium hidden sm:block">
-                Showing <span className="text-gray-900 font-bold">{products?.length || 0}</span> results
+              <p className="text-gray-900 font-medium hidden sm:block">
+                Showing <span className="font-bold">{products?.length || 0}</span> results
               </p>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -330,7 +330,7 @@ export default function ShopPage() {
                     <select
                         value={sort}
                         onChange={(e) => setSort(e.target.value)}
-                        className="w-full appearance-none px-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:border-primary cursor-pointer text-sm font-medium"
+                        className="w-full appearance-none px-4 py-2.5 bg-white/80 backdrop-blur-sm border border-white/50 rounded-xl outline-none focus:border-primary cursor-pointer text-sm font-medium shadow-sm"
                     >
                         <option value="newest">Newest Arrivals</option>
                         <option value="price_asc">Price: Low to High</option>
@@ -340,7 +340,7 @@ export default function ShopPage() {
                     <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 </div>
 
-                <div className="flex bg-white rounded-xl border border-gray-200 p-1">
+                <div className="flex bg-white/80 backdrop-blur-sm rounded-xl border border-white/50 p-1 shadow-sm">
                   <button
                     onClick={() => setViewMode("grid")}
                     className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-gray-100 text-primary shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
@@ -359,14 +359,14 @@ export default function ShopPage() {
 
             {/* Content */}
             {isLoading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-[2rem] h-[400px] animate-pulse" />
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                {[...Array(10)].map((_, i) => (
+                  <div key={i} className="bg-white/50 rounded-[2rem] h-[400px] animate-pulse" />
                 ))}
               </div>
             ) : products?.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-[2rem] border border-gray-100/50">
-                 <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-6 font-display text-4xl">
+              <div className="flex flex-col items-center justify-center py-20 text-center bg-white/60 backdrop-blur-sm rounded-[2rem] border border-white/50 shadow-sm">
+                 <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-gray-300 mb-6 font-display text-4xl shadow-sm">
                     <FiSearch />
                  </div>
                  <h3 className="text-2xl font-bold text-gray-900">No products found</h3>

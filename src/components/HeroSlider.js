@@ -58,7 +58,7 @@ export default function HeroSlider() {
               dragElastic={0.2}
               {...swipeHandlers}
             >
-              <Link href={slides[index].link || "#"} className="block w-full h-full">
+              <Link href={slides[index].link || "#"} className="block w-full h-full relative">
                 <Image
                   src={slides[index].image}
                   alt={slides[index].title || "Banner"}
