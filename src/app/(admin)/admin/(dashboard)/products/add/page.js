@@ -23,6 +23,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { useQuery } from "@tanstack/react-query";
 import CategorySelector from "@/components/admin/CategorySelector";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import imageCompression from "browser-image-compression";
 
 
 export default function AddProduct() {
@@ -186,14 +187,32 @@ export default function AddProduct() {
   const [videoUploading, setVideoUploading] = useState(false);
 
   const handleFileUpload = async (e, index, type = 'image') => {
-    const file = e.target.files[0];
+    let file = e.target.files[0];
     if (!file) return;
+
+    if (type === 'video') setVideoUploading(true);
+    else {
+      setUploading(true);
+      // Compress image before upload
+      if (file.type.startsWith('image/')) {
+        try {
+          const options = {
+            maxSizeMB: 1, // Max 1MB
+            maxWidthOrHeight: 1920,
+            useWebWorker: true
+          };
+          const compressedFile = await imageCompression(file, options);
+          file = compressedFile;
+        } catch (error) {
+          console.error("Image compression error:", error);
+          // If compression fails, we can fall back to original file or show an error
+          toast.error("Warning: Could not compress image, uploading original.");
+        }
+      }
+    }
 
     const formData = new FormData();
     formData.append("file", file);
-
-    if (type === 'video') setVideoUploading(true);
-    else setUploading(true);
     
     try {
       // Use standard fetch or api wrapper if it supports formData automatically settings Content-Type to multipart/form-data
