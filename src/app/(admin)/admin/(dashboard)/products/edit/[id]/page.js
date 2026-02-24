@@ -14,7 +14,8 @@ import {
   FiDollarSign, 
   FiGrid,
   FiUpload,
-  FiGlobe
+  FiGlobe,
+  FiPlayCircle
 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,6 +25,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import CategorySelector from "@/components/admin/CategorySelector";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import imageCompression from "browser-image-compression";
+import Image from "next/image";
 
 export default function EditProduct({ params }) {
   const router = useRouter();
@@ -55,7 +57,7 @@ export default function EditProduct({ params }) {
     metaKeywords: ""
   });
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "" });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
 
   const { data: categories } = useQuery({
     queryKey: ["admin-categories"],
@@ -162,6 +164,99 @@ export default function EditProduct({ params }) {
     setProduct({ ...product, videos: newVideos.length ? newVideos : [""] });
   };
 
+  const handleVariantImageUpload = async (e, variantIndex) => {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const toastId = toast.loading("Uploading variant image...");
+
+    if (file.type.startsWith('image/')) {
+      try {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true
+        };
+        const compressedFile = await imageCompression(file, options);
+        file = compressedFile;
+      } catch (error) {
+        console.error("Image compression error:", error);
+        toast.error("Warning: Could not compress image, uploading original.", { id: toastId });
+      }
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+          const newVariants = [...product.variants];
+          if (!newVariants[variantIndex].images) newVariants[variantIndex].images = [];
+          newVariants[variantIndex].images.push(data.url);
+          setProduct({ ...product, variants: newVariants });
+          toast.success("Variant image uploaded!", { id: toastId });
+      } else {
+          toast.error("Failed to upload image", { id: toastId });
+      }
+    } catch (error) {
+      toast.error("Failed to upload image", { id: toastId });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeVariantImage = (variantIndex, imageIndex) => {
+    const newVariants = [...product.variants];
+    newVariants[variantIndex].images = newVariants[variantIndex].images.filter((_, i) => i !== imageIndex);
+    setProduct({ ...product, variants: newVariants });
+  };
+
+  const handleVariantVideoUpload = async (e, variantIndex) => {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    setVideoUploading(true);
+    const toastId = toast.loading("Uploading variant video...");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+          const newVariants = [...product.variants];
+          if (!newVariants[variantIndex].videos) newVariants[variantIndex].videos = [];
+          newVariants[variantIndex].videos.push(data.url);
+          setProduct({ ...product, variants: newVariants });
+          toast.success("Variant video uploaded!", { id: toastId });
+      } else {
+          toast.error("Failed to upload video", { id: toastId });
+      }
+    } catch (error) {
+      toast.error("Failed to upload video", { id: toastId });
+    } finally {
+      setVideoUploading(false);
+    }
+  };
+
+  const removeVariantVideo = (variantIndex, videoIndex) => {
+    const newVariants = [...product.variants];
+    newVariants[variantIndex].videos = newVariants[variantIndex].videos.filter((_, i) => i !== videoIndex);
+    setProduct({ ...product, variants: newVariants });
+  };
+
   const addVariant = () => {
     if (!newVariant.color || (!newVariant.size && !newVariant.length) || !newVariant.price) {
       return toast.error("Please fill color, size/length and price for variant");
@@ -173,10 +268,12 @@ export default function EditProduct({ params }) {
         stock: Number(newVariant.stock) || 0,
         price: Number(newVariant.price) || 0,
         mrp: Number(newVariant.mrp) || undefined,
-        discount: Number(newVariant.discount) || undefined
+        discount: Number(newVariant.discount) || undefined,
+        images: newVariant.images || [],
+        videos: newVariant.videos || []
       }] 
     });
-    setNewVariant({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "" });
+    setNewVariant({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
   };
 
   const removeVariant = (index) => {
@@ -620,40 +717,43 @@ export default function EditProduct({ params }) {
           </h2>
           
           {/* New Variant Form */}
-          <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
-              <input 
-                type="text" 
-                value={newVariant.color}
-                onChange={(e) => setNewVariant({...newVariant, color: e.target.value})}
-                placeholder="e.g. Black"
-                className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
-              <input 
-                type="text" 
-                value={newVariant.size || ""}
-                onChange={(e) => setNewVariant({...newVariant, size: e.target.value})}
-                placeholder="e.g. XL"
-                className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase">Length</label>
-              <input 
-                type="text" 
-                value={newVariant.length || ""}
-                onChange={(e) => setNewVariant({...newVariant, length: e.target.value})}
-                placeholder="e.g. 5m"
-                className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase">Price</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
+                <input 
+                  type="text" 
+                  value={newVariant.color}
+                  onChange={(e) => setNewVariant({...newVariant, color: e.target.value})}
+                  placeholder="e.g. Black"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
+                <input 
+                  type="text" 
+                  value={newVariant.size || ""}
+                  onChange={(e) => setNewVariant({...newVariant, size: e.target.value})}
+                  placeholder="e.g. XL"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Length</label>
+                <input 
+                  type="text" 
+                  value={newVariant.length || ""}
+                  onChange={(e) => setNewVariant({...newVariant, length: e.target.value})}
+                  placeholder="e.g. 5m"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Selling Price</label>
                 <input 
                   type="number" 
                   value={newVariant.price}
@@ -667,11 +767,11 @@ export default function EditProduct({ params }) {
                     setNewVariant({...newVariant, price: e.target.value, discount});
                   }}
                   placeholder="29"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase">MRP</label>
+                <label className="text-[10px] font-bold text-gray-400 uppercase">MRP / Base Price</label>
                 <input 
                   type="number" 
                   value={newVariant.mrp}
@@ -685,21 +785,10 @@ export default function EditProduct({ params }) {
                     setNewVariant({...newVariant, mrp: e.target.value, discount});
                   }}
                   placeholder="39"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-gray-400 uppercase">Stock</label>
-                <input 
-                  type="number" 
-                  value={newVariant.stock}
-                  onChange={(e) => setNewVariant({...newVariant, stock: e.target.value})}
-                  placeholder="50"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
-                />
-              </div>
-            </div>
-            <div className="md:col-span-1 space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Discount (%)</label>
                 <input 
                   type="number" 
@@ -714,29 +803,42 @@ export default function EditProduct({ params }) {
                     setNewVariant({...newVariant, discount: e.target.value, price});
                   }}
                   placeholder="0"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Stock</label>
+                <input 
+                  type="number" 
+                  value={newVariant.stock}
+                  onChange={(e) => setNewVariant({...newVariant, stock: e.target.value})}
+                  placeholder="50"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                />
+              </div>
             </div>
-            <button 
-              type="button" 
-              onClick={addVariant}
-              className="bg-gray-900 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all"
-            >
-              <FiPlus /> Add Variant
-            </button>
+            <div className="flex justify-start md:mt-2">
+              <button 
+                type="button" 
+                onClick={addVariant}
+                className="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all"
+              >
+                <FiPlus /> Add Variant
+              </button>
+            </div>
           </div>
 
           {/* Variants Table */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {product.variants.map((v, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-surface rounded-2xl border border-gray-50 group">
-                <div className="flex gap-4 flex-1 items-center">
+              <div key={i} className="flex flex-col p-5 bg-surface rounded-2xl border border-gray-100 group gap-4">
+                <div className="flex flex-col md:flex-row gap-4 flex-1 items-start md:items-center">
                   <div className="flex items-center gap-2 min-w-[100px]">
-                    <div className="w-3 h-3 rounded-full bg-gray-900" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
+                    <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
                     <span className="font-bold text-gray-900">{v.color}</span>
                   </div>
-                  {v.size && <span className="font-bold text-gray-500 min-w-[60px]">Size: {v.size}</span>}
-                  {v.length && <span className="font-bold text-gray-500 min-w-[60px]">Length: {v.length}</span>}
+                  {v.size && <span className="font-bold text-gray-500 min-w-[60px] bg-gray-50 px-2 py-1 rounded-md text-sm">Size: {v.size}</span>}
+                  {v.length && <span className="font-bold text-gray-500 min-w-[60px] bg-gray-50 px-2 py-1 rounded-md text-sm">Length: {v.length}</span>}
                   
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-gray-400 uppercase">Price</span>
@@ -783,13 +885,87 @@ export default function EditProduct({ params }) {
                         className="w-20 bg-white border border-gray-100 px-3 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
                     />
                   </div>
+                  
+                  <button 
+                    onClick={() => removeVariant(i)}
+                    className="p-2 text-gray-300 hover:text-red-500 bg-white rounded-lg border border-transparent hover:border-red-100 transition-colors md:ml-auto mt-2 md:mt-0"
+                  >
+                    <FiTrash2 />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => removeVariant(i)}
-                  className="p-2 text-gray-300 hover:text-red-500 transition-colors ml-4"
-                >
-                  <FiTrash2 />
-                </button>
+
+                {/* Variant Images */}
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-bold text-gray-400 uppercase">Variant Images</span>
+                    <label className="cursor-pointer bg-white hover:bg-gray-50 text-primary px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 border border-primary/20 shadow-sm">
+                      <FiUpload /> Upload Image
+                      <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={(e) => handleVariantImageUpload(e, i)}
+                          disabled={uploading}
+                      />
+                    </label>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto pb-2">
+                    {v.images?.map((img, imgIdx) => (
+                      <div key={imgIdx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 group/img">
+                        <Image src={img} fill alt="" className="object-cover" unoptimized />
+                        <button
+                          onClick={() => removeVariantImage(i, imgIdx)}
+                          className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                        >
+                          <FiTrash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    {(!v.images || v.images.length === 0) && (
+                      <div className="w-16 h-16 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 bg-gray-50/50">
+                        <FiImage size={20} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Variant Videos */}
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-bold text-gray-400 uppercase">Variant Videos</span>
+                    <div className="flex items-center gap-2">
+                      <label className="cursor-pointer bg-white hover:bg-gray-50 text-primary px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 border border-primary/20 shadow-sm">
+                        <FiUpload /> Upload Video
+                        <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="video/*"
+                            onChange={(e) => handleVariantVideoUpload(e, i)}
+                            disabled={videoUploading}
+                        />
+                      </label>
+                      {videoUploading && <span className="text-xs text-primary animate-pulse">Uploading...</span>}
+                    </div>
+                  </div>
+                  <div className="flex gap-3 overflow-x-auto pb-2">
+                    {v.videos?.map((vid, vidIdx) => (
+                      <div key={vidIdx} className="relative w-24 h-16 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 group/img bg-black">
+                        <video src={vid} className="w-full h-full object-cover opacity-80" />
+                        <button
+                          onClick={() => removeVariantVideo(i, vidIdx)}
+                          className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                        >
+                          <FiTrash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    {(!v.videos || v.videos.length === 0) && (
+                      <div className="w-24 h-16 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 bg-gray-50/50">
+                        <FiPlayCircle size={20} />
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
             {product.variants.length === 0 && (

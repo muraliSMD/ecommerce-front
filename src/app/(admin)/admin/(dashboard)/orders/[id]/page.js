@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { 
@@ -17,7 +17,9 @@ import {
   FiCalendar,
   FiCreditCard,
   FiDownload,
-  FiX
+  FiX,
+  FiCopy,
+  FiEdit3
 } from "react-icons/fi";
 import { generateInvoice } from "@/lib/invoiceGenerator";
 import Image from "next/image";
@@ -46,6 +48,13 @@ export default function AdminOrderDetails() {
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [targetStatus, setTargetStatus] = useState("");
+  const [adminNotes, setAdminNotes] = useState("");
+
+  useEffect(() => {
+    if (order?.adminNotes !== undefined) {
+      setAdminNotes(order.adminNotes);
+    }
+  }, [order]);
 
   const updateStatusMutation = useMutation({
     mutationFn: async (variables) => {
@@ -58,6 +67,7 @@ export default function AdminOrderDetails() {
           if (variables.status) payload.orderStatus = variables.status;
           if (variables.rejectionReason) payload.rejectionReason = variables.rejectionReason;
           if (variables.paymentStatus) payload.paymentStatus = variables.paymentStatus;
+          if (variables.adminNotes !== undefined) payload.adminNotes = variables.adminNotes;
       }
 
       await api.put(`/orders/${id}`, payload);
@@ -82,6 +92,31 @@ export default function AdminOrderDetails() {
   const confirmRejection = () => {
       if (!rejectionReason.trim()) return toast.error("Please provide a reason");
       updateStatusMutation.mutate({ status: targetStatus, rejectionReason });
+  };
+
+  const handleCopyOrderDetails = () => {
+      if (!order) return;
+      
+      let details = `Order #${order._id.slice(-6).toUpperCase()}\n`;
+      details += `Date: ${new Date(order.createdAt).toLocaleString()}\n`;
+      details += `Customer: ${order.shippingAddress?.fullName || order.shippingAddress?.name || "Guest"}\n`;
+      details += `Phone: ${order.shippingAddress?.phone || "N/A"}\n`;
+      details += `Address: ${order.shippingAddress?.address || ""}, ${order.shippingAddress?.city || ""}\n\n`;
+      
+      details += `Items:\n`;
+      order.items.forEach(item => {
+          details += `- ${item.quantity}x ${item.product?.name || "Product"}`;
+          if (item.variant?.color || item.variant?.size) {
+              details += ` (${item.variant?.color || ''} ${item.variant?.size || ''})`.trim();
+          }
+          details += `\n`;
+      });
+      
+      details += `\nTotal: ${formatPrice(order.totalAmount)}`;
+      
+      navigator.clipboard.writeText(details)
+          .then(() => toast.success("Order details copied to clipboard!"))
+          .catch(() => toast.error("Failed to copy details"));
   };
 
   const deleteMutation = useMutation({
@@ -150,6 +185,12 @@ export default function AdminOrderDetails() {
 
         <div className="flex items-center gap-3">
            <button 
+             onClick={handleCopyOrderDetails}
+             className="px-4 py-2 bg-white text-gray-700 border border-gray-100 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm"
+           >
+             <FiCopy /> Copy Details
+           </button>
+           <button 
              onClick={() => {
                 if(confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
                     deleteMutation.mutate();
@@ -174,12 +215,21 @@ export default function AdminOrderDetails() {
                     {order.items.map((item, index) => (
                         <div key={index} className="flex gap-4 items-start pb-6 border-b border-gray-50 last:border-0 last:pb-0">
                             <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden relative flex-shrink-0 border border-gray-100">
-                                <Image 
-                                    src={item.product?.images?.[0] || "/placeholder.jpg"} 
-                                    alt={item.product?.name || "Product"} 
-                                    fill 
-                                    className="object-cover"
-                                />
+                                {(() => {
+                                    let imgUrl = item.product?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070";
+                                    if (item.variant?.color && item.product?.variants) {
+                                        const matchedV = item.product.variants.find(v => v.color === item.variant.color);
+                                        if (matchedV?.images?.[0]) imgUrl = matchedV.images[0];
+                                    }
+                                    return (
+                                        <Image 
+                                            src={imgUrl} 
+                                            alt={item.product?.name || "Product"} 
+                                            fill 
+                                            className="object-cover"
+                                        />
+                                    );
+                                })()}
                             </div>
                             <div className="flex-grow">
                                 <div className="flex justify-between items-start">
@@ -395,6 +445,31 @@ export default function AdminOrderDetails() {
                          </div>
                      </div>
                   </div>
+               </div>
+            </div>
+
+            {/* Admin Notes */}
+            <div className="bg-white rounded-[2rem] p-8 shadow-xl shadow-black/5 border border-gray-100">
+               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <FiEdit3 className="text-primary" /> Admin Notes
+               </h2>
+               <div className="space-y-4">
+                  <p className="text-xs text-gray-500 mb-2">
+                     These notes will be visible to the customer on their order details page.
+                  </p>
+                  <textarea
+                     value={adminNotes}
+                     onChange={(e) => setAdminNotes(e.target.value)}
+                     className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium h-32 resize-none"
+                     placeholder="Add special instructions, delay notices, or custom messages here..."
+                  />
+                  <button 
+                     onClick={() => updateStatusMutation.mutate({ adminNotes })}
+                     disabled={updateStatusMutation.isPending}
+                     className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-secondary transition-colors shadow-lg shadow-primary/20"
+                  >
+                     {updateStatusMutation.isPending ? 'Saving...' : 'Save Notes'}
+                  </button>
                </div>
             </div>
          </div>

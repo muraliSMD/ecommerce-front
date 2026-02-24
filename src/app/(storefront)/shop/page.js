@@ -419,7 +419,7 @@ export default function ShopPage() {
                             >
                                  <Link href={`/product/${product._id}`} className="block w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 bg-surface rounded-2xl overflow-hidden relative">
                                     <Image 
-                                        src={product.images?.[0] || '/placeholder.jpg'} 
+                                        src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                                         alt={product.name}
                                         fill
                                         className="object-cover transition-transform group-hover:scale-110"

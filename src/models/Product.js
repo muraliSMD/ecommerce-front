@@ -19,6 +19,7 @@ const variantSchema = new mongoose.Schema({
   mrp: { type: Number }, // Base price / Original price
   discount: { type: Number }, // Discount percentage
   images: { type: [String], default: [] }, // variant-specific images
+  videos: { type: [String], default: [] }, // variant-specific videos
 });
 
 
