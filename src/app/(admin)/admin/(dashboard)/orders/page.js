@@ -101,7 +101,7 @@ export default function AdminOrders() {
 
       <div className="grid grid-cols-1 gap-6">
         {filteredOrders.map((order) => (
-          <div key={order._id} className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 overflow-hidden relative">
+          <div key={order._id} className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 overflow-hidden relative max-w-full">
             <div className="flex flex-col lg:flex-row justify-between gap-8">
               {/* Order Info */}
               <div className="space-y-6 flex-grow">
@@ -255,7 +255,7 @@ export default function AdminOrders() {
                     <div key={i} className="flex-shrink-0 flex items-center gap-3 bg-surface p-2 rounded-xl pr-4 border border-gray-50">
                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-white border border-gray-100 relative">
                           <Image 
-                            src={item.product?.images?.[0] || "/placeholder.png"} 
+                            src={item.product?.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || item.product?.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                             alt={item.product?.name || "Product"}
                             fill
                             className="object-cover" 

@@ -832,7 +832,7 @@ export default function EditProduct({ params }) {
           <div className="space-y-4">
             {product.variants.map((v, i) => (
               <div key={i} className="flex flex-col p-5 bg-surface rounded-2xl border border-gray-100 group gap-4">
-                <div className="flex flex-col md:flex-row gap-4 flex-1 items-start md:items-center">
+                <div className="flex flex-col lg:flex-row gap-4 flex-1 items-start lg:items-center flex-wrap">
                   <div className="flex items-center gap-2 min-w-[100px]">
                     <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
                     <span className="font-bold text-gray-900">{v.color}</span>

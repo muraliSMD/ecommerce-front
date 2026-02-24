@@ -781,8 +781,8 @@ export default function AddProduct() {
             {product.variants.map((v, i) => (
               <div key={i} className="flex flex-col p-5 bg-surface rounded-2xl border border-gray-100 group gap-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex gap-4 md:gap-8 flex-wrap items-center">
-                    <div className="flex items-center gap-2">
+                <div className="flex flex-col lg:flex-row gap-4 flex-1 items-start lg:items-center flex-wrap">
+                  <div className="flex items-center gap-2 min-w-[100px]">
                       <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: v.color?.toLowerCase() }}></div>
                       <span className="font-bold text-gray-900">{v.color}</span>
                     </div>

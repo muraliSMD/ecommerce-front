@@ -48,12 +48,15 @@ export default function ProductDetailsAdmin({ params }) {
     ? product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0)
     : (product.stock || 0);
 
+  const variantImages = product.variants?.flatMap(v => v.images || []) || [];
+  
   const gallery = [
     ...(product.videos?.map(v => ({ url: v, type: 'video' })) || []),
-    ...(product.images?.map(img => ({ url: img, type: 'image' })) || [])
+    ...(product.images?.map(img => ({ url: img, type: 'image' })) || []),
+    ...(variantImages.map(img => ({ url: img, type: 'image' })))
   ];
 
-  const activeMedia = gallery[activeMediaIndex] || { url: "/placeholder.png", type: 'image' };
+  const activeMedia = gallery[activeMediaIndex] || { url: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070", type: 'image' };
 
   return (
     <div className="max-w-6xl mx-auto pb-20 space-y-8">
