@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { FiPlus, FiTrash2, FiEdit2, FiChevronRight, FiChevronDown, FiFolder, FiFolderPlus, FiUpload, FiImage } from "react-icons/fi";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import imageCompression from "browser-image-compression";
 
 // Recursive Category Item Component
 const CategoryItem = ({ category, allCategories, level = 0, onDelete, onEdit, onAddChild }) => {
@@ -160,13 +161,29 @@ export default function CategoriesPage() {
   };
 
   const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+    let file = e.target.files[0];
     if (!file) return;
+
+    setUploading(true);
+
+    if (file.type.startsWith('image/')) {
+      try {
+        const options = {
+          maxSizeMB: 1, // Max 1MB
+          maxWidthOrHeight: 1920,
+          useWebWorker: true
+        };
+        const compressedFile = await imageCompression(file, options);
+        file = compressedFile;
+      } catch (error) {
+        console.error("Image compression error:", error);
+        toast.error("Warning: Could not compress image, uploading original.");
+      }
+    }
 
     const uploadData = new FormData();
     uploadData.append("file", file);
 
-    setUploading(true);
     try {
       const res = await fetch("/api/upload", {
           method: "POST",

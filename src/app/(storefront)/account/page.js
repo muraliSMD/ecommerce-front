@@ -6,20 +6,36 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import imageCompression from "browser-image-compression";
 
 export default function AccountOverview() {
   const { userInfo, login } = useUserStore();
   const [isUploading, setIsUploading] = useState(false);
 
   const handleAvatarUpload = async (e) => {
-    const file = e.target.files?.[0];
+    let file = e.target.files?.[0];
     if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
 
     const toastId = toast.loading("Uploading avatar...");
     setIsUploading(true);
+
+    if (file.type.startsWith('image/')) {
+        try {
+            const options = {
+                maxSizeMB: 1, // Max 1MB
+                maxWidthOrHeight: 800, // Profile pics can be smaller
+                useWebWorker: true
+            };
+            const compressedFile = await imageCompression(file, options);
+            file = compressedFile;
+        } catch (error) {
+            console.error("Image compression error:", error);
+            toast.error("Warning: Could not compress image, uploading original.", { id: toastId });
+        }
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
 
     try {
         // 1. Upload to Cloudinary
