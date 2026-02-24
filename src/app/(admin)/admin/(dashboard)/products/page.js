@@ -104,14 +104,14 @@ export default function AdminProducts() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Products</h1>
           <p className="text-gray-500 mt-2">Manage your catalog and inventory.</p>
         </div>
         <Link 
           href="/admin/products/add"
-          className="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95"
+          className="bg-primary hover:bg-secondary text-white px-6 py-4 md:px-8 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95 w-full md:w-auto mt-4 md:mt-0"
         >
           <FiPlus size={20} /> Add New Product
         </Link>
@@ -119,7 +119,7 @@ export default function AdminProducts() {
 
       {/* Filters Bar */}
       <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center">
-        <div className="relative flex-grow w-full">
+        <div className="relative w-full md:flex-grow">
           <FiSearch className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input 
             type="text"
@@ -129,26 +129,24 @@ export default function AdminProducts() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative w-full md:w-48">
-            <FiFilter className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <select 
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full bg-surface border-none focus:ring-2 focus:ring-primary/20 pl-14 pr-6 py-4 rounded-2xl outline-none appearance-none cursor-pointer"
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
+        <div className="relative w-full md:w-auto min-w-[200px]">
+           <FiFilter className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+           <select 
+             value={filterCategory}
+             onChange={(e) => setFilterCategory(e.target.value)}
+             className="w-full bg-surface border-none focus:ring-2 focus:ring-primary/20 pl-14 pr-6 py-4 rounded-2xl outline-none appearance-none cursor-pointer"
+           >
+             {categories.map(cat => (
+               <option key={cat} value={cat}>{cat}</option>
+             ))}
+           </select>
         </div>
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 border border-gray-100 overflow-hidden w-full max-w-full">
+        <div className="w-full overflow-x-auto align-middle">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead className="whitespace-nowrap">
               <tr className="bg-surface/50 text-gray-400 text-[10px] font-bold uppercase tracking-widest border-b border-gray-100">
                 <th className="px-8 py-6">Product</th>
@@ -166,14 +164,19 @@ export default function AdminProducts() {
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-2xl overflow-hidden bg-surface border border-gray-100 relative">
                         <Image 
-                          src={product.images?.[0] || "/placeholder.png"} 
+                          src={product.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                           alt={product.name}
                           fill
                           className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       </div>
                       <div>
-                        <p className="font-bold text-gray-900 group-hover:text-primary transition-colors">{product.name}</p>
+                        <p 
+                            className="font-bold text-gray-900 group-hover:text-primary transition-colors max-w-[120px] sm:max-w-[200px] lg:max-w-[300px] truncate"
+                            title={product.name}
+                        >
+                            {product.name}
+                        </p>
                         <p className="text-xs text-gray-400 font-mono">ID: {product._id.slice(-8).toUpperCase()}</p>
                       </div>
                     </div>

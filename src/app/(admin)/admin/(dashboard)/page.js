@@ -102,7 +102,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Orders Table */}
-        <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100">
+        <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 max-w-full">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-display font-bold">Recent Orders</h2>
             <Link href="/admin/orders" className="text-primary font-bold text-sm flex items-center gap-2 hover:underline">
@@ -110,8 +110,8 @@ export default function AdminDashboard() {
             </Link>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
+          <div className="w-full overflow-x-auto align-middle mt-4">
+            <table className="w-full text-left min-w-[600px]">
               <thead className="whitespace-nowrap">
                 <tr className="text-gray-400 text-xs font-bold uppercase tracking-widest border-b border-gray-50">
                   <th className="pb-4">Order ID</th>
