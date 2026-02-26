@@ -184,13 +184,18 @@ export async function POST(request) {
         logger.error("Failed to generate sequential orderId", { error: counterError.message });
     }
 
+    // Calculate final total
+    const shippingCharge = body.shippingCharge || 0;
+    const taxAmount = body.taxAmount || 0;
+    const finalAmount = Math.max(0, totalAmount - discountAmount + shippingCharge + taxAmount);
+
     const order = await new Order({
       orderId,
       user: userId,
       items,
       totalAmount: finalAmount, 
-      shippingCharge: body.shippingCharge || 0,
-      taxAmount: body.taxAmount || 0,
+      shippingCharge: shippingCharge,
+      taxAmount: taxAmount,
       discountAmount: discountAmount,
       couponCode: usedCoupon ? usedCoupon.code : null,
       paymentMethod: body.paymentMethod || "COD",

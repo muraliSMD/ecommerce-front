@@ -2,17 +2,17 @@ import { z } from "zod";
 
 export const addressSchema = z.object({
   name: z.string().min(2, "Name is required"),
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
+  email: z.string().email("Invalid email").optional().nullable().or(z.literal("")),
   phone: z.string().min(10, "Valid phone number is required"),
-  address1: z.string().min(5, "Address line 1 is required"),
-  address2: z.string().optional(),
-  address3: z.string().optional(),
+  address1: z.string().min(2, "Address line 1 is required"),
+  address2: z.string().optional().nullable().or(z.literal("")),
+  address3: z.string().optional().nullable().or(z.literal("")),
   city: z.string().min(2, "City is required"),
-  state: z.string().optional().or(z.literal("")),
+  state: z.string().optional().nullable().or(z.literal("")),
   pincode: z.string().min(4, "Pincode is required"),
-  landmark: z.string().optional(),
-  label: z.string().optional(),
-  address: z.string().optional() // Legacy fallback
+  landmark: z.string().optional().nullable().or(z.literal("")),
+  label: z.string().optional().nullable().or(z.literal("")),
+  address: z.string().optional().nullable().or(z.literal("")) // Legacy fallback
 });
 
 export const orderItemSchema = z.object({
