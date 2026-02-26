@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { FiMapPin, FiPhone, FiMail, FiSend } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { useSettingsStore } from "@/store/settingsStore";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ export default function ContactPage() {
     message: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const settings = useSettingsStore((state) => state.settings);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -88,7 +90,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Our Location</h4>
-                                        <p className="text-white/80">54/1 Ottar Street<br />Omalur, Salem 636455, Tamil Nadu, India</p>
+                                        <p className="text-white/80 whitespace-pre-line">{settings.address || "54/1 Ottar Street\nOmalur, Salem 636455, Tamil Nadu, India"}</p>
                                     </div>
                                 </div>
 
@@ -98,7 +100,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Email Us</h4>
-                                        <p className="text-white/80">support@grabszy.com</p>
+                                        <p className="text-white/80">{settings.supportEmail || "support@grabszy.com"}</p>
                                     </div>
                                 </div>
 
@@ -108,7 +110,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Call Us</h4>
-                                        <p className="text-white/80">+91 8610773865</p>
+                                        <p className="text-white/80">{settings.supportPhone || "+91 8610773865"}</p>
                                         <p className="text-white/80">Mon - Sat, 9am - 9pm IST</p>
                                     </div>
                                 </div>
@@ -129,7 +131,7 @@ export default function ContactPage() {
                                         onChange={handleChange}
                                         required
                                         className="w-full bg-gray-50 border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all"
-                                        placeholder="John Doe"
+                                        placeholder="Your Name"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -141,7 +143,7 @@ export default function ContactPage() {
                                         onChange={handleChange}
                                         required
                                         className="w-full bg-gray-50 border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all"
-                                        placeholder="john@example.com"
+                                        placeholder="your@email.com"
                                     />
                                 </div>
                             </div>

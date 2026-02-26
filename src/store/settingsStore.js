@@ -25,6 +25,9 @@ export const useSettingsStore = create(
         taxRate: 0,
         shippingCharge: 0,
         siteName: "GRABSZY",
+        supportEmail: "support@grabszy.com",
+        supportPhone: "+91 8610773865",
+        address: "54/1 Ottar Street, Omalur, Salem 636455, Tamil Nadu, India",
       },
       isLoading: false,
 

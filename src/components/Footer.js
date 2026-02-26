@@ -80,10 +80,9 @@ export default function Footer() {
 
           {/* Contact Column */}
           <div>
-            <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">GRABSZY HQ</h4>
-            <p className="text-gray-500 leading-relaxed mb-4 text-sm md:text-base">
-              54/1 ottar Street Omalur<br />
-              Salem, Tamil Nadu, 636455
+            <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">{settings?.siteName || "GRABSZY"} HQ</h4>
+            <p className="text-gray-500 leading-relaxed mb-4 text-sm md:text-base whitespace-pre-line">
+              {settings?.address || "54/1 Ottar Street\nOmalur, Salem 636455"}
             </p>
             <a href={`mailto:${settings?.supportEmail || "support@grabszy.com"}`} className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">
               {settings?.supportEmail || "support@grabszy.com"}

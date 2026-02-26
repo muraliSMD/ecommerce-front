@@ -223,9 +223,9 @@ export default function CheckoutPage() {
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
             amount: orderData.amount, // Amount is in paise (e.g. 10000)
             currency: orderData.currency,
-            name: "GRABSZY",
+            name: settings.siteName || "GRABSZY",
             description: "Order Payment",
-            image: "https://your-logo-url.com/logo.png",
+            image: settings.logo || "/logo.png",
             order_id: orderData.id,
             handler: async function (response) {
                 try {
@@ -489,7 +489,7 @@ export default function CheckoutPage() {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
-                                    placeholder="John Doe"
+                                    placeholder="Full Name"
                                 />
                             </div>
                             <div>

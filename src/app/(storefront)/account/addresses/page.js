@@ -93,7 +93,7 @@ export default function AddressesPage() {
                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
                         value={formData.name}
                         onChange={e => setFormData({...formData, name: e.target.value})}
-                        placeholder="e.g. John Doe"
+                        placeholder="Full Name"
                     />
                 </div>
                 <div>

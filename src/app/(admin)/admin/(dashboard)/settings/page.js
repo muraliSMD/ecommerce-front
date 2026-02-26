@@ -31,6 +31,8 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState({
     siteName: "",
     supportEmail: "",
+    supportPhone: "",
+    address: "",
     logo: "",
     favicon: "",
     currency: "USD",
@@ -84,6 +86,8 @@ export default function AdminSettings() {
       setSettings({
         siteName: fetchedSettings.siteName || "",
         supportEmail: fetchedSettings.supportEmail || "",
+        supportPhone: fetchedSettings.supportPhone || "",
+        address: fetchedSettings.address || "",
         logo: fetchedSettings.logo || "",
         favicon: fetchedSettings.favicon || "",
         currency: fetchedSettings.currency || "USD",
@@ -256,6 +260,32 @@ export default function AdminSettings() {
                     value={settings.supportEmail}
                     onChange={handleInputChange}
                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                />
+                </div>
+
+                <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <FiMessageCircle /> Support Phone
+                </label>
+                <input 
+                    type="text" 
+                    name="supportPhone"
+                    value={settings.supportPhone}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                />
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <FiGlobe /> Business Address
+                </label>
+                <textarea 
+                    name="address"
+                    value={settings.address}
+                    onChange={handleInputChange}
+                    rows={2}
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all resize-none"
                 />
                 </div>
                 
