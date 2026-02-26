@@ -5,9 +5,16 @@ import { api } from "@/lib/api";
 import Link from "next/link";
 import Image from "next/image";
 import { FiPackage, FiArrowRight, FiSearch } from "react-icons/fi";
+import { useEffect, useState } from "react";
 import { useSettingsStore } from "@/store/settingsStore"; // Use global formatter
 
 export default function MyOrdersPage() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { data: orders, isLoading } = useQuery({
     queryKey: ["my-orders"],
     queryFn: async () => {
@@ -17,6 +24,8 @@ export default function MyOrdersPage() {
   });
 
   const formatPrice = useSettingsStore((state) => state.formatPrice);
+
+  if (!mounted) return null; // Prevent hydration mismatch on date and currency
 
   if (isLoading) {
     return (
