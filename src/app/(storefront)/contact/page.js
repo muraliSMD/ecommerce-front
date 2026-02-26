@@ -18,12 +18,28 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success("Message sent successfully! We'll get back to you soon.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setIsSubmitting(false);
+    try {
+        const response = await fetch("/api/contact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            toast.success(data.message || "Message sent successfully!");
+            setFormData({ name: "", email: "", subject: "", message: "" });
+        } else {
+            toast.error(data.message || "Failed to send message");
+        }
+    } catch (error) {
+        toast.error("Something went wrong. Please try again later.");
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -72,7 +88,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Our Location</h4>
-                                        <p className="text-white/80">123 Commerce St, Wholesale District<br />New York, NY 10001, USA</p>
+                                        <p className="text-white/80">54/1 Ottar Street<br />Omalur, Salem 636455, Tamil Nadu, India</p>
                                     </div>
                                 </div>
 
@@ -83,7 +99,6 @@ export default function ContactPage() {
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Email Us</h4>
                                         <p className="text-white/80">support@grabszy.com</p>
-                                        <p className="text-white/80">wholesale@grabszy.com</p>
                                     </div>
                                 </div>
 
@@ -93,8 +108,8 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Call Us</h4>
-                                        <p className="text-white/80">+1 (555) 123-4567</p>
-                                        <p className="text-white/80">Mon - Fri, 9am - 6pm EST</p>
+                                        <p className="text-white/80">+91 8610773865</p>
+                                        <p className="text-white/80">Mon - Sat, 9am - 9pm IST</p>
                                     </div>
                                 </div>
                             </div>

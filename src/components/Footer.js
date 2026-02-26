@@ -72,9 +72,9 @@ export default function Footer() {
             <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">Customer Care</h4>
             <ul className="space-y-4 text-gray-500 text-sm md:text-base">
               <li><Link href="/account/orders" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Track Order</Link></li>
-              <li><Link href="#" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Shipping Policy</Link></li>
-              <li><Link href="#" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Returns & Exchanges</Link></li>
-              <li><Link href="#" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Contact Us</Link></li>
+              <li><Link href="/shipping-policy" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Shipping Policy</Link></li>
+              <li><Link href="/returns-and-exchange" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Returns & Exchanges</Link></li>
+              <li><Link href="/contact" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -85,8 +85,8 @@ export default function Footer() {
               54/1 ottar Street Omalur<br />
               Salem, Tamil Nadu, 636455
             </p>
-            <a href={`mailto:${settings?.supportEmail || "[EMAIL_ADDRESS]"}`} className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">
-              {settings?.supportEmail || "[EMAIL_ADDRESS]"}
+            <a href={`mailto:${settings?.supportEmail || "support@grabszy.com"}`} className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">
+              {settings?.supportEmail || "support@grabszy.com"}
             </a>
           </div>
         </div>

@@ -68,7 +68,7 @@ export default function MyOrdersPage() {
                 {/* Order Info & Status */}
                 <div className="flex-1">
                    <div className="flex flex-wrap items-center gap-3 mb-2">
-                        <span className="font-bold text-gray-900 text-lg">#{order._id.slice(-6).toUpperCase()}</span>
+                        <span className="font-bold text-gray-900 text-lg">#{order.orderId || order._id.slice(-6).toUpperCase()}</span>
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                             order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-600' :
                             order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-600' :

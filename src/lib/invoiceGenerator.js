@@ -21,7 +21,7 @@ export const generateInvoice = (order, settings = {}) => {
 
   doc.setFontSize(10);
   doc.text("Your Premium Store", 14, 40);
-  doc.text(settings.supportEmail || "contact@grabszy.com", 14, 45);
+  doc.text(settings.supportEmail || "support@grabszy.com", 14, 45);
 
   // Invoice Details
   doc.setFontSize(12);

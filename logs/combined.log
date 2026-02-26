@@ -2,3 +2,18 @@
   "sourceId": "698e3eff5a5ddaf3ed056942",
   "newId": "699c6237299e200dad4742be"
 } 
+2026-02-26 12:15:27 [[32minfo[39m]: User logged in successfully {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244",
+  "role": "admin"
+} 
+2026-02-26 17:19:48 [[32minfo[39m]: Pruning expired push subscription for admin 698081fcc3e4cc458f359244  
+2026-02-26 18:08:56 [[32minfo[39m]: New user registered {
+  "email": "muralis.1995@gmail.com",
+  "userId": "69a03ecbd27a9d5a286022c3"
+} 
+2026-02-26 18:09:23 [[32minfo[39m]: User logged in successfully {
+  "email": "muralis.1995@gmail.com",
+  "userId": "69a03ecbd27a9d5a286022c3",
+  "role": "customer"
+} 

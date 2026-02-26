@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import HeroSlider from "@/components/HeroSlider";
 import ProductCard from "@/components/ProductCard";
 import Image from "next/image";
@@ -11,10 +11,37 @@ import Link from "next/link";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function Home() {
   const addToCart = useCartStore((state) => state.addToCart);
   const categorySliderRef = useRef(null);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubscribe = async () => {
+    if (!email) {
+      toast.error("Please enter your email");
+      return;
+    }
+
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const { data } = await api.post("/newsletter/subscribe", { email });
+      toast.success(data.message || "Thank you for subscribing!");
+      setEmail("");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Subscription failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const scrollCategories = (direction) => {
     if (categorySliderRef.current) {
@@ -213,10 +240,16 @@ export default function Home() {
               <input 
                 type="email" 
                 placeholder="Enter your email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="bg-white/10 border border-white/20 rounded-xl md:rounded-2xl px-6 py-4 flex-grow focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-400"
               />
-              <button className="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-xl md:rounded-2xl font-bold transition-all active:scale-95 whitespace-nowrap shadow-lg shadow-primary/30">
-                Subscribe
+              <button 
+                onClick={handleSubscribe}
+                disabled={isSubmitting}
+                className={`bg-primary hover:bg-secondary text-white px-8 py-4 rounded-xl md:rounded-2xl font-bold transition-all active:scale-95 whitespace-nowrap shadow-lg shadow-primary/30 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
+                {isSubmitting ? 'Subscribing...' : 'Subscribe'}
               </button>
             </div>
           </div>

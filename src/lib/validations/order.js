@@ -28,6 +28,8 @@ export const orderItemSchema = z.object({
 export const checkoutSchema = z.object({
   shippingAddress: addressSchema,
   paymentMethod: z.enum(["COD", "Online", "Stripe", "Razorpay"]),
+  shippingCharge: z.number().optional().default(0),
+  taxAmount: z.number().optional().default(0),
   items: z.array(orderItemSchema).min(1, "Cart cannot be empty").optional(), // Items might be optional if using DB cart fallback
   paymentInfo: z.object({
     couponCode: z.string().optional(),

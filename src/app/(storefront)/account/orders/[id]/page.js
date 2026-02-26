@@ -88,7 +88,7 @@ export default function OrderDetailsPage() {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 className="text-3xl font-display font-bold text-gray-900">Order #{order._id.slice(-6).toUpperCase()}</h1>
+            <h1 className="text-3xl font-display font-bold text-gray-900">Order #{order.orderId || order._id.slice(-6).toUpperCase()}</h1>
             <p className="text-gray-500">Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}</p>
             {['Pending', 'Processing', 'Shipped'].includes(order.orderStatus) && (
               <p className="text-primary font-bold mt-1 inline-flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full text-sm">

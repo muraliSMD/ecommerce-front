@@ -19,11 +19,6 @@ if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 export async function GET(request, { params }) {
   try {
     await dbConnect();
-    const user = await getFullUserFromRequest(request);
-    if (!user) {
-      return NextResponse.json({ message: "Not authorized" }, { status: 401 });
-    }
-
     const { id } = await params;
     const order = await Order.findById(id).populate("items.product");
     
@@ -31,11 +26,18 @@ export async function GET(request, { params }) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
     }
 
-    // Check if user owns the order or is admin
-    const orderUserId = order.user ? order.user.toString() : null;
-    const isOwner = orderUserId === user._id.toString();
+    const user = await getFullUserFromRequest(request);
     
-    if (!isOwner && !isAdmin(user)) {
+    // Authorization logic:
+    // 1. Admin has access
+    // 2. Logged in owner has access
+    // 3. Guest has access to guest orders (no user field)
+    const isGuestOrder = !order.user;
+    const orderUserId = order.user ? order.user.toString() : null;
+    const isOwner = user && orderUserId === user._id.toString();
+    const isAuthorized = isAdmin(user) || isOwner || isGuestOrder;
+
+    if (!isAuthorized) {
       return NextResponse.json({ message: "Access denied" }, { status: 403 });
     }
 
@@ -95,14 +97,14 @@ export async function PUT(request, { params }) {
                 recipient: order.user,
                 type: "order_status",
                 title: "Order Update",
-                message: `Your order #${order._id.toString().slice(-6)} is now ${orderStatus}`,
+                message: `Your order #${order.orderId || order._id.toString().slice(-6)} is now ${orderStatus}`,
                 link: `/account/orders/${order._id}`,
                 isRead: false
             });
             
              // Send WhatsApp Notification
             if (order.shippingAddress?.phone) {
-                const message = `Update: Your order #${order._id.toString().slice(-6)} is now ${orderStatus}. Track here: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/account/orders/${order._id}`;
+                const message = `Update: Your order #${order.orderId || order._id.toString().slice(-6)} is now ${orderStatus}. Track here: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/account/orders/${order._id}`;
                 sendWhatsAppMessage(order.shippingAddress.phone, message);
             }
 
@@ -112,7 +114,7 @@ export async function PUT(request, { params }) {
                 if (userDoc && userDoc.pushSubscriptions && userDoc.pushSubscriptions.length > 0) {
                     const payload = JSON.stringify({
                         title: "Order Update",
-                        body: `Your order #${order._id.toString().slice(-6)} is now ${orderStatus}`,
+                        body: `Your order #${order.orderId || order._id.toString().slice(-6)} is now ${orderStatus}`,
                         url: `/account/orders/${order._id}`
                     });
 

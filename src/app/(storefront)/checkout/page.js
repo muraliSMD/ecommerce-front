@@ -339,6 +339,8 @@ export default function CheckoutPage() {
                 address: billingDetail.address || (billingDetail.address1 ? `${billingDetail.address1}, ${billingDetail.address2}, ${billingDetail.city}, ${billingDetail.pincode}` : "")
             },
             paymentMethod,
+            shippingCharge: shippingCost,
+            taxAmount: taxAmount,
             items: items.map(i => ({
                 product: i.product._id,
                 quantity: i.quantity,

@@ -71,18 +71,20 @@ export default function ProductDetails({ initialProduct }) {
     return variants.filter((v) => v.color === selectedColor && v.length).map((v) => v.length);
   }, [variants, selectedColor, allLengths]);
 
+  // Main Effect: Derive variant and media from selection states
   useEffect(() => {
     let variant = variants.find(
       (v) => v.color === selectedColor && (v.size === selectedSize || v.length === selectedLength)
     );
 
+    // If no exact match but we have a color, find ANY variant with that color
     if (!variant && selectedColor) {
         variant = variants.find(v => v.color === selectedColor);
         if (variant) {
-            if (variant.size) {
+            if (variant.size && selectedSize !== variant.size) {
                 setSelectedSize(variant.size);
                 setSelectedLength("");
-            } else if (variant.length) {
+            } else if (variant.length && selectedLength !== variant.length) {
                 setSelectedLength(variant.length);
                 setSelectedSize("");
             }
@@ -91,6 +93,7 @@ export default function ProductDetails({ initialProduct }) {
 
     setSelectedVariant(variant || null);
     
+    // Update media based on new variant
     const variantVideos = variant?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
     const validVideos = variantVideos.length > 0 ? variantVideos : (product?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || []);
     
@@ -105,50 +108,42 @@ export default function ProductDetails({ initialProduct }) {
     setQuantity(1);
   }, [selectedColor, selectedSize, selectedLength, variants, product]);
 
+  // Initialization Effect: Run only once or when variants/params change on MOUNT
   useEffect(() => {
-    if (variants.length) {
-      const colorParam = searchParams.get('color');
-      const sizeParam = searchParams.get('size');
-      const lengthParam = searchParams.get('length');
+    if (!variants.length || mounted) return;
 
-      // 1. Prioritize URL parameters
-      if (colorParam && allColors.includes(colorParam)) {
-        setSelectedColor(colorParam);
-        if (sizeParam && variants.some(v => v.color === colorParam && v.size === sizeParam)) {
-            setSelectedSize(sizeParam);
-            setSelectedLength("");
-        } else if (lengthParam && variants.some(v => v.color === colorParam && v.length === lengthParam)) {
-            setSelectedLength(lengthParam);
-            setSelectedSize("");
-        }
-      } 
-      // 2. Fallback to first variant if no VALID URL parameters
-      else {
-        setSelectedColor(variants[0].color);
-        if (variants[0].size) setSelectedSize(variants[0].size);
-        if (variants[0].length) setSelectedLength(variants[0].length);
-      }
+    const colorParam = searchParams.get('color');
+    const sizeParam = searchParams.get('size');
+    const lengthParam = searchParams.get('length');
 
-      setSelectedVariant(variants[0]);
-      
-      const variantVideos = variants[0].videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
-      const validVideos = variantVideos.length > 0 ? variantVideos : (product?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || []);
-      
-      if (validVideos.length > 0) {
-          setSelectedMedia({ url: validVideos[0], type: 'video' });
-      } else {
-          const img = variants[0].images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || product?.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.[0] || null;
-          if (img) setSelectedMedia({ url: img, type: 'image' });
+    if (colorParam && allColors.includes(colorParam)) {
+      setSelectedColor(colorParam);
+      if (sizeParam && variants.some(v => v.color === colorParam && v.size === sizeParam)) {
+          setSelectedSize(sizeParam);
+          setSelectedLength("");
+      } else if (lengthParam && variants.some(v => v.color === colorParam && v.length === lengthParam)) {
+          setSelectedLength(lengthParam);
+          setSelectedSize("");
       }
     } else {
-      const validVideos = product?.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
-      if (validVideos.length > 0) {
-          setSelectedMedia({ url: validVideos[0], type: 'video' });
-      } else if (product?.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.length) {
-          setSelectedMedia({ url: product.images.filter(i => typeof i === 'string' && i.trim() !== '')[0], type: 'image' });
-      }
+      // Default to first variant
+      setSelectedColor(variants[0].color);
+      if (variants[0].size) setSelectedSize(variants[0].size);
+      if (variants[0].length) setSelectedLength(variants[0].length);
     }
-  }, [product, variants, allColors, searchParams]);
+  }, [variants, allColors, searchParams, mounted]);
+
+  // Fallback for products without variants
+  useEffect(() => {
+    if (variants.length || !product) return;
+    
+    const validVideos = product.videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
+    if (validVideos.length > 0) {
+        setSelectedMedia({ url: validVideos[0], type: 'video' });
+    } else if (product.images?.filter(i => typeof i === 'string' && i.trim() !== '')?.length) {
+        setSelectedMedia({ url: product.images.filter(i => typeof i === 'string' && i.trim() !== '')[0], type: 'image' });
+    }
+  }, [product, variants]);
 
   // No need for separate mount effect if merged above
 
