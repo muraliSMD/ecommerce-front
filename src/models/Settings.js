@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 const settingsSchema = new mongoose.Schema({
   siteName: { type: String, default: "GRABSZY" },
   supportEmail: { type: String, default: "support@grabszy.com" },
+  supportPhone: { type: String, default: "+91 8610773865" },
+  address: { type: String, default: "54/1 Ottar Street, Omalur, Salem 636455, Tamil Nadu, India" },
   logo: { type: String, default: "" },
   favicon: { type: String, default: "" },
   

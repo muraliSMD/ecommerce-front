@@ -74,18 +74,24 @@ export const generateInvoice = (order, settings = {}) => {
   });
 
   // Totals
+  const subtotal = order.totalAmount - (order.shippingCharge || 0) - (order.taxAmount || 0) + (order.discountAmount || 0);
   const finalY = doc.lastAutoTable.finalY + 10;
-  doc.text(`Subtotal: ${order.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}`, 140, finalY);
-  doc.text(`Shipping: ${order.shippingCount ? order.shippingCount.toFixed(2) : "Free"}`, 140, finalY + 6);
+  doc.text(`Subtotal: ${subtotal.toFixed(2)}`, 140, finalY);
+  doc.text(`Shipping: ${order.shippingCharge > 0 ? order.shippingCharge.toFixed(2) : "Free"}`, 140, finalY + 6);
   
-  let totalY = finalY + 12;
+  let currentY = finalY + 12;
+  if (order.taxAmount > 0) {
+      doc.text(`Tax: ${order.taxAmount.toFixed(2)}`, 140, currentY);
+      currentY += 6;
+  }
+  
   if(order.discountAmount > 0) {
-      doc.text(`Discount: -${order.discountAmount.toFixed(2)}`, 140, finalY + 12);
-      totalY = finalY + 18;
+      doc.text(`Discount: -${order.discountAmount.toFixed(2)}`, 140, currentY);
+      currentY += 6;
   }
   
   doc.setFont("helvetica", "bold");
-  doc.text(`Total: ${order.totalAmount.toFixed(2)}`, 140, totalY);
+  doc.text(`Total: ${order.totalAmount.toFixed(2)}`, 140, currentY);
 
   // Signature
   if (settings.signature) {

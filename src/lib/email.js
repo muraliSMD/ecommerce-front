@@ -1,5 +1,16 @@
 import nodemailer from 'nodemailer';
 import logger from '@/lib/logger';
+import Settings from '@/models/Settings';
+import dbConnect from '@/lib/db';
+
+async function getEmailSettings() {
+  await dbConnect();
+  const settings = await Settings.findOne().lean();
+  return settings || { 
+    siteName: 'GRABSZY', 
+    supportEmail: 'support@grabszy.com' 
+  };
+}
 
 const isSecure = process.env.SMTP_SECURE === 'true' || process.env.SMTP_PORT === '465';
 
@@ -15,7 +26,8 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = async ({ to, subject, html, text, fromAddress, replyTo }) => {
   try {
-    const fromName = process.env.SMTP_FROM_NAME || 'GRABSZY';
+    const settings = await getEmailSettings();
+    const fromName = process.env.SMTP_FROM_NAME || settings.siteName || 'GRABSZY';
     const finalFrom = fromAddress 
       ? `"${fromName}" <${fromAddress}>` 
       : `"${fromName}" <${process.env.SMTP_USER}>`;
@@ -26,7 +38,7 @@ export const sendEmail = async ({ to, subject, html, text, fromAddress, replyTo 
       subject,
       html,
       text: text || "Please view this email in an HTML-compatible client.", // Fallback
-      replyTo: replyTo || "support@grabszy.com",
+      replyTo: replyTo || settings.supportEmail || "support@grabszy.com",
     });
     logger.info("Email sent successfully", { messageId: info.messageId, to, subject });
     return info;
@@ -37,25 +49,30 @@ export const sendEmail = async ({ to, subject, html, text, fromAddress, replyTo 
 };
 
 export const sendWelcomeEmail = async (user) => {
+    const settings = await getEmailSettings();
+    const siteName = settings.siteName || 'GRABSZY';
+    
     const html = `
       <div style="font-family: Arial, sans-serif; color: #333;">
-        <h1>Welcome to GRABSZY, ${user.name}!</h1>
+        <h1>Welcome to ${siteName}, ${user.name}!</h1>
         <p>We're thrilled to have you on board. Start shopping now for the best deals!</p>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}" style="display: inline-block; padding: 10px 20px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px;">Shop Now</a>
       </div>
     `;
-    const text = `Welcome to GRABSZY, ${user.name}!\n\nWe're thrilled to have you on board. Start shopping now for the best deals at ${process.env.NEXT_PUBLIC_APP_URL}`;
+    const text = `Welcome to ${siteName}, ${user.name}!\n\nWe're thrilled to have you on board. Start shopping now for the best deals at ${process.env.NEXT_PUBLIC_APP_URL}`;
     
     await sendEmail({ 
       to: user.email, 
-      subject: "Welcome to GRABSZY! 🎉", 
+      subject: `Welcome to ${siteName}! 🎉`, 
       html,
       text,
-      fromAddress: "noreply@grabszy.com"
+      fromAddress: `noreply@${siteName.toLowerCase()}.com`
     });
 };
 
 export const sendPasswordResetEmail = async (user, token) => {
+    const settings = await getEmailSettings();
+    const siteName = settings.siteName || 'GRABSZY';
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${token}`;
     const html = `
       <div style="font-family: Arial, sans-serif; color: #333;">
@@ -72,11 +89,15 @@ export const sendPasswordResetEmail = async (user, token) => {
       subject: "Password Reset Request 🔒", 
       html,
       text,
-      fromAddress: "noreply@grabszy.com"
+      fromAddress: `noreply@${siteName.toLowerCase()}.com`
     });
 };
 
 export const sendOrderConfirmationEmail = async (order, user) => {
+    const settings = await getEmailSettings();
+    const siteName = settings.siteName || 'GRABSZY';
+    const supportEmail = settings.supportEmail || "support@grabszy.com";
+
     const itemsHtml = order.items.map(item => `
         <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee;">
@@ -93,7 +114,7 @@ export const sendOrderConfirmationEmail = async (order, user) => {
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
             <div style="background-color: #000; color: #fff; padding: 30px; text-align: center;">
                 <h1 style="margin: 0; font-size: 24px;">Order Confirmed! 📦</h1>
-                <p style="margin: 10px 0 0; opacity: 0.8;">Thank you for shopping with GRABSZY</p>
+                <p style="margin: 10px 0 0; opacity: 0.8;">Thank you for shopping with ${siteName}</p>
             </div>
             
             <div style="padding: 30px;">
@@ -128,8 +149,8 @@ export const sendOrderConfirmationEmail = async (order, user) => {
             </div>
             
             <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #999;">
-                <p>If you have any questions, contact us at support@grabszy.com</p>
-                <p>&copy; ${new Date().getFullYear()} GRABSZY. All rights reserved.</p>
+                <p>If you have any questions, contact us at ${supportEmail}</p>
+                <p>&copy; ${new Date().getFullYear()} ${siteName}. All rights reserved.</p>
             </div>
         </div>
     `;
@@ -138,14 +159,16 @@ export const sendOrderConfirmationEmail = async (order, user) => {
 
     await sendEmail({ 
       to: user.email, 
-      subject: `Order Confirmation #${order.orderId || order._id} - GRABSZY`, 
+      subject: `Order Confirmation #${order.orderId || order._id} - ${siteName}`, 
       html,
       text,
-      fromAddress: "order@grabszy.com"
+      fromAddress: `order@${siteName.toLowerCase()}.com`
     });
 };
 
 export const sendVerificationEmail = async (user, token) => {
+    const settings = await getEmailSettings();
+    const siteName = settings.siteName || 'GRABSZY';
     const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
     const html = `
         <div style="font-family: Arial, sans-serif; color: #333;">
@@ -159,10 +182,10 @@ export const sendVerificationEmail = async (user, token) => {
 
     await sendEmail({ 
       to: user.email, 
-      subject: "Verify Your Email 📧", 
+      subject: `Verify Your Email - ${siteName} 📧`, 
       html,
       text,
-      fromAddress: "noreply@grabszy.com"
+      fromAddress: `noreply@${siteName.toLowerCase()}.com`
     });
 };
 
