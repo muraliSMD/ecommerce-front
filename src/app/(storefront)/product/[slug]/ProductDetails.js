@@ -3,14 +3,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ZoomImage from "@/components/ZoomImage";
 import toast from "react-hot-toast";
 import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle } from "react-icons/fi";
 import Image from "next/image";
 import { useSettingsStore } from "@/store/settingsStore";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import ReviewsSection from "@/components/ReviewsSection";
 import { useWishlistStore } from "@/store/wishlistStore";
@@ -20,6 +21,10 @@ export default function ProductDetails({ initialProduct }) {
   const addToCart = useCartStore((state) => state.addToCart);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const { addItem, removeItem, isInWishlist } = useWishlistStore();
+
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const { data: product, isLoading, refetch } = useQuery({
     queryKey: ["product", slug],
@@ -102,9 +107,28 @@ export default function ProductDetails({ initialProduct }) {
 
   useEffect(() => {
     if (variants.length) {
-      setSelectedColor(variants[0].color);
-      if (variants[0].size) setSelectedSize(variants[0].size);
-      if (variants[0].length) setSelectedLength(variants[0].length);
+      const colorParam = searchParams.get('color');
+      const sizeParam = searchParams.get('size');
+      const lengthParam = searchParams.get('length');
+
+      // 1. Prioritize URL parameters
+      if (colorParam && allColors.includes(colorParam)) {
+        setSelectedColor(colorParam);
+        if (sizeParam && variants.some(v => v.color === colorParam && v.size === sizeParam)) {
+            setSelectedSize(sizeParam);
+            setSelectedLength("");
+        } else if (lengthParam && variants.some(v => v.color === colorParam && v.length === lengthParam)) {
+            setSelectedLength(lengthParam);
+            setSelectedSize("");
+        }
+      } 
+      // 2. Fallback to first variant if no VALID URL parameters
+      else {
+        setSelectedColor(variants[0].color);
+        if (variants[0].size) setSelectedSize(variants[0].size);
+        if (variants[0].length) setSelectedLength(variants[0].length);
+      }
+
       setSelectedVariant(variants[0]);
       
       const variantVideos = variants[0].videos?.filter(v => typeof v === 'string' && v.trim() !== '') || [];
@@ -124,7 +148,63 @@ export default function ProductDetails({ initialProduct }) {
           setSelectedMedia({ url: product.images.filter(i => typeof i === 'string' && i.trim() !== '')[0], type: 'image' });
       }
     }
-  }, [product, variants]);
+  }, [product, variants, allColors, searchParams]);
+
+  // No need for separate mount effect if merged above
+
+  // Update URL params when selections change
+  useEffect(() => {
+    if (!mounted) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (selectedColor) params.set('color', selectedColor);
+    else params.delete('color');
+
+    if (selectedSize) {
+      params.set('size', selectedSize);
+      params.delete('length');
+    } else if (selectedLength) {
+      params.set('length', selectedLength);
+      params.delete('size');
+    } else {
+      params.delete('size');
+      params.delete('length');
+    }
+
+    const queryString = params.toString();
+    const newPath = queryString ? `${pathname}?${queryString}` : pathname;
+    
+    // Use replace to avoid polluting history on every click, or push if you want it trackable
+    router.replace(newPath, { scroll: false });
+  }, [selectedColor, selectedSize, selectedLength, pathname, router, mounted, searchParams]);
+
+  const handleShare = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    
+    // Always copy to clipboard as requested
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard!");
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+
+    if (navigator.share) {
+      try {
+        const shareText = `Check out ${product.name}${selectedColor ? ` in ${selectedColor}` : ''}${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedLength ? ` (Length: ${selectedLength})` : ''}!`;
+        await navigator.share({
+          title: product.name,
+          text: shareText,
+          url: url,
+        });
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          // Already copied above
+        }
+      }
+    }
+  };
 
   if (isLoading && !product) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -463,10 +543,35 @@ export default function ProductDetails({ initialProduct }) {
                     ? "border-red-100 bg-red-50 text-red-500" 
                     : "border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50"
                 }`}
+                title="Wishlist"
               >
                 <FiHeart size={24} className={isInWishlist(product._id) ? "fill-current" : ""} />
               </button>
+
+              <button 
+                onClick={handleShare}
+                className="w-14 h-14 md:w-[68px] md:h-auto flex-shrink-0 flex items-center justify-center border-2 rounded-2xl transition-all border-gray-100 text-gray-400 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
+                title="Share Product"
+              >
+                <FiShare2 size={24} />
+              </button>
             </div>
+
+            <AnimatePresence>
+              {quantity > 3 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 text-blue-700 mt-4 overflow-hidden"
+                >
+                  <FiPlayCircle className="flex-shrink-0 mt-1 rotate-90" />
+                  <p className="text-sm font-medium leading-relaxed">
+                    <strong>Bulk Order:</strong> Orders over 3 units require custom manufacturing before being dispatched to your address.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
         

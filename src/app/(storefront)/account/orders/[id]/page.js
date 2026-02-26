@@ -12,7 +12,7 @@ import { FiStar, FiDownload } from "react-icons/fi";
 import { generateInvoice } from "@/lib/invoiceGenerator";
 import InlineOrderReview from "@/components/InlineOrderReview";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
@@ -22,10 +22,15 @@ export default function OrderDetailsPage() {
   const { settings } = useSettingsStore();
   const queryClient = useQueryClient();
   
+  const [mounted, setMounted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState(null); // 'cancel' or 'return'
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["order", id],
@@ -62,6 +67,7 @@ export default function OrderDetailsPage() {
 
   if (isLoading) return <div className="h-96 bg-white rounded-3xl animate-pulse" />;
   if (!order) return <div>Order not found</div>;
+  if (!mounted) return null; // Prevent hydration errors
 
   const totalQuantity = order.items.reduce((acc, item) => acc + item.quantity, 0);
   const estimatedDays = totalQuantity <= 3 ? 4 : 10;

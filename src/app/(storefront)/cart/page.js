@@ -120,6 +120,19 @@ export default function CartPage() {
                 </div>
               </div>
 
+              <AnimatePresence>
+                {items.some(i => i.quantity > 3) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="mb-6 p-4 bg-orange-50 border border-orange-100 rounded-2xl text-orange-800 text-xs leading-relaxed"
+                  >
+                    <strong>Note:</strong> Your order contains bulk items (3+ units). These require custom manufacturing before dispatch.
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <Link
                 href="/checkout"
                 className="w-full bg-primary hover:bg-secondary text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
