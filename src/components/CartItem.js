@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
@@ -37,24 +38,41 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
           </button>
         </div>
 
-        <div className="flex justify-between items-end pt-2">
-          <p className="text-xl font-bold text-gray-900">{formatPrice(price)}</p>
-          
-          <div className="flex items-center bg-surface border border-gray-100 rounded-xl p-1">
-            <button 
-              onClick={onDecrement}
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
-            >
-              <FiMinus size={14} />
-            </button>
-            <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
-            <button 
-              onClick={onIncrement}
-              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
-            >
-              <FiPlus size={14} />
-            </button>
+        <div className="flex flex-col gap-2 pt-2">
+          <div className="flex justify-between items-end">
+            <p className="text-xl font-bold text-gray-900">{formatPrice(price)}</p>
+            
+            <div className="flex items-center bg-surface border border-gray-100 rounded-xl p-1">
+              <button 
+                onClick={onDecrement}
+                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
+              >
+                <FiMinus size={14} />
+              </button>
+              <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
+              <button 
+                onClick={onIncrement}
+                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
+              >
+                <FiPlus size={14} />
+              </button>
+            </div>
           </div>
+
+          <AnimatePresence>
+            {item.quantity > 3 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="bg-blue-50 border border-blue-100 rounded-xl p-3 flex gap-2 text-blue-700 overflow-hidden mt-1"
+              >
+                <p className="text-[11px] font-medium leading-tight">
+                  <strong>Bulk Order:</strong> This item requires custom manufacturing due to quantity (3+).
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

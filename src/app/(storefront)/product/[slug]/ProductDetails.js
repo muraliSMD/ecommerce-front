@@ -148,7 +148,7 @@ export default function ProductDetails({ initialProduct }) {
           setSelectedMedia({ url: product.images.filter(i => typeof i === 'string' && i.trim() !== '')[0], type: 'image' });
       }
     }
-  }, [product, variants, allColors]); // Remove searchParams from dependencies to avoid loop if using router.replace
+  }, [product, variants, allColors, searchParams]);
 
   // No need for separate mount effect if merged above
 
@@ -177,7 +177,7 @@ export default function ProductDetails({ initialProduct }) {
     
     // Use replace to avoid polluting history on every click, or push if you want it trackable
     router.replace(newPath, { scroll: false });
-  }, [selectedColor, selectedSize, selectedLength, pathname, router, mounted]);
+  }, [selectedColor, selectedSize, selectedLength, pathname, router, mounted, searchParams]);
 
   const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -556,6 +556,22 @@ export default function ProductDetails({ initialProduct }) {
                 <FiShare2 size={24} />
               </button>
             </div>
+
+            <AnimatePresence>
+              {quantity > 3 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3 text-blue-700 mt-4 overflow-hidden"
+                >
+                  <FiPlayCircle className="flex-shrink-0 mt-1 rotate-90" />
+                  <p className="text-sm font-medium leading-relaxed">
+                    <strong>Bulk Order:</strong> Orders over 3 units require custom manufacturing before being dispatched to your address.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
         
