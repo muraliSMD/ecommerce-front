@@ -1,0 +1,11 @@
+2026-02-26 22:15:07 [[31merror[39m]: Test email failed {
+  "error": "logger is not defined"
+} 
+2026-02-26 22:15:40 [[31merror[39m]: Error sending email {
+  "error": "Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)",
+  "to": "grabszy2025@gmail.com",
+  "subject": "GRABSZY SMTP Test ✅"
+} 
+2026-02-26 22:15:40 [[31merror[39m]: Test email failed {
+  "error": "Email could not be sent"
+} 

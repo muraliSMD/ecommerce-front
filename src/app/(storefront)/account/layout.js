@@ -14,6 +14,8 @@ export default function AccountLayout({ children }) {
   const router = useRouter();
 
   useEffect(() => {
+    // Only redirect if hydration is complete and we are DEFINITELY not logged in
+    // This prevents race conditions during token rehydration
     if (isHydrated && !userInfo) {
       router.push("/");
     }
