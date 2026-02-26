@@ -270,12 +270,20 @@ export default function AdminOrderDetails() {
                     <div className="space-y-3 text-sm">
                         <div className="flex justify-between text-gray-500">
                             <span>Subtotal</span>
-                            <span>{formatPrice(order.items.reduce((acc, item) => acc + item.price * item.quantity, 0))}</span>
+                            <span>{formatPrice(order.totalAmount - (order.shippingCharge || 0) - (order.taxAmount || 0) + (order.discountAmount || 0))}</span>
                         </div>
                         <div className="flex justify-between text-gray-500">
                             <span>Shipping</span>
-                            <span>{order.shippingCount ? formatPrice(order.shippingCount) : 'Free'}</span>
+                            <span className={order.shippingCharge > 0 ? "text-gray-900 font-bold" : "text-green-600 font-bold"}>
+                                {order.shippingCharge > 0 ? formatPrice(order.shippingCharge) : 'Free'}
+                            </span>
                         </div>
+                        {order.taxAmount > 0 && (
+                             <div className="flex justify-between text-gray-500">
+                                <span>Tax</span>
+                                <span>{formatPrice(order.taxAmount)}</span>
+                             </div>
+                        )}
                         {order.discountAmount > 0 && (
                             <div className="flex justify-between text-green-600">
                                 <span>Discount</span>

@@ -240,11 +240,25 @@ export default function OrderDetailsPage() {
             <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
                  <div className="flex justify-between text-gray-500 mb-2">
                     <span>Subtotal</span>
-                    <span>{formatPrice(order.totalAmount)}</span>
+                    <span>{formatPrice(order.totalAmount - (order.shippingCharge || 0) - (order.taxAmount || 0) + (order.discountAmount || 0))}</span>
                  </div>
+                 {order.discountAmount > 0 && (
+                     <div className="flex justify-between text-red-500 mb-2">
+                        <span>Discount</span>
+                        <span>-{formatPrice(order.discountAmount)}</span>
+                     </div>
+                 )}
+                 {order.taxAmount > 0 && (
+                     <div className="flex justify-between text-gray-500 mb-2">
+                        <span>Tax</span>
+                        <span>{formatPrice(order.taxAmount)}</span>
+                     </div>
+                 )}
                  <div className="flex justify-between text-gray-500 mb-4">
                     <span>Shipping</span>
-                    <span className="text-primary font-bold">FREE</span>
+                    <span className={order.shippingCharge > 0 ? "font-bold text-gray-900" : "text-primary font-bold"}>
+                        {order.shippingCharge > 0 ? formatPrice(order.shippingCharge) : "FREE"}
+                    </span>
                  </div>
                  <div className="border-t border-gray-100 pt-4 flex justify-between font-bold text-xl text-gray-900">
                     <span>Total</span>
