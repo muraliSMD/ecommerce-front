@@ -326,16 +326,16 @@ export default function CheckoutPage() {
             body: JSON.stringify({
             shippingAddress: {
                 name: billingDetail.name,
-                email: billingDetail.email,
+                email: billingDetail.email || "",
                 phone: billingDetail.phone,
                 address1: billingDetail.address1,
-                address2: billingDetail.address2,
-                address3: billingDetail.address3,
+                address2: billingDetail.address2 || "",
+                address3: billingDetail.address3 || "",
                 city: billingDetail.city,
-                state: billingDetail.state,
+                state: billingDetail.state || "",
                 pincode: billingDetail.pincode,
-                landmark: billingDetail.landmark,
-                label: billingDetail.label,
+                landmark: billingDetail.landmark || "",
+                label: billingDetail.label || "Home",
                 address: billingDetail.address || (billingDetail.address1 ? `${billingDetail.address1}, ${billingDetail.address2}, ${billingDetail.city}, ${billingDetail.pincode}` : "")
             },
             paymentMethod,
