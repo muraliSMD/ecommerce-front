@@ -236,7 +236,7 @@ export default function ProductDetails({ initialProduct }) {
   return (
     <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="mb-4">
+        <div className="mb-4 lg:mb-6 px-4 md:px-0">
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
@@ -333,9 +333,40 @@ export default function ProductDetails({ initialProduct }) {
             className="lg:col-span-5 space-y-6 md:space-y-8"
           >
             <div className="space-y-4">
-              <span className="text-primary font-bold tracking-widest uppercase text-sm">
-                {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
-              </span>
+              <div className="flex justify-between items-start">
+                <span className="text-primary font-bold tracking-widest uppercase text-sm">
+                  {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
+                </span>
+                
+                {/* Mobile Share & Wishlist */}
+                <div className="flex lg:hidden gap-3">
+                  <button 
+                    onClick={() => {
+                       if (isInWishlist(product._id)) {
+                          removeItem(product._id);
+                          toast.success("Removed from Wishlist");
+                       } else {
+                          addItem(product);
+                          toast.success("Added to Wishlist");
+                       }
+                    }}
+                    className={`w-10 h-10 flex items-center justify-center border-2 rounded-xl transition-all ${
+                        isInWishlist(product._id) 
+                        ? "border-red-100 bg-red-50 text-red-500" 
+                        : "border-gray-100 text-gray-400"
+                    }`}
+                  >
+                    <FiHeart size={20} className={isInWishlist(product._id) ? "fill-current" : ""} />
+                  </button>
+                  <button 
+                    onClick={handleShare}
+                    className="w-10 h-10 flex items-center justify-center border-2 rounded-xl border-gray-100 text-gray-400 active:bg-gray-50"
+                  >
+                    <FiShare2 size={20} />
+                  </button>
+                </div>
+              </div>
+
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 leading-tight">
                 {product.name}
               </h1>
@@ -538,7 +569,7 @@ export default function ProductDetails({ initialProduct }) {
                       toast.success("Added to Wishlist");
                    }
                 }}
-                className={`w-14 h-14 md:w-[68px] md:h-auto flex-shrink-0 flex items-center justify-center border-2 rounded-2xl transition-all ${
+                className={`hidden lg:flex w-14 h-14 md:w-[68px] md:h-auto items-center justify-center border-2 rounded-2xl transition-all ${
                     isInWishlist(product._id) 
                     ? "border-red-100 bg-red-50 text-red-500" 
                     : "border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50"
@@ -550,7 +581,7 @@ export default function ProductDetails({ initialProduct }) {
 
               <button 
                 onClick={handleShare}
-                className="w-14 h-14 md:w-[68px] md:h-auto flex-shrink-0 flex items-center justify-center border-2 rounded-2xl transition-all border-gray-100 text-gray-400 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
+                className="hidden lg:flex w-14 h-14 md:w-[68px] md:h-auto items-center justify-center border-2 rounded-2xl transition-all border-gray-100 text-gray-400 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
                 title="Share Product"
               >
                 <FiShare2 size={24} />

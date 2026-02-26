@@ -136,7 +136,7 @@ export default function Header() {
     <header 
       onMouseLeave={() => setActiveCategory(null)}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm py-2 lg:py-3" : "bg-white py-3 lg:py-4"
+        isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm py-1.5 lg:py-3" : "bg-white py-2 lg:py-4"
       }`}
     >
       <div className="container mx-auto px-4 md:px-8">
@@ -145,14 +145,14 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="relative z-50 group">
             {settings?.logo ? (
-                <div className="relative h-20 w-40">
+                <div className="relative h-12 w-28 lg:h-20 lg:w-40">
                     <Image 
                         src={settings.logo} 
                         alt={settings.siteName || "Logo"} 
                         fill 
-                        sizes="160px"
+                        sizes="(max-width: 1024px) 112px, 160px"
                         priority
-                        className="object-cover object-left"
+                        className="object-contain object-left"
                     />
                 </div>
             ) : (
