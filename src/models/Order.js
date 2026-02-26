@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
+    orderId: { type: String, unique: true },
     user: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     items: [
         {
@@ -15,6 +16,8 @@ const orderSchema = new mongoose.Schema({
         },
     ],
     totalAmount: { type: Number, required: true},
+    shippingCharge: { type: Number, default: 0 },
+    taxAmount: { type: Number, default: 0 },
     discountAmount: { type: Number, default: 0 },
     couponCode: { type: String },
     paymentMethod: {type: String, enum:["COD","Stripe", "Razorpay", "Online"], default: "COD"},

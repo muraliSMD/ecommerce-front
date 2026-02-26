@@ -9,9 +9,25 @@ import confetti from "canvas-confetti";
 export default function CheckoutSuccessPage() {
   const { id } = useParams();
   const [mounted, setMounted] = useState(false);
+  const [orderFriendlyId, setOrderFriendlyId] = useState("");
 
   useEffect(() => {
     setMounted(true);
+    
+    // Fetch order ID for display
+    const fetchOrderId = async () => {
+      try {
+        const response = await fetch(`/api/orders/${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setOrderFriendlyId(data.orderId);
+        }
+      } catch (err) {
+        console.error("Failed to fetch order details", err);
+      }
+    };
+    fetchOrderId();
+
     // Trigger confetti
     const duration = 3 * 1000;
     const animationEnd = Date.now() + duration;
@@ -32,7 +48,7 @@ export default function CheckoutSuccessPage() {
     }, 250);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [id]);
 
 
 
@@ -50,7 +66,7 @@ export default function CheckoutSuccessPage() {
 
         <div className="bg-gray-50 rounded-2xl p-4 mb-8 border border-gray-100">
           <p className="text-sm text-gray-500 uppercase tracking-wider font-bold mb-1">Order ID</p>
-          <p className="text-xl font-mono font-bold text-gray-900">#{id.slice(-6).toUpperCase()}</p>
+          <p className="text-xl font-mono font-bold text-gray-900">#{orderFriendlyId || id.slice(-6).toUpperCase()}</p>
         </div>
 
         <div className="space-y-3">

@@ -65,6 +65,7 @@ export default function AdminOrders() {
   });
 
   const filteredOrders = orders?.filter(o => 
+    o.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     o._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     o.shippingAddress?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
@@ -111,7 +112,7 @@ export default function AdminOrders() {
                   </div>
                   <div>
                     <Link href={`/admin/orders/${order._id}`} className="hover:underline hover:text-primary transition-colors">
-                      <h3 className="font-mono text-sm text-gray-400">Order #{order._id.slice(-8).toUpperCase()}</h3>
+                      <h3 className="font-mono text-sm text-gray-400">Order #{order.orderId || order._id.slice(-8).toUpperCase()}</h3>
                     </Link>
                     <div className="flex items-center gap-4 mt-1">
                       <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${

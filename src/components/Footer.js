@@ -85,8 +85,8 @@ export default function Footer() {
               54/1 ottar Street Omalur<br />
               Salem, Tamil Nadu, 636455
             </p>
-            <a href={`mailto:${settings?.supportEmail || "[EMAIL_ADDRESS]"}`} className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">
-              {settings?.supportEmail || "[EMAIL_ADDRESS]"}
+            <a href={`mailto:${settings?.supportEmail || "support@grabszy.com"}`} className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">
+              {settings?.supportEmail || "support@grabszy.com"}
             </a>
           </div>
         </div>

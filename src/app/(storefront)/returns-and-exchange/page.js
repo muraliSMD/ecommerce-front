@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { FiRotateCcw, FiShield, FiCheckCircle, FiHelpCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -118,12 +119,12 @@ export default function ReturnsPage() {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Need help with a return?</h3>
                   <p className="text-gray-500 mb-6 font-medium">Our support team is just a click away.</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <a href="/contact" className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-primary transition-all active:scale-95 shadow-lg shadow-gray-900/10">
+                      <Link href="/contact" className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-primary transition-all active:scale-95 shadow-lg shadow-gray-900/10 text-center">
                           Contact Support
-                      </a>
-                      <a href="/account/orders" className="bg-white text-gray-900 border border-gray-200 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95">
+                      </Link>
+                      <Link href="/account/orders" className="bg-white text-gray-900 border border-gray-200 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95 text-center">
                           Track Your Order
-                      </a>
+                      </Link>
                   </div>
               </div>
             </div>
