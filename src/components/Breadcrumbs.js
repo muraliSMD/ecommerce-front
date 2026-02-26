@@ -5,21 +5,29 @@ import { usePathname } from "next/navigation";
 export default function Breadcrumbs({ items }) {
   const pathname = usePathname();
 
+  const truncate = (text, length = 25) => {
+    if (!text) return "";
+    return text.length > length ? text.substring(0, length) + "..." : text;
+  };
+
   if (items) {
     return (
       <nav aria-label="Breadcrumb" className="text-sm mb-4">
         <ol className="flex items-center gap-2 text-gray-600 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
           {items.map((item, idx) => {
             const isLast = idx === items.length - 1;
+            // Truncate only if it's not the first few items or if label is very long
+            const displayLabel = idx > 1 ? truncate(item.label, isLast ? 20 : 25) : item.label;
+            
             return (
-              <li key={idx} className="flex items-center gap-1">
-                {idx > 0 && <span>/</span>}
+              <li key={idx} className="flex items-center gap-1 flex-shrink-0">
+                {idx > 0 && <span className="opacity-40">/</span>}
                 {!isLast ? (
-                  <Link href={item.href} className="hover:underline">
-                    {item.label}
+                  <Link href={item.href} className="hover:underline whitespace-nowrap">
+                    {displayLabel}
                   </Link>
                 ) : (
-                  <span className="text-gray-800 font-medium">{item.label}</span>
+                  <span className="text-gray-800 font-medium whitespace-nowrap">{displayLabel}</span>
                 )}
               </li>
             );
@@ -44,24 +52,23 @@ export default function Breadcrumbs({ items }) {
 
         {segments.map((segment, idx) => {
           const href = "/" + segments.slice(0, idx + 1).join("/");
-          // turn `cart-checkout` into `Cart Checkout`
-          const label = decodeURIComponent(segment)
+          const isLast = idx === segments.length - 1;
+          
+          let label = decodeURIComponent(segment)
             .replace(/-/g, " ")
             .replace(/\b\w/g, (l) => l.toUpperCase());
-
-          const isLast = idx === segments.length - 1;
+          
+          label = truncate(label, isLast ? 20 : 25);
 
           return (
-            <li key={idx} className="flex items-center gap-1">
-              <span>/</span>
+            <li key={idx} className="flex items-center gap-1 flex-shrink-0">
+              <span className="opacity-40">/</span>
               {!isLast ? (
-                // clickable for all except the last
-                <Link href={href} className="hover:underline">
+                <Link href={href} className="hover:underline whitespace-nowrap">
                   {label}
                 </Link>
               ) : (
-                // last one plain text
-                <span className="text-gray-800">{label}</span>
+                <span className="text-gray-800 whitespace-nowrap">{label}</span>
               )}
             </li>
           );
