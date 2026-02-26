@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle } from "react-icons/fi";
 import Image from "next/image";
 import { useSettingsStore } from "@/store/settingsStore";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import ReviewsSection from "@/components/ReviewsSection";
 import { useWishlistStore } from "@/store/wishlistStore";
