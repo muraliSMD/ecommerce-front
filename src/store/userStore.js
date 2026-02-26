@@ -19,7 +19,10 @@ export const useUserStore = create(
         set({ isAuthModalOpen: isOpen, authMode: mode }),
       
       login: (userInfo, token) => {
-        // Cookie is now set by the server (HttpOnly)
+        // Persist token for axios interceptors
+        if (typeof window !== "undefined") {
+            localStorage.setItem("token", token);
+        }
         set({ token, userInfo, isAuthModalOpen: false });
         
         // Sync Cart & Wishlist
@@ -36,6 +39,10 @@ export const useUserStore = create(
             console.error("Logout failed", err);
         }
         
+        if (typeof window !== "undefined") {
+            localStorage.removeItem("token");
+        }
+        
         set({ token: null, userInfo: null });
 
         // Clear/Reset Cart & Wishlist User State
@@ -49,7 +56,10 @@ export const useUserStore = create(
     {
       name: "user-storage",
       version: 1,
-      partialize: (state) => ({ userInfo: state.userInfo }),
+      partialize: (state) => ({ 
+        userInfo: state.userInfo,
+        token: state.token // Ensure token is also persisted
+      }),
       onRehydrateStorage: () => (state) => {
         state.setHydrated();
       },

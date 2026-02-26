@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import toast from "react-hot-toast";
 import { FiX, FiMail, FiLock, FiUser, FiArrowRight } from "react-icons/fi";
 
 export default function AuthModal() {
+  const queryClient = useQueryClient();
   const { isAuthModalOpen, authMode, setAuthModalOpen, login } = useUserStore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -73,6 +75,8 @@ export default function AuthModal() {
           if (res.ok) {
             if (authMode === "login") {
               login(data.user, data.token);
+              // Invalidate all queries to refresh data (like linked guest orders)
+              queryClient.invalidateQueries();
               toast.success("Welcome back to GRABSZY!");
               setAuthModalOpen(false);
             } else {

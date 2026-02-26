@@ -17,3 +17,24 @@
   "userId": "69a03ecbd27a9d5a286022c3",
   "role": "customer"
 } 
+2026-02-26 22:15:07 [[31merror[39m]: Test email failed {
+  "error": "logger is not defined"
+} 
+2026-02-26 22:15:40 [[31merror[39m]: Error sending email {
+  "error": "Invalid login: 535 5.7.8 Error: authentication failed: (reason unavailable)",
+  "to": "grabszy2025@gmail.com",
+  "subject": "GRABSZY SMTP Test ✅"
+} 
+2026-02-26 22:15:40 [[31merror[39m]: Test email failed {
+  "error": "Email could not be sent"
+} 
+2026-02-26 22:16:32 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<81f1351c-0f67-6c0a-09ad-83b4612e0d06@grabszy.com>",
+  "to": "grabszy2025@gmail.com",
+  "subject": "GRABSZY SMTP Test ✅"
+} 
+2026-02-26 22:17:01 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<30ddd140-72f3-1439-4fd3-948ca694f73e@grabszy.com>",
+  "to": "grabszy2025@gmail.com",
+  "subject": "GRABSZY Alias Test 📧"
+} 
