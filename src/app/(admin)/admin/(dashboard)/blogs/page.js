@@ -7,9 +7,11 @@ import Link from "next/link";
 import { FiPlus, FiEdit2, FiTrash2, FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { format } from "date-fns";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function AdminBlogsPage() {
   const queryClient = useQueryClient();
+  const [blogToDelete, setBlogToDelete] = useState(null);
 
   // Fetch Blogs
   const { data: blogs, isLoading } = useQuery({
@@ -34,10 +36,8 @@ export default function AdminBlogsPage() {
     },
   });
 
-  const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this blog post?")) {
-      deleteMutation.mutate(id);
-    }
+  const handleDelete = (blog) => {
+    setBlogToDelete(blog);
   };
 
   if (isLoading) return <div className="p-8 text-center">Loading blogs...</div>;
@@ -98,7 +98,7 @@ export default function AdminBlogsPage() {
                                     <FiEdit2 size={18} />
                                 </Link>
                                 <button 
-                                    onClick={() => handleDelete(blog._id)}
+                                    onClick={() => handleDelete(blog)}
                                     className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                 >
                                     <FiTrash2 size={18} />
@@ -117,6 +117,18 @@ export default function AdminBlogsPage() {
             </tbody>
         </table>
       </div>
+
+      {blogToDelete && (
+        <ConfirmationModal 
+          isOpen={!!blogToDelete}
+          onClose={() => setBlogToDelete(null)}
+          onConfirm={() => deleteMutation.mutate(blogToDelete._id)}
+          title="Delete Blog Post"
+          message={`Are you sure you want to delete "${blogToDelete.title}"? This action cannot be undone.`}
+          confirmText={deleteMutation.isPending ? "Deleting..." : "Delete Post"}
+          type="danger"
+        />
+      )}
     </div>
   );
 }
