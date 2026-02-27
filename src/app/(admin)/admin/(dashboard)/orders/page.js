@@ -141,7 +141,7 @@ export default function AdminOrders() {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                       <FiMail className="text-gray-300" />
-                      <span>{order.user?.email || "No email"}</span>
+                      <span>{order.shippingAddress?.email || order.user?.email || "No email"}</span>
                     </div>
                     {order.shippingAddress?.phone && (
                       <div className="flex items-center gap-2 text-sm text-gray-500">

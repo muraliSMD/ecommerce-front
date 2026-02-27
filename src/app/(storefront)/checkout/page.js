@@ -107,7 +107,11 @@ export default function CheckoutPage() {
             setShowAddressForm(true);
         }
     }
-  }, [userAddresses, selectedAddressId]);
+    // Pre-fill email from userInfo if not already set
+    if (userInfo?.email && !formData.email) {
+        setFormData(prev => ({ ...prev, email: userInfo.email }));
+    }
+  }, [userAddresses, selectedAddressId, userInfo, formData.email]);
 
   // Update payment method based on settings
   useEffect(() => {
@@ -326,7 +330,7 @@ export default function CheckoutPage() {
             body: JSON.stringify({
             shippingAddress: {
                 name: billingDetail.name,
-                email: billingDetail.email || "",
+                email: billingDetail.email || userInfo?.email || "",
                 phone: billingDetail.phone,
                 address1: billingDetail.address1,
                 address2: billingDetail.address2 || "",

@@ -5,10 +5,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { FiTrash2, FiPlus, FiMapPin, FiPhone, FiUser } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { useUserStore } from "@/store/userStore";
 
 export default function AddressesPage() {
   const queryClient = useQueryClient();
   const [showAddForm, setShowAddForm] = useState(false);
+  const { userInfo } = useUserStore();
   
   // Form State
   const [formData, setFormData] = useState({
@@ -62,8 +64,8 @@ export default function AddressesPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.address || !formData.phone) {
-        toast.error("Please fill all fields");
+    if (!formData.name || !formData.address1 || !formData.phone || !formData.email) {
+        toast.error("Please fill all required fields");
         return;
     }
     addMutation.mutate(formData);
@@ -76,7 +78,12 @@ export default function AddressesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-display font-bold text-gray-900">Address Book</h1>
         <button 
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => {
+                if (!showAddForm) {
+                    setFormData({ ...formData, email: userInfo?.email || "" });
+                }
+                setShowAddForm(!showAddForm);
+            }}
             className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-xl font-bold hover:bg-gray-800 transition-colors"
         >
             <FiPlus /> {showAddForm ? "Cancel" : "Add New"}
@@ -96,15 +103,25 @@ export default function AddressesPage() {
                         placeholder="Full Name"
                     />
                 </div>
-                <div>
-                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Phone Number *</label>
-                    <input 
-                         className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
-                         value={formData.phone}
-                         onChange={e => setFormData({...formData, phone: e.target.value})}
-                         placeholder="+1 234 567 890"
-                    />
-                 </div>
+                  <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Email Address *</label>
+                      <input 
+                          type="email"
+                          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                          value={formData.email}
+                          onChange={e => setFormData({...formData, email: e.target.value})}
+                          placeholder="john@example.com"
+                      />
+                  </div>
+                  <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Phone Number *</label>
+                      <input 
+                          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-black transition-colors"
+                          value={formData.phone}
+                          onChange={e => setFormData({...formData, phone: e.target.value})}
+                          placeholder="+1 234 567 890"
+                      />
+                  </div>
                  <div className="md:col-span-2">
                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Address Line 1 *</label>
                     <input 
