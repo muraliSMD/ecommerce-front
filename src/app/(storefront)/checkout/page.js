@@ -684,7 +684,7 @@ export default function CheckoutPage() {
                     </button>
                 )}
 
-                {(!items.length || (!(settings.paymentMethods?.cod ?? true) && !(settings.paymentMethods?.online ?? true))) && (
+                {!isOrderPlaced && (!items.length || (!(settings.paymentMethods?.cod ?? true) && !(settings.paymentMethods?.online ?? true))) && (
                      <div className="col-span-2 p-4 bg-red-50 text-red-600 rounded-xl text-center text-sm font-bold">
                         No payment methods available. Please contact support.
                      </div>

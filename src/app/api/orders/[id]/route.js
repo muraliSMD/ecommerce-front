@@ -3,6 +3,7 @@ import Order from '@/models/Order';
 import Product from '@/models/Product';
 import Notification from '@/models/Notification';
 import User from '@/models/User';
+import Counter from '@/models/Counter';
 import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import webpush from 'web-push';
@@ -153,6 +154,16 @@ export async function DELETE(request, { params }) {
 
     if (!order) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
+    }
+
+    // Reset sequence if no orders left
+    const remainingCount = await Order.countDocuments();
+    if (remainingCount === 0) {
+        await Counter.findOneAndUpdate(
+            { id: 'orderNumber' },
+            { seq: 0 },
+            { upsert: true }
+        );
     }
 
     return NextResponse.json({ message: "Order deleted successfully" });
