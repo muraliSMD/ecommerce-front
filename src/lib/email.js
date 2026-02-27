@@ -3,6 +3,10 @@ import logger from '@/lib/logger';
 import Settings from '@/models/Settings';
 import dbConnect from '@/lib/db';
 
+const getBaseUrl = () => {
+  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+};
+
 async function getEmailSettings() {
   await dbConnect();
   const settings = await Settings.findOne().lean();
@@ -56,10 +60,10 @@ export const sendWelcomeEmail = async (user) => {
       <div style="font-family: Arial, sans-serif; color: #333;">
         <h1>Welcome to ${siteName}, ${user.name}!</h1>
         <p>We're thrilled to have you on board. Start shopping now for the best deals!</p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}" style="display: inline-block; padding: 10px 20px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px;">Shop Now</a>
+        <a href="${getBaseUrl()}" style="display: inline-block; padding: 10px 20px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px;">Shop Now</a>
       </div>
     `;
-    const text = `Welcome to ${siteName}, ${user.name}!\n\nWe're thrilled to have you on board. Start shopping now for the best deals at ${process.env.NEXT_PUBLIC_APP_URL}`;
+    const text = `Welcome to ${siteName}, ${user.name}!\n\nWe're thrilled to have you on board. Start shopping now for the best deals at ${getBaseUrl()}`;
     
     await sendEmail({ 
       to: user.email, 
@@ -73,7 +77,7 @@ export const sendWelcomeEmail = async (user) => {
 export const sendPasswordResetEmail = async (user, token) => {
     const settings = await getEmailSettings();
     const siteName = settings.siteName || 'GRABSZY';
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${token}`;
+    const resetUrl = `${getBaseUrl()}/reset-password/${token}`;
     const html = `
       <div style="font-family: Arial, sans-serif; color: #333;">
         <h1>Reset Your Password</h1>
@@ -144,7 +148,7 @@ export const sendOrderConfirmationEmail = async (order, user) => {
                 </div>
 
                 <div style="margin-top: 40px; text-align: center;">
-                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${order._id}" style="display: inline-block; padding: 15px 30px; color: #fff; background-color: #000; text-decoration: none; border-radius: 8px; font-weight: bold;">View Order Status</a>
+                    <a href="${getBaseUrl()}/account/orders/${order._id}" style="display: inline-block; padding: 15px 30px; color: #fff; background-color: #000; text-decoration: none; border-radius: 8px; font-weight: bold;">View Order Status</a>
                 </div>
             </div>
             
@@ -155,7 +159,7 @@ export const sendOrderConfirmationEmail = async (order, user) => {
         </div>
     `;
 
-    const text = `Order Confirmed!\n\nHi ${user.name || 'Customer'},\n\nYour order #${order.orderId || order._id} has been successfully placed.\n\nItems:\n${itemsText}\n\nTotal: ₹${order.totalAmount.toFixed(2)}\n\nView Status: ${process.env.NEXT_PUBLIC_APP_URL}/account/orders/${order._id}`;
+    const text = `Order Confirmed!\n\nHi ${user.name || 'Customer'},\n\nYour order #${order.orderId || order._id} has been successfully placed.\n\nItems:\n${itemsText}\n\nTotal: ₹${order.totalAmount.toFixed(2)}\n\nView Status: ${getBaseUrl()}/account/orders/${order._id}`;
 
     await sendEmail({ 
       to: user.email, 
@@ -169,7 +173,7 @@ export const sendOrderConfirmationEmail = async (order, user) => {
 export const sendVerificationEmail = async (user, token) => {
     const settings = await getEmailSettings();
     const siteName = settings.siteName || 'GRABSZY';
-    const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
+    const verifyUrl = `${getBaseUrl()}/verify-email?token=${token}`;
     const html = `
         <div style="font-family: Arial, sans-serif; color: #333;">
             <h1>Verify Your Email 📧</h1>
