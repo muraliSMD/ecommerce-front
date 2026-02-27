@@ -10,6 +10,12 @@ import {
   FiTruck,
   FiSearch,
   FiFilter,
+  FiMoreVertical,
+  FiArrowRight,
+  FiUser,
+  FiMapPin,
+  FiMail,
+  FiPhone,
   FiTrash2,
   FiX
 } from "react-icons/fi";
