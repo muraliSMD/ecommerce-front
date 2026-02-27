@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { FiSearch, FiMail, FiCopy, FiCheckCircle } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { SectionLoader } from "@/components/Loader";
+import ConfirmationModal from "@/components/ConfirmationModal";
+import { FiSearch, FiMail, FiCopy, FiCheckCircle, FiTrash2 } from "react-icons/fi";
 
 export default function SubscribersPage() {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [subscriberToDelete, setSubscriberToDelete] = useState(null);
 
   const { data: subscribers, isLoading } = useQuery({
     queryKey: ["admin-subscribers"],
@@ -16,6 +19,18 @@ export default function SubscribersPage() {
       const { data } = await api.get("/admin/subscribers");
       return data;
     },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      await api.delete(`/admin/subscribers?id=${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["admin-subscribers"]);
+      toast.success("Subscriber removed");
+      setSubscriberToDelete(null);
+    },
+    onError: (err) => toast.error(err.response?.data?.message || "Failed to remove subscriber"),
   });
 
   const filteredSubscribers = subscribers?.filter(s => 
@@ -67,6 +82,7 @@ export default function SubscribersPage() {
                         <th className="p-6 font-bold">Subscriber Email</th>
                         <th className="p-6 font-bold">Status</th>
                         <th className="p-6 font-bold">Joined</th>
+                        <th className="p-6 font-bold text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody className="text-sm">
@@ -94,6 +110,15 @@ export default function SubscribersPage() {
                                     day: 'numeric'
                                 })}
                             </td>
+                            <td className="p-6 text-right">
+                                <button 
+                                    onClick={() => setSubscriberToDelete(subscriber)}
+                                    className="p-2 bg-gray-100 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                    title="Remove Subscriber"
+                                >
+                                    <FiTrash2 size={16} />
+                                </button>
+                            </td>
                         </tr>
                     ))}
                     {filteredSubscribers?.length === 0 && (
@@ -107,6 +132,18 @@ export default function SubscribersPage() {
             </table>
         </div>
       </div>
+
+      {subscriberToDelete && (
+        <ConfirmationModal 
+          isOpen={!!subscriberToDelete}
+          onClose={() => setSubscriberToDelete(null)}
+          onConfirm={() => deleteMutation.mutate(subscriberToDelete._id)}
+          title="Remove Subscriber"
+          message={`Are you sure you want to remove "${subscriberToDelete.email}" from the newsletter list?`}
+          confirmText={deleteMutation.isPending ? "Removing..." : "Remove"}
+          type="danger"
+        />
+      )}
     </div>
   );
 }

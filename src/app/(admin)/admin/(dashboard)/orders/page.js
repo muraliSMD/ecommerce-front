@@ -10,12 +10,6 @@ import {
   FiTruck,
   FiSearch,
   FiFilter,
-  FiMoreVertical,
-  FiArrowRight,
-  FiUser,
-  FiMapPin,
-  FiMail,
-  FiPhone,
   FiTrash2,
   FiX
 } from "react-icons/fi";
@@ -24,10 +18,12 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function AdminOrders() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [orderToDelete, setOrderToDelete] = useState(null);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
 
   const { data: orders, isLoading } = useQuery({
@@ -236,11 +232,7 @@ export default function AdminOrders() {
                       </>
                   )}
                   <button 
-                    onClick={() => {
-                      if(confirm('Are you sure you want to delete this order?')) {
-                        deleteMutation.mutate(order._id);
-                      }
-                    }}
+                    onClick={() => setOrderToDelete(order)}
                     className="p-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 col-span-2 mt-2"
                   >
                     <FiTrash2 /> <span className="text-[10px] font-bold uppercase">Delete Order</span>
@@ -280,6 +272,18 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
+
+      {orderToDelete && (
+        <ConfirmationModal 
+          isOpen={!!orderToDelete}
+          onClose={() => setOrderToDelete(null)}
+          onConfirm={() => deleteMutation.mutate(orderToDelete._id)}
+          title="Delete Order"
+          message={`Are you sure you want to delete order #${orderToDelete.orderId || orderToDelete._id.slice(-8).toUpperCase()}? This action cannot be undone.`}
+          confirmText={deleteMutation.isPending ? "Deleting..." : "Delete Order"}
+          type="danger"
+        />
+      )}
     </div>
   );
 }

@@ -3,13 +3,16 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { FiSearch, FiUser, FiSlash, FiCheckCircle } from "react-icons/fi";
+import { FiSearch, FiUser, FiSlash, FiCheckCircle, FiTrash2 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { SectionLoader } from "@/components/Loader";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 export default function CustomersPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [userToBan, setUserToBan] = useState(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
@@ -26,8 +29,21 @@ export default function CustomersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries(["admin-users"]);
       toast.success("User status updated");
+      setUserToBan(null);
     },
     onError: (err) => toast.error(err.response?.data?.message || "Failed to update status"),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (userId) => {
+      await api.delete(`/admin/users?userId=${userId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["admin-users"]);
+      toast.success("User deleted successfully");
+      setUserToDelete(null);
+    },
+    onError: (err) => toast.error(err.response?.data?.message || "Failed to delete user"),
   });
 
   const filteredUsers = users?.filter(u => 
@@ -106,19 +122,25 @@ export default function CustomersPage() {
                             </td>
                             <td className="p-6 text-right">
                                 {user.role !== 'admin' && (
-                                    <button 
-                                        onClick={() => toggleBanMutation.mutate({ 
-                                            userId: user._id, 
-                                            isBanned: !user.isBanned 
-                                        })}
-                                        className={`px-4 py-2 rounded-lg font-bold text-xs transition-colors ${
-                                            user.isBanned
-                                            ? "bg-green-100 text-green-700 hover:bg-green-200"
-                                            : "bg-red-100 text-red-700 hover:bg-red-200"
-                                        }`}
-                                    >
-                                        {user.isBanned ? "Unban" : "Ban User"}
-                                    </button>
+                                    <div className="flex items-center justify-end gap-2">
+                                        <button 
+                                            onClick={() => setUserToBan(user)}
+                                            className={`px-4 py-2 rounded-lg font-bold text-xs transition-colors ${
+                                                user.isBanned
+                                                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                                : "bg-red-100 text-red-700 hover:bg-red-200"
+                                            }`}
+                                        >
+                                            {user.isBanned ? "Unban" : "Ban User"}
+                                        </button>
+                                        <button 
+                                            onClick={() => setUserToDelete(user)}
+                                            className="p-2 bg-gray-100 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                            title="Delete Account"
+                                        >
+                                            <FiTrash2 size={16} />
+                                        </button>
+                                    </div>
                                 )}
                             </td>
                         </tr>
@@ -134,6 +156,33 @@ export default function CustomersPage() {
             </table>
         </div>
       </div>
+
+      {userToBan && (
+        <ConfirmationModal 
+          isOpen={!!userToBan}
+          onClose={() => setUserToBan(null)}
+          onConfirm={() => toggleBanMutation.mutate({ 
+            userId: userToBan._id, 
+            isBanned: !userToBan.isBanned 
+          })}
+          title={userToBan.isBanned ? "Unban User" : "Ban User"}
+          message={`Are you sure you want to ${userToBan.isBanned ? 'unban' : 'ban'} "${userToBan.name}"? ${userToBan.isBanned ? 'They will regain access to their account.' : 'They will lose access to their account immediately.'}`}
+          confirmText={toggleBanMutation.isPending ? "Updating..." : (userToBan.isBanned ? "Unban User" : "Ban User")}
+          type={userToBan.isBanned ? "info" : "danger"}
+        />
+      )}
+
+      {userToDelete && (
+        <ConfirmationModal 
+          isOpen={!!userToDelete}
+          onClose={() => setUserToDelete(null)}
+          onConfirm={() => deleteMutation.mutate(userToDelete._id)}
+          title="Delete User Account"
+          message={`Are you sure you want to delete the account for "${userToDelete.name}"? This action cannot be undone and all their data will be permanently removed.`}
+          confirmText={deleteMutation.isPending ? "Deleting..." : "Delete Account"}
+          type="danger"
+        />
+      )}
     </div>
   );
 }

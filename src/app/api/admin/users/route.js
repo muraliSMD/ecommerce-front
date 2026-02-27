@@ -54,3 +54,33 @@ export async function PUT(request) {
         return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
       }
 }
+export async function DELETE(request) {
+    try {
+        await dbConnect();
+        const currentUser = await getFullUserFromRequest(request);
+
+        if (!currentUser || !isAdmin(currentUser)) {
+            return NextResponse.json({ message: "Not authorized" }, { status: 403 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const userId = searchParams.get('userId');
+
+        if (!userId) {
+            return NextResponse.json({ message: "User ID is required" }, { status: 400 });
+        }
+
+        // Prevent self-deletion
+        if (userId === currentUser._id.toString()) {
+            return NextResponse.json({ message: "Cannot delete yourself" }, { status: 400 });
+        }
+
+        const user = await User.findByIdAndDelete(userId);
+        if (!user) return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+        return NextResponse.json({ message: "User deleted successfully" });
+
+    } catch (error) {
+        return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
+    }
+}

@@ -8,6 +8,7 @@ import { FiPlus, FiTrash2, FiEdit2, FiChevronRight, FiChevronDown, FiFolder, FiF
 import Image from "next/image";
 import toast from "react-hot-toast";
 import imageCompression from "browser-image-compression";
+import ConfirmationModal from "@/components/ConfirmationModal";
 
 // Recursive Category Item Component
 const CategoryItem = ({ category, allCategories, level = 0, onDelete, onEdit, onAddChild }) => {
@@ -97,6 +98,7 @@ export default function CategoriesPage() {
   
   const [formData, setFormData] = useState({ name: "", description: "", image: "" });
   const [uploading, setUploading] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   // Fetch Categories
   const { data: categories, isLoading } = useQuery({
@@ -223,9 +225,7 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = (category) => {
-    if (confirm(`Are you sure you want to delete "${category.name}"? This might affect subcategories.`)) {
-        deleteMutation.mutate(category._id);
-    }
+    setCategoryToDelete(category);
   };
 
   const closeModal = () => {
@@ -368,6 +368,17 @@ export default function CategoriesPage() {
                 </form>
             </div>
         </div>
+      )}
+      {categoryToDelete && (
+        <ConfirmationModal 
+          isOpen={!!categoryToDelete}
+          onClose={() => setCategoryToDelete(null)}
+          onConfirm={() => deleteMutation.mutate(categoryToDelete._id)}
+          title="Delete Category"
+          message={`Are you sure you want to delete "${categoryToDelete.name}"? This action cannot be undone and might affect subcategories and products.`}
+          confirmText={deleteMutation.isPending ? "Deleting..." : "Delete Category"}
+          type="danger"
+        />
       )}
     </div>
   );
