@@ -25,6 +25,7 @@ export default function ProductDetailsAdmin({ params }) {
   const { id } = use(params);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["admin-product", id],
@@ -33,6 +34,10 @@ export default function ProductDetailsAdmin({ params }) {
       return data;
     },
   });
+
+  useEffect(() => {
+    setActiveMediaIndex(0);
+  }, [selectedVariant]);
 
   if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
   if (error || !product) return (
@@ -48,13 +53,16 @@ export default function ProductDetailsAdmin({ params }) {
     ? product.variants.reduce((acc, v) => acc + (Number(v.stock) || 0), 0)
     : (product.stock || 0);
 
-  const variantImages = product.variants?.flatMap(v => v.images || []) || [];
-  
-  const gallery = [
-    ...(product.videos?.map(v => ({ url: v, type: 'video' })) || []),
-    ...(product.images?.map(img => ({ url: img, type: 'image' })) || []),
-    ...(variantImages.map(img => ({ url: img, type: 'image' })))
+  const baseGallery = [
+    ...(product.videos?.filter(v => typeof v === 'string' && v.trim() !== '').map(v => ({ url: v, type: 'video' })) || []),
+    ...(product.images?.filter(img => typeof img === 'string' && img.trim() !== '').map(img => ({ url: img, type: 'image' })) || []),
   ];
+
+  const variantGallery = selectedVariant?.images?.filter(img => typeof img === 'string' && img.trim() !== '').map(img => ({ url: img, type: 'image' })) || [];
+  
+  const gallery = selectedVariant 
+    ? (variantGallery.length > 0 ? variantGallery : baseGallery)
+    : [...baseGallery, ...(product.variants?.flatMap(v => v.images?.filter(img => typeof img === 'string' && img.trim() !== '').map(img => ({ url: img, type: 'image' }))) || [])];
 
   const activeMedia = gallery[activeMediaIndex] || { url: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070", type: 'image' };
 
@@ -130,15 +138,43 @@ export default function ProductDetailsAdmin({ params }) {
                 <p className="text-gray-400 font-mono text-sm mt-1">ID: {product._id}</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-display font-bold text-primary">{formatPrice(product.price)}</p>
-                <p className="text-sm text-gray-400 mt-1">Base Price</p>
+                <p className="text-3xl font-display font-bold text-primary">
+                  {formatPrice(selectedVariant ? selectedVariant.price : product.price)}
+                </p>
+                <p className="text-sm text-gray-400 mt-1">{selectedVariant ? "Variant Price" : "Base Price"}</p>
               </div>
             </div>
+
+            {product.variants?.length > 0 && (
+              <div className="mb-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Select Variant to Inspect</p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedVariant(null)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 ${!selectedVariant ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-gray-600 border-transparent hover:border-gray-200'}`}
+                  >
+                    All Variants (Summary)
+                  </button>
+                  {product.variants.map((v, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedVariant(v)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 flex items-center gap-2 ${selectedVariant === v ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-gray-600 border-transparent hover:border-gray-200'}`}
+                    >
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
+                      {v.color} {v.size ? `/ ${v.size}` : ''} {v.length ? `/ ${v.length}` : ''}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-8 border-y border-gray-50">
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Stock</p>
-                <p className={`text-xl font-bold ${totalStock > 0 ? 'text-gray-900' : 'text-red-500'}`}>{totalStock}</p>
+                <p className={`text-xl font-bold ${(selectedVariant ? selectedVariant.stock : totalStock) > 0 ? 'text-gray-900' : 'text-red-500'}`}>
+                  {selectedVariant ? selectedVariant.stock : totalStock}
+                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">SKU</p>
@@ -150,8 +186,8 @@ export default function ProductDetailsAdmin({ params }) {
               </div>
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</p>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${totalStock > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                   {totalStock > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${(selectedVariant ? selectedVariant.stock : totalStock) > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                   {(selectedVariant ? selectedVariant.stock : totalStock) > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
                 </span>
               </div>
             </div>
@@ -196,11 +232,15 @@ export default function ProductDetailsAdmin({ params }) {
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-sm">
                   {product.variants?.map((v, i) => (
-                    <tr key={i} className="hover:bg-gray-50/50">
+                    <tr 
+                      key={i} 
+                      onClick={() => setSelectedVariant(v)}
+                      className={`cursor-pointer transition-colors ${selectedVariant === v ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50/50'}`}
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
-                          <span className="font-bold text-gray-900">{v.color}</span>
+                          <span className={`font-bold ${selectedVariant === v ? 'text-primary' : 'text-gray-900'}`}>{v.color}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 font-medium text-gray-600">
