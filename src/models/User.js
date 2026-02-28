@@ -60,6 +60,7 @@ const userSchema = new mongoose.Schema({
     ],
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    wishlistShareId: { type: String, unique: true, sparse: true },
 });
 
 export default mongoose.models.User || mongoose.model("User", userSchema);

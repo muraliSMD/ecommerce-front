@@ -18,8 +18,10 @@ import {
   FiList 
 } from "react-icons/fi";
 import Link from "next/link";
+import { getColorValue } from "@/lib/colors";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import { ProductCardSkeleton } from "@/components/Skeleton";
 
 // Helper to separate render
 const CategoryButton = ({ category, selectedCategory, setSelectedCategory, level = 0 }) => (
@@ -55,7 +57,13 @@ const FilterContent = ({
     selectedCategory, 
     setSelectedCategory, 
     priceRange, 
-    setPriceRange 
+    setPriceRange,
+    availableColors = [],
+    selectedColor,
+    setSelectedColor,
+    availableSizes = [],
+    selectedSize,
+    setSelectedSize
   }) => (
     <div className="space-y-8">
       {/* Search */}
@@ -73,7 +81,7 @@ const FilterContent = ({
       {/* Categories */}
       <div>
         <h3 className="font-bold text-gray-900 mb-4">Categories</h3>
-        <div className="space-y-1 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="space-y-1 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
            <button
               onClick={() => setSelectedCategory("All")}
               className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
@@ -95,6 +103,58 @@ const FilterContent = ({
         </div>
       </div>
 
+      {/* Color Filter */}
+      {availableColors.length > 0 && (
+        <div>
+          <h3 className="font-bold text-gray-900 mb-4">Filter by Color</h3>
+          <div className="flex flex-wrap gap-3">
+            <button
+               onClick={() => setSelectedColor(null)}
+               className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${!selectedColor ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-200'}`}
+               title="All Colors"
+            >
+               <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-red-500 via-green-500 to-blue-500"></div>
+            </button>
+             {availableColors.map((color) => (
+               <button
+                 key={color}
+                 onClick={() => setSelectedColor(selectedColor === color ? null : color)}
+                 className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-200'}`}
+                 title={color}
+               >
+                 <div 
+                   className="w-6 h-6 rounded-full border border-gray-100" 
+                   style={{ backgroundColor: getColorValue(color) }}
+                 ></div>
+               </button>
+             ))}
+
+          </div>
+        </div>
+      )}
+
+      {/* Size Filter */}
+      {availableSizes.length > 0 && (
+        <div>
+          <h3 className="font-bold text-gray-900 mb-4">Filter by Size</h3>
+          <div className="flex flex-wrap gap-2">
+            {availableSizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                  selectedSize === size 
+                    ? "bg-primary text-white border-primary shadow-sm" 
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Price Range */}
       <div>
         <h3 className="font-bold text-gray-900 mb-4">Price Range</h3>
@@ -104,14 +164,14 @@ const FilterContent = ({
             placeholder="Min"
             value={priceRange.min}
             onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm"
+            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm shadow-sm"
           />
           <input
             type="number"
             placeholder="Max"
             value={priceRange.max}
             onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm"
+            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm shadow-sm"
           />
         </div>
       </div>
@@ -132,6 +192,8 @@ export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState(urlCategory || "All");
   const [sort, setSort] = useState("newest");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   // Sync with URL category if it changes
   useEffect(() => {
@@ -165,7 +227,6 @@ export default function ShopPage() {
       if (!categories) return [];
       const categoryMap = {};
       const tree = [];
-      // Deep clone to avoid mutating original if needed, but here simple map is ok
       categories.forEach(cat => {
           categoryMap[cat._id] = { ...cat, children: [] };
       });
@@ -183,7 +244,7 @@ export default function ShopPage() {
   };
 
   // Fetch Categories
-  const { data: categories } = useQuery({
+  const { data: categoriesDoc } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data } = await api.get("/categories");
@@ -199,7 +260,7 @@ export default function ShopPage() {
     isFetchingNextPage, 
     isLoading 
   } = useInfiniteQuery({
-    queryKey: ["products", selectedCategory, sort, debouncedSearch, priceRange],
+    queryKey: ["products", selectedCategory, sort, debouncedSearch, priceRange, selectedColor, selectedSize],
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         sort,
@@ -211,6 +272,8 @@ export default function ShopPage() {
       if (selectedCategory !== "All") params.append("category", selectedCategory);
       if (priceRange.min) params.append("minPrice", priceRange.min);
       if (priceRange.max) params.append("maxPrice", priceRange.max);
+      if (selectedColor) params.append("colors", selectedColor);
+      if (selectedSize) params.append("sizes", selectedSize);
 
       const { data } = await api.get(`/products?${params.toString()}`);
       return data;
@@ -221,6 +284,10 @@ export default function ShopPage() {
   });
 
   const products = data?.pages.flatMap(page => page) || [];
+
+  // Extract all available colors and sizes from loaded products
+  const availableColors = Array.from(new Set(products.flatMap(p => p.variants?.map(v => v.color) || []).filter(Boolean)));
+  const availableSizes = Array.from(new Set(products.flatMap(p => p.variants?.map(v => v.size) || []).filter(Boolean)));
 
   const handleAddToCart = (product, qty = 1, variant) => {
     addToCart(product, qty, variant);
@@ -261,11 +328,17 @@ export default function ShopPage() {
                 <FilterContent 
                     search={search}
                     setSearch={setSearch}
-                    categories={categories}
+                    categories={categoriesDoc}
                     selectedCategory={selectedCategory}
                     setSelectedCategory={setSelectedCategory}
                     priceRange={priceRange}
                     setPriceRange={setPriceRange}
+                    availableColors={availableColors}
+                    selectedColor={selectedColor}
+                    setSelectedColor={setSelectedColor}
+                    availableSizes={availableSizes}
+                    selectedSize={selectedSize}
+                    setSelectedSize={setSelectedSize}
                 />
              </div>
           </aside>
@@ -297,11 +370,17 @@ export default function ShopPage() {
                     <FilterContent 
                         search={search}
                         setSearch={setSearch}
-                        categories={categories}
+                        categories={categoriesDoc}
                         selectedCategory={selectedCategory}
                         setSelectedCategory={setSelectedCategory}
                         priceRange={priceRange}
                         setPriceRange={setPriceRange}
+                        availableColors={availableColors}
+                        selectedColor={selectedColor}
+                        setSelectedColor={setSelectedColor}
+                        availableSizes={availableSizes}
+                        selectedSize={selectedSize}
+                        setSelectedSize={setSelectedSize}
                     />
                     <div className="mt-8 pt-6 border-t border-gray-100">
                         <button 
@@ -361,7 +440,7 @@ export default function ShopPage() {
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                 {[...Array(10)].map((_, i) => (
-                  <div key={i} className="bg-white/50 rounded-[2rem] h-[400px] animate-pulse" />
+                  <ProductCardSkeleton key={i} />
                 ))}
               </div>
             ) : products?.length === 0 ? (

@@ -26,6 +26,7 @@ import CategorySelector from "@/components/admin/CategorySelector";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";
+import { getColorValue } from "@/lib/colors";
 
 export default function EditProduct({ params }) {
   const router = useRouter();
@@ -834,7 +835,7 @@ export default function EditProduct({ params }) {
               <div key={i} className="flex flex-col p-5 bg-surface rounded-2xl border border-gray-100 group gap-4">
                 <div className="flex flex-col lg:flex-row gap-4 flex-1 items-start lg:items-center flex-wrap">
                   <div className="flex items-center gap-2 min-w-[100px]">
-                    <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
+                    <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: getColorValue(v.color) }}></div>
                     <span className="font-bold text-gray-900">{v.color}</span>
                   </div>
                   {v.size && <span className="font-bold text-gray-500 min-w-[60px] bg-gray-50 px-2 py-1 rounded-md text-sm">Size: {v.size}</span>}

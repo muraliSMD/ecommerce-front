@@ -59,7 +59,7 @@ export async function GET(request) {
 import { sendWhatsAppMessage } from "@/lib/whatsapp";
 import { rateLimit } from '@/lib/rateLimit';
 import { checkoutSchema } from '@/lib/validations/order';
-import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendOrderConfirmationEmail, sendLowStockAlert } from '@/lib/email';
 
 export async function POST(request) {
   try {
@@ -217,7 +217,58 @@ export async function POST(request) {
         }
     }
 
-    // 2. Reduce stock ... (skipped for readability, keep existing logic)
+    // 2. Reduce stock & Check for Low Stock
+    for (const item of items) {
+        try {
+            const product = await Product.findById(item.product);
+            if (!product) continue;
+
+            let updatedProduct;
+            let currentStock = 0;
+            let targetVariant = null;
+
+            if (product.hasVariants && item.variant) {
+                // Find and update specific variant stock
+                updatedProduct = await Product.findOneAndUpdate(
+                    { 
+                        _id: item.product, 
+                        "variants.color": item.variant.color,
+                        "variants.size": item.variant.size,
+                        "variants.length": item.variant.length
+                    },
+                    { $inc: { "variants.$.stock": -item.quantity } },
+                    { new: true }
+                );
+
+                if (updatedProduct) {
+                    targetVariant = updatedProduct.variants.find(v => 
+                        v.color === item.variant.color && 
+                        v.size === item.variant.size && 
+                        v.length === item.variant.length
+                    );
+                    currentStock = targetVariant ? targetVariant.stock : 0;
+                }
+            } else {
+                // Update top-level stock
+                updatedProduct = await Product.findByIdAndUpdate(
+                    item.product,
+                    { $inc: { stock: -item.quantity } },
+                    { new: true }
+                );
+                currentStock = updatedProduct ? updatedProduct.stock : 0;
+            }
+
+            // Trigger Low Stock Alert (Threshold: 5)
+            if (updatedProduct && currentStock <= 5 && currentStock >= 0) {
+                await sendLowStockAlert(updatedProduct, targetVariant);
+            }
+        } catch (stockError) {
+            logger.error("Failed to update stock or send alert", { 
+                error: stockError.message, 
+                productId: item.product 
+            });
+        }
+    }
 
     // 3. Trigger Admin Notification
     try {

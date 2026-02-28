@@ -193,3 +193,56 @@ export const sendVerificationEmail = async (user, token) => {
     });
 };
 
+export const sendLowStockAlert = async (product, variant = null) => {
+    try {
+        const settings = await getEmailSettings();
+        const siteName = settings.siteName || 'GRABSZY';
+        const adminEmail = settings.supportEmail || process.env.SMTP_USER;
+        
+        const itemName = variant 
+            ? `${product.name} (${variant.color}${variant.size ? ` / ${variant.size}` : ''}${variant.length ? ` / ${variant.length}` : ''})`
+            : product.name;
+        
+        const stockCount = variant ? variant.stock : product.stock;
+
+        const html = `
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #dc3545; border-radius: 10px; overflow: hidden;">
+                <div style="background-color: #dc3545; color: #fff; padding: 25px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 22px;">⚠️ Low Stock Alert</h1>
+                    <p style="margin: 5px 0; opacity: 0.9;">Inventory threshold reached</p>
+                </div>
+                <div style="padding: 30px;">
+                    <p style="font-size: 16px;">Hello Admin,</p>
+                    <p>The following item is running low on stock and needs your attention:</p>
+                    
+                    <div style="background-color: #fff5f5; padding: 20px; border-left: 4px solid #dc3545; border-radius: 4px; margin: 25px 0;">
+                        <p style="margin: 5px 0;"><strong>Product:</strong> ${product.name}</p>
+                        ${variant ? `<p style="margin: 5px 0;"><strong>Variant:</strong> ${variant.color || 'N/A'} ${variant.size ? `/ ${variant.size}` : ''} ${variant.length ? `/ ${variant.length}` : ''}</p>` : ''}
+                        <p style="margin: 5px 0;"><strong>Remaining Stock:</strong> <span style="color: #dc3545; font-weight: 800; font-size: 18px;">${stockCount}</span></p>
+                        <p style="margin: 5px 0;"><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
+                    </div>
+                    
+                    <p>To avoid "Out of Stock" status for customers, we recommend restocking this item soon.</p>
+                    
+                    <div style="text-align: center; margin-top: 35px;">
+                        <a href="${getBaseUrl()}/admin/products/edit/${product._id}" style="display: inline-block; padding: 15px 30px; color: #fff; background-color: #000; text-decoration: none; border-radius: 8px; font-weight: bolder;">Manage Inventory</a>
+                    </div>
+                </div>
+                <div style="background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+                    <p>This is an automated inventory alert from ${siteName}.</p>
+                </div>
+            </div>
+        `;
+
+        await sendEmail({ 
+            to: adminEmail, 
+            subject: `[STOCK ALERT] ${itemName} is low!`, 
+            html,
+            text: `Low Stock Alert: ${itemName} currently has ${stockCount} items left. Update inventory at: ${getBaseUrl()}/admin/products/edit/${product._id}`,
+            fromAddress: `alerts@${siteName.toLowerCase()}.com`
+        });
+    } catch (error) {
+        logger.error("Failed to send low stock alert email", { error: error.message });
+    }
+};
+

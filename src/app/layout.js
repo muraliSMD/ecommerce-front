@@ -22,6 +22,7 @@ import dbConnect from "@/lib/db";
 import Settings from "@/models/Settings";
 import ScriptManager from "@/components/ScriptManager";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
+import PwaManager from "@/components/PwaManager";
 
 export async function generateMetadata() {
   await dbConnect();
@@ -33,8 +34,10 @@ export async function generateMetadata() {
     title: settings.seo?.metaTitle || "GRABSZY | Premium Clothing & Lifestyle",
     description: settings.seo?.metaDescription || "Experience the next generation of online shopping with Grabszy.",
     keywords: settings.seo?.metaKeywords || "fashion, clothing, premium, ecommerce",
+    manifest: '/manifest.json',
     icons: {
       icon: settings.favicon || '/favicon.ico',
+      apple: '/icons/icon-192x192.png',
     },
     openGraph: {
       title: settings.seo?.metaTitle,
@@ -59,6 +62,12 @@ export async function generateMetadata() {
   };
 }
 
+export function generateViewport() {
+  return {
+    themeColor: '#000000',
+  };
+}
+
 export default async function RootLayout({ children }) {  
     await dbConnect();
     const settingsDoc = await Settings.findOne().lean();
@@ -71,6 +80,7 @@ export default async function RootLayout({ children }) {
         <QueryProvider>
           <SettingsInitializer />
           <AuthModal />
+          <PwaManager />
           <PopupManager />
           <ChatWidget />
           <PushNotificationManager />

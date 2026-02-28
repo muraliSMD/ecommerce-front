@@ -1,58 +1,48 @@
 import dbConnect from "@/lib/db";
 import Product from "@/models/Product";
-import Category from "@/models/Category";
 import Blog from "@/models/Blog";
 
 export default async function sitemap() {
   await dbConnect();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://grabszy.com";
 
-  // Static routes
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://grabszy.com";
+
+  // 1. Static Routes
   const staticRoutes = [
     "",
+    "/shop",
     "/about",
     "/contact",
-    "/shop",
     "/cart",
+    "/checkout",
     "/wishlist",
+    "/blog",
+    "/returns-and-exchange",
+    "/shipping-policy",
   ].map((route) => ({
-    url: `${siteUrl}${route}`,
+    url: `${baseUrl}${route}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 1,
+    changeFrequency: "daily",
+    priority: route === "" ? 1 : 0.8,
   }));
 
-  // Dynamic products
-  const products = await Product.find({}).select("slug updatedAt").lean();
+  // 2. Product Routes
+  const products = await Product.find({ isActive: true }).select("slug updatedAt").lean();
   const productRoutes = products.map((product) => ({
-    url: `${siteUrl}/product/${product.slug}`,
+    url: `${baseUrl}/product/${product.slug}`,
     lastModified: product.updatedAt || new Date(),
-    changeFrequency: 'daily',
-    priority: 0.8,
-  }));
-
-  // Dynamic categories
-  const categories = await Category.find({}).select("name slug updatedAt").lean();
-  const categoryRoutes = categories.map((category) => ({
-    url: `${siteUrl}/shop?category=${category.slug || category.name}`,
-    lastModified: category.updatedAt || new Date(),
-    changeFrequency: 'weekly',
+    changeFrequency: "weekly",
     priority: 0.7,
   }));
 
-  // Dynamic blogs
-  const blogs = await Blog.find({}).select("slug updatedAt").lean();
-  const blogRoutes = blogs.map((blog) => ({
-    url: `${siteUrl}/blog/${blog.slug}`,
-    lastModified: blog.updatedAt || new Date(),
-    changeFrequency: 'monthly',
+  // 3. Blog Routes
+  const blogs = await Blog.find({ isPublished: true }).select("slug updatedAt").lean();
+  const blogRoutes = blogs.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: post.updatedAt || new Date(),
+    changeFrequency: "monthly",
     priority: 0.6,
   }));
 
-  return [
-    ...staticRoutes,
-    ...productRoutes,
-    ...categoryRoutes,
-    ...blogRoutes,
-  ];
+  return [...staticRoutes, ...productRoutes, ...blogRoutes];
 }

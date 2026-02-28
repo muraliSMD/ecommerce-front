@@ -33,6 +33,9 @@ export async function generateMetadata({ params, searchParams }) {
   const variantText = variant ? ` (${variant.color || ''}${variant.size ? ` ${variant.size}` : ''}${variant.length ? ` ${variant.length}` : ''})` : '';
   const title = `${product.name}${variantText} | GRABSZY`;
 
+  // Dynamic OG image URL
+  const ogImageUrl = `${siteUrl}/api/og/product?name=${encodeURIComponent(product.name)}&price=${product.price}&image=${encodeURIComponent(shareImage)}`;
+
   return {
     title,
     description: plainDescription,
@@ -42,9 +45,9 @@ export async function generateMetadata({ params, searchParams }) {
       url: `${siteUrl}/product/${slug}${color ? `?color=${color}` : ''}`,
       images: [
         {
-          url: shareImage,
-          width: 800,
-          height: 800,
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
         },
       ],
       type: 'article',
@@ -53,7 +56,7 @@ export async function generateMetadata({ params, searchParams }) {
       card: 'summary_large_image',
       title,
       description: plainDescription,
-      images: [shareImage],
+      images: [ogImageUrl],
     },
   };
 }
@@ -71,7 +74,13 @@ export default async function Page({ params }) {
     notFound();
   }
 
-  const serializedProduct = JSON.parse(JSON.stringify(product));
+  let serializedProduct = null;
+  try {
+    serializedProduct = JSON.parse(JSON.stringify(product));
+  } catch (err) {
+    console.error("Serialization Error for product:", slug, err);
+    notFound();
+  }
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://grabszy.com";
 
   return (

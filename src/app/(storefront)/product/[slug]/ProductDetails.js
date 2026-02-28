@@ -10,6 +10,7 @@ import ZoomImage from "@/components/ZoomImage";
 import toast from "react-hot-toast";
 import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle } from "react-icons/fi";
 import Image from "next/image";
+import { getColorValue } from "@/lib/colors";
 import { useSettingsStore } from "@/store/settingsStore";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
@@ -453,9 +454,15 @@ export default function ProductDetails({ initialProduct }) {
                             <Image src={colorImage} alt={color} fill className="object-cover" />
                             <div className={`absolute inset-0 bg-black/20 ${selectedColor === color ? 'bg-black/0' : 'group-hover:bg-black/10'} transition-colors`} />
                           </>
-                        ) : (
-                          <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{color}</span>
-                        )}
+                         ) : (
+                           <div className="flex items-center gap-2">
+                             <div 
+                               className="w-4 h-4 rounded-full border border-gray-200" 
+                               style={{ backgroundColor: getColorValue(color) }}
+                             />
+                             <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{color}</span>
+                           </div>
+                         )}
                       </button>
                     )
                   })}
