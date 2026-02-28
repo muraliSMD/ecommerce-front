@@ -123,6 +123,8 @@ export async function GET(request) {
   }
 }
 
+import { productSchema } from '@/lib/validations/product';
+
 export async function POST(request) {
   try {
     await dbConnect();
@@ -134,9 +136,19 @@ export async function POST(request) {
     }
 
     const body = await request.json();
+    const validation = productSchema.safeParse(body);
+    
+    if (!validation.success) {
+        return NextResponse.json({ 
+            message: "Validation failed", 
+            errors: validation.error.format() 
+        }, { status: 400 });
+    }
+
+    const validatedData = validation.data;
     
     // Generate slug from name
-    let slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    let slug = validatedData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     
     // Check if slug exists
     let existingProduct = await Product.findOne({ slug });
@@ -144,7 +156,7 @@ export async function POST(request) {
         slug = `${slug}-${Date.now()}`;
     }
     
-    const newProduct = new Product({ ...body, slug });
+    const newProduct = new Product({ ...validatedData, slug });
     const savedProduct = await newProduct.save();
     return NextResponse.json(savedProduct, { status: 201 });
   } catch (error) {

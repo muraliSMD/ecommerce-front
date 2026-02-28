@@ -15,6 +15,8 @@ export async function GET() {
   }
 }
 
+import { categorySchema } from '@/lib/validations/category';
+
 export async function POST(request) {
   try {
     await dbConnect();
@@ -24,24 +26,17 @@ export async function POST(request) {
       return NextResponse.json({ message: "Admin access required" }, { status: 403 });
     }
 
-    // Debugging: Log the raw request info
-    console.log("POST /api/categories - Method:", request.method);
-    console.log("Headers:", Object.fromEntries(request.headers));
-
-    // Cloning the request to read text without consuming the original stream for json() if needed, 
-    // BUT strictly speaking we can just read text() and parse it manually to be safe and debug.
-    const bodyText = await request.text();
-    console.log("Raw Body:", bodyText);
+    const rawBody = await request.json();
+    const validation = categorySchema.safeParse(rawBody);
     
-    if (!bodyText) {
-        return NextResponse.json({ message: "Empty request body" }, { status: 400 });
+    if (!validation.success) {
+        return NextResponse.json({ 
+            message: "Validation failed", 
+            errors: validation.error.format() 
+        }, { status: 400 });
     }
 
-    const { name, image, parent, description } = JSON.parse(bodyText);
-    
-    if (!name) {
-        return NextResponse.json({ message: "Name is required" }, { status: 400 });
-    }
+    const { name, image, parent, description } = validation.data;
 
     let level = 0;
     let ancestors = [];

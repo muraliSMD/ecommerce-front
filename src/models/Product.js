@@ -6,6 +6,11 @@ const reviewSchema = new mongoose.Schema(
     name: { type: String, required: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, required: true },
+    images: { type: [String], default: [] },
+    videos: { type: [String], default: [] },
+    isVerified: { type: Boolean, default: false },
+    helpfulVotes: { type: Number, default: 0 },
+    votedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

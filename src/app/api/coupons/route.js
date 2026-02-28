@@ -48,6 +48,8 @@ export async function GET(request) {
   }
 }
 
+import { couponSchema } from '@/lib/validations/coupon';
+
 export async function POST(request) {
     try {
         await dbConnect();
@@ -57,12 +59,17 @@ export async function POST(request) {
             return NextResponse.json({ message: "Not authorized" }, { status: 403 });
         }
 
-        const body = await request.json();
-
-        // Basic Validation
-        if (!body.code || !body.discountType || !body.value) {
-            return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+        const rawBody = await request.json();
+        const validation = couponSchema.safeParse(rawBody);
+        
+        if (!validation.success) {
+            return NextResponse.json({ 
+                message: "Validation failed", 
+                errors: validation.error.format() 
+            }, { status: 400 });
         }
+
+        const body = validation.data;
 
         const existingCookie = await Coupon.findOne({ code: body.code.toUpperCase() });
         if (existingCookie) {

@@ -44,6 +44,8 @@ export async function GET(request, { params }) {
   }
 }
 
+import { productSchema } from '@/lib/validations/product';
+
 export async function PUT(request, { params }) {
   try {
     await dbConnect();
@@ -57,7 +59,15 @@ export async function PUT(request, { params }) {
     const { id } = await params;
     const body = await request.json();
     
-    const updatedProduct = await Product.findByIdAndUpdate(id, body, { new: true });
+    const validation = productSchema.partial().safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json({ 
+            message: "Validation failed", 
+            errors: validation.error.format() 
+        }, { status: 400 });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, validation.data, { new: true });
     
     if (!updatedProduct) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });

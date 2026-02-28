@@ -19,6 +19,8 @@ export async function GET() {
   }
 }
 
+import { settingsSchema } from '@/lib/validations/settings';
+
 export async function PUT(request) {
   try {
     await dbConnect();
@@ -27,8 +29,17 @@ export async function PUT(request) {
       return NextResponse.json({ message: "Admin access required" }, { status: 403 });
     }
 
-    const body = await request.json();
-    console.log("Settings PUT received:", body);
+    const rawBody = await request.json();
+    const validation = settingsSchema.safeParse(rawBody);
+    
+    if (!validation.success) {
+        return NextResponse.json({ 
+            message: "Validation failed", 
+            errors: validation.error.format() 
+        }, { status: 400 });
+    }
+
+    const body = validation.data;
     
     // Update the singleton document
     // upsert: true ensures it creates if somehow missing (though findOneAndUpdate usually needs a query)

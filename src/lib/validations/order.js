@@ -20,7 +20,8 @@ export const orderItemSchema = z.object({
   quantity: z.number().int().positive("Quantity must be at least 1"),
   variant: z.object({
     color: z.string().optional(),
-    size: z.string().optional()
+    size: z.string().optional(),
+    length: z.string().optional()
   }).nullable().optional(),
   price: z.number().positive()
 });

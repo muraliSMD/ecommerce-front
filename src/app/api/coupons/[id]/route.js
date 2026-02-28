@@ -24,6 +24,8 @@ export async function GET(request, { params }) {
     }
 }
 
+import { couponSchema } from '@/lib/validations/coupon';
+
 export async function PUT(request, { params }) {
     try {
         await dbConnect();
@@ -33,8 +35,18 @@ export async function PUT(request, { params }) {
              return NextResponse.json({ message: "Not authorized" }, { status: 403 });
         }
 
-        const body = await request.json();
-        const coupon = await Coupon.findByIdAndUpdate(params.id, body, { new: true });
+        const rawBody = await request.json();
+        const validation = couponSchema.partial().safeParse(rawBody);
+        
+        if (!validation.success) {
+            return NextResponse.json({ 
+                message: "Validation failed", 
+                errors: validation.error.format() 
+            }, { status: 400 });
+        }
+
+        const { id } = await params;
+        const coupon = await Coupon.findByIdAndUpdate(id, validation.data, { new: true });
 
         if (!coupon) {
              return NextResponse.json({ message: "Coupon not found" }, { status: 404 });

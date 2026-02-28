@@ -17,14 +17,18 @@ import { motion } from "framer-motion";
 import { SectionLoader } from "@/components/Loader";
 import { useSettingsStore } from "@/store/settingsStore";
 import AnalyticsChart from "@/components/AnalyticsChart";
+import CategorySalesChart from "@/components/CategorySalesChart";
+import TopSellers from "@/components/TopSellers";
+import { useState } from "react";
 
 export default function AdminDashboard() {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const [period, setPeriod] = useState("7d");
   
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ["admin-analytics"],
+    queryKey: ["admin-analytics", period],
     queryFn: async () => {
-      const { data } = await api.get("/admin/analytics");
+      const { data } = await api.get(`/admin/analytics?period=${period}`);
       return data;
     },
   });
@@ -33,34 +37,57 @@ export default function AdminDashboard() {
     queryKey: ["admin-recent-orders"],
     queryFn: async () => {
         const { data } = await api.get("/orders?limit=5");
-        // Fallback if API doesn't support limit yet, or just slice text
         return Array.isArray(data) ? data.slice(0, 5) : data.orders || []; 
     }
   });
 
   const { data: products } = useQuery({
-    queryKey: ["admin-products"], // Keep fetching products for low stock logic (or move to API later)
+    queryKey: ["admin-products"],
     queryFn: async () => {
       const { data } = await api.get("/products");
       return data;
     },
   });
 
-
   if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   const stats = [
-    { label: "Total Revenue", value: formatPrice(analytics?.totalRevenue || 0), icon: FiDollarSign, color: "bg-green-500", trend: "Live" },
-    { label: "Orders", value: analytics?.totalOrders || 0, icon: FiShoppingBag, color: "bg-blue-500", trend: "Live" },
-    { label: "Products", value: analytics?.totalProducts || 0, icon: FiPackage, color: "bg-purple-500", trend: "Live" },
-    { label: "Total Users", value: analytics?.totalUsers || 0, icon: FiUsers, color: "bg-orange-500", trend: "Live" },
+    { label: "Revenue", value: formatPrice(analytics?.totalRevenue || 0), icon: FiDollarSign, color: "bg-green-500", trend: period.toUpperCase() },
+    { label: "Orders", value: analytics?.totalOrders || 0, icon: FiShoppingBag, color: "bg-blue-500", trend: "TOTAL" },
+    { label: "Products", value: analytics?.totalProducts || 0, icon: FiPackage, color: "bg-purple-500", trend: "TOTAL" },
+    { label: "Total Users", value: analytics?.totalUsers || 0, icon: FiUsers, color: "bg-orange-500", trend: "TOTAL" },
+  ];
+
+  const periods = [
+    { id: '7d', label: '7 Days' },
+    { id: '30d', label: '30 Days' },
+    { id: '90d', label: '90 Days' },
+    { id: 'all', label: 'All Time' },
   ];
 
   return (
     <div className="space-y-10">
-      <div>
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Store Overview</h1>
-        <p className="text-gray-500 mt-2">Welcome back, Admin. Here&apos;s what&apos;s happening today.</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Store Overview</h1>
+            <p className="text-gray-500 mt-2">Welcome back, Admin. Here&apos;s what&apos;s happening.</p>
+        </div>
+        
+        <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm">
+            {periods.map((p) => (
+                <button
+                    key={p.id}
+                    onClick={() => setPeriod(p.id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                        period === p.id 
+                        ? "bg-gray-900 text-white shadow-lg" 
+                        : "text-gray-500 hover:bg-gray-50"
+                    }`}
+                >
+                    {p.label}
+                </button>
+            ))}
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -77,9 +104,7 @@ export default function AdminDashboard() {
               <div className={`${stat.color} p-4 rounded-2xl text-white shadow-lg`}>
                 <stat.icon size={24} />
               </div>
-              <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                stat.trend.startsWith('+') ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-500'
-              }`}>
+              <span className="text-[10px] font-black text-gray-400 tracking-widest uppercase bg-gray-50 px-2 py-1 rounded-full">
                 {stat.trend}
               </span>
             </div>
@@ -89,20 +114,56 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Analytics Chart */}
-      {analytics?.chartData && (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-        >
-            <AnalyticsChart data={analytics.chartData} />
-        </motion.div>
-      )}
+      {/* Analytics Charts Row */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        {analytics?.chartData && (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4 }}
+            >
+                <AnalyticsChart data={analytics.chartData} />
+            </motion.div>
+        )}
+        {analytics?.salesByCategory && (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+            >
+                <CategorySalesChart data={analytics.salesByCategory} />
+            </motion.div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Recent Orders Table */}
-        <div className="lg:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 max-w-full">
+        <div className="lg:col-span-2 space-y-8">
+             {/* New Top Sellers and Orders Row */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <TopSellers data={analytics?.topSellers} />
+                
+                <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 min-h-[400px]">
+                    <h2 className="text-2xl font-display font-bold mb-8">Performance Summary</h2>
+                    <div className="space-y-6">
+                        <div className="p-6 bg-surface rounded-3xl border border-gray-100">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Conversion Rate</p>
+                            <div className="flex items-end gap-2">
+                                <h4 className="text-4xl font-display font-bold">3.2%</h4>
+                                <span className="text-green-500 font-bold text-sm mb-1">+0.4%</span>
+                            </div>
+                        </div>
+                        <div className="p-6 bg-surface rounded-3xl border border-gray-100">
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Average Order Value</p>
+                            <div className="flex items-end gap-2">
+                                <h4 className="text-4xl font-display font-bold">{formatPrice(analytics?.totalRevenue / (analytics?.totalOrders || 1))}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 max-w-full">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-display font-bold">Recent Orders</h2>
             <Link href="/admin/orders" className="text-primary font-bold text-sm flex items-center gap-2 hover:underline">
@@ -147,46 +208,47 @@ export default function AdminDashboard() {
                 ))}
               </tbody>
             </table>
-          </div>
         </div>
+      </div>
+    </div>
 
-        {/* Quick Actions */}
+        {/* Sidebar Column */}
         <div className="space-y-8">
             <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100">
-            <h2 className="text-2xl font-display font-bold mb-8">Quick Actions</h2>
-            <div className="grid grid-cols-1 gap-4">
-                <Link 
-                href="/admin/products/add"
-                className="group flex items-center justify-between p-6 bg-surface rounded-3xl border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm"
-                >
-                <div className="flex items-center gap-4">
-                    <div className="bg-primary/10 p-3 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                    <FiPackage size={20} />
-                    </div>
-                    <div>
-                    <p className="font-bold text-gray-900">Add Product</p>
-                    <p className="text-xs text-gray-500">Create new listing</p>
-                    </div>
+                <h2 className="text-2xl font-display font-bold mb-8">Quick Actions</h2>
+                <div className="grid grid-cols-1 gap-4">
+                    <Link 
+                    href="/admin/products/add"
+                    className="group flex items-center justify-between p-6 bg-surface rounded-3xl border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="bg-primary/10 p-3 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                                <FiPackage size={20} />
+                            </div>
+                            <div>
+                                <p className="font-bold text-gray-900">Add Product</p>
+                                <p className="text-xs text-gray-500">Create new listing</p>
+                            </div>
+                        </div>
+                        <FiArrowRight className="text-gray-300 group-hover:text-primary transition-colors" />
+                    </Link>
+                    
+                    <Link 
+                    href="/admin/categories"
+                    className="group flex items-center justify-between p-6 bg-surface rounded-3xl border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="bg-blue-500/10 p-3 rounded-2xl text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                <FiGrid size={20} />
+                            </div>
+                            <div>
+                                <p className="font-bold text-gray-900">Manage Categories</p>
+                                <p className="text-xs text-gray-500">Edit store sections</p>
+                            </div>
+                        </div>
+                        <FiArrowRight className="text-gray-300 group-hover:text-blue-500 transition-colors" />
+                    </Link>
                 </div>
-                <FiArrowRight className="text-gray-300 group-hover:text-primary transition-colors" />
-                </Link>
-                
-                <Link 
-                href="/admin/categories"
-                className="group flex items-center justify-between p-6 bg-surface rounded-3xl border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm"
-                >
-                <div className="flex items-center gap-4">
-                    <div className="bg-blue-500/10 p-3 rounded-2xl text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                    <FiGrid size={20} />
-                    </div>
-                    <div>
-                    <p className="font-bold text-gray-900">Manage Categories</p>
-                    <p className="text-xs text-gray-500">Edit store sections</p>
-                    </div>
-                </div>
-                <FiArrowRight className="text-gray-300 group-hover:text-blue-500 transition-colors" />
-                </Link>
-            </div>
             </div>
 
             {/* Low Stock Alerts */}
@@ -203,12 +265,9 @@ export default function AdminDashboard() {
                 
                 <div className="space-y-4 relative">
                     {products?.filter(p => {
-                        // Check if main stock is low (for non-variant products)
                         if (!p.variants || p.variants.length === 0) return p.stock < 10;
-                        // Check if ANY variant is low stock
                         return p.variants.some(v => v.stock < 5);
                     }).sort((a, b) => {
-                        // Sort out-of-stock to the top
                         const aOut = (!a.variants?.length ? a.stock === 0 : a.variants.some(v => v.stock === 0));
                         const bOut = (!b.variants?.length ? b.stock === 0 : b.variants.some(v => v.stock === 0));
                         if (aOut && !bOut) return -1;
