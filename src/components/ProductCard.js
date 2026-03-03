@@ -11,7 +11,7 @@ export default function ProductCard({ product, onAddToCart }) {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
 
   return (
-    <div className="group card-hover p-2 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/50 overflow-hidden relative">
+    <div className="group card-hover p-2 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/50 overflow-hidden relative h-full flex flex-col">
       {/* ... keeping existing JSX ... */}
       <Link href={`/product/${product.slug || product._id}`} className="block relative aspect-square overflow-hidden rounded-xl bg-surface">
         {product.videos?.filter(v => typeof v === 'string' && v.trim() !== '').length > 0 ? (
@@ -41,7 +41,7 @@ export default function ProductCard({ product, onAddToCart }) {
         )}
       </Link>
 
-      <div className="p-2.5 space-y-1.5">
+      <div className="p-2.5 flex flex-col justify-between flex-grow gap-2">
         <div className="flex justify-between items-start gap-2">
           <div className="min-w-0">
             <p className="text-[9px] font-bold text-primary uppercase tracking-widest truncate">

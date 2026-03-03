@@ -33,7 +33,18 @@ export default function AdminProducts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
   const [productToDelete, setProductToDelete] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);
+  const [selectedCollectionId, setSelectedCollectionId] = useState("");
   const formatPrice = useSettingsStore((state) => state.formatPrice);
+
+  const { data: collections } = useQuery({
+    queryKey: ["admin-collections"],
+    queryFn: async () => {
+      const { data } = await api.get("/admin/collections");
+      return data;
+    },
+  });
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -52,6 +63,20 @@ export default function AdminProducts() {
     },
     onError: () => {
       toast.error("Failed to delete product");
+    }
+  });
+
+  const bulkCollectionMutation = useMutation({
+    mutationFn: (data) => api.post(`/admin/collections/bulk`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["admin-products"]);
+      toast.success("Products added to collection");
+      setIsCollectionModalOpen(false);
+      setSelectedProducts([]);
+      setSelectedCollectionId("");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "Failed to add products to collection");
     }
   });
 
@@ -100,6 +125,20 @@ export default function AdminProducts() {
 
   const categories = ["All", ...new Set(products?.map(p => getCategoryName(p)).filter(c => c !== "Uncategorized") || [])];
 
+  const handleSelectProduct = (id) => {
+    setSelectedProducts(prev => 
+      prev.includes(id) ? prev.filter(pId => pId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedProducts.length === filteredProducts.length) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(filteredProducts.map(p => p._id));
+    }
+  };
+
   if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   return (
@@ -143,12 +182,35 @@ export default function AdminProducts() {
         </div>
       </div>
 
+      {/* Bulk Actions Header */}
+      {selectedProducts.length > 0 && (
+        <div className="bg-primary/10 border border-primary/20 p-4 rounded-3xl flex items-center justify-between animate-fade-in mb-6">
+          <p className="font-bold text-gray-900 bg-white px-4 py-2 rounded-2xl shadow-sm text-sm">
+            {selectedProducts.length} product(s) selected
+          </p>
+          <button 
+            onClick={() => setIsCollectionModalOpen(true)}
+            className="bg-gray-900 hover:bg-black text-white px-6 py-2.5 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 text-sm"
+          >
+            <FiPackage size={16} /> Add to Collection
+          </button>
+        </div>
+      )}
+
       {/* Products Table */}
       <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 border border-gray-100 overflow-hidden w-full max-w-full">
         <div className="w-full overflow-x-auto align-middle">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead className="whitespace-nowrap">
               <tr className="bg-surface/50 text-gray-400 text-[10px] font-bold uppercase tracking-widest border-b border-gray-100">
+                <th className="px-8 py-6 w-12 text-center">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 rounded-md border-gray-300 text-primary focus:ring-primary accent-primary cursor-pointer"
+                    checked={selectedProducts.length > 0 && selectedProducts.length === filteredProducts.length}
+                    onChange={handleSelectAll}
+                  />
+                </th>
                 <th className="px-8 py-6">Product</th>
                 <th className="px-8 py-6">Category</th>
                 <th className="px-8 py-6">Price</th>
@@ -159,7 +221,15 @@ export default function AdminProducts() {
             </thead>
             <tbody className="divide-y divide-gray-50 whitespace-nowrap">
               {filteredProducts.map((product) => (
-                <tr key={product._id} className="group hover:bg-gray-50/50 transition-colors">
+                <tr key={product._id} className={`group hover:bg-gray-50/50 transition-colors ${selectedProducts.includes(product._id) ? 'bg-primary/5' : ''}`}>
+                  <td className="px-8 py-6 text-center">
+                    <input 
+                        type="checkbox" 
+                        className="w-4 h-4 rounded-md border-gray-300 text-primary focus:ring-primary accent-primary cursor-pointer"
+                        checked={selectedProducts.includes(product._id)}
+                        onChange={() => handleSelectProduct(product._id)}
+                      />
+                  </td>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-2xl overflow-hidden bg-surface border border-gray-100 relative">
@@ -299,6 +369,60 @@ export default function AdminProducts() {
           message={`Are you sure you want to delete "${productToDelete.name}"? This action cannot be undone.`}
           confirmText={deleteProductMutation.isPending ? "Deleting..." : "Delete Product"}
         />
+      )}
+
+      {/* Bulk Collection Modal */}
+      {isCollectionModalOpen && (
+        <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="p-6 md:p-8 border-b border-gray-100">
+              <h2 className="text-2xl font-display font-bold text-gray-900">Add to Collection</h2>
+              <p className="text-gray-500 text-sm mt-1">Assign {selectedProducts.length} products to a collection.</p>
+            </div>
+            
+            <div className="p-6 md:p-8 space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-2">Select Collection</label>
+                <select 
+                  value={selectedCollectionId}
+                  onChange={(e) => setSelectedCollectionId(e.target.value)}
+                  className="w-full bg-surface border-none focus:ring-2 focus:ring-primary/20 px-6 py-4 rounded-2xl outline-none appearance-none cursor-pointer"
+                >
+                  <option value="" disabled>-- Select a Collection --</option>
+                  {collections?.map(c => (
+                    <option key={c._id} value={c._id}>{c.name}</option>
+                  ))}
+                </select>
+                {(!collections || collections.length === 0) && (
+                   <p className="text-xs text-red-500 mt-2">No collections available. Create one first.</p>
+                )}
+              </div>
+
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setIsCollectionModalOpen(false)}
+                  className="flex-1 px-6 py-4 rounded-2xl font-bold text-gray-500 bg-surface hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => {
+                     if (!selectedCollectionId) return toast.error("Please select a collection");
+                     bulkCollectionMutation.mutate({
+                        productIds: selectedProducts,
+                        collectionId: selectedCollectionId,
+                        action: 'add'
+                     });
+                  }}
+                  disabled={!selectedCollectionId || bulkCollectionMutation.isPending}
+                  className="flex-1 px-6 py-4 rounded-2xl font-bold text-white bg-gray-900 hover:bg-black transition-colors shadow-lg shadow-black/20 disabled:opacity-50"
+                >
+                  {bulkCollectionMutation.isPending ? "Adding..." : "Add to Collection"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

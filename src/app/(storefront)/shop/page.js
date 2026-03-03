@@ -12,16 +12,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   FiSearch, 
   FiFilter, 
-  FiX, 
-  FiChevronDown, 
   FiGrid, 
   FiList 
 } from "react-icons/fi";
 import Link from "next/link";
-import { getColorValue } from "@/lib/colors";
+import { getColorValue, getBaseColor } from "@/lib/colors";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { ProductCardSkeleton } from "@/components/Skeleton";
+import { FiChevronDown, FiX } from "react-icons/fi";
 
 // Helper to separate render
 const CategoryButton = ({ category, selectedCategory, setSelectedCategory, level = 0 }) => (
@@ -120,11 +119,11 @@ const FilterContent = ({
                  key={color}
                  onClick={() => setSelectedColor(selectedColor === color ? null : color)}
                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-200'}`}
-                 title={color}
+                 title={color.charAt(0).toUpperCase() + color.slice(1)}
                >
                  <div 
                    className="w-6 h-6 rounded-full border border-gray-100" 
-                   style={{ backgroundColor: getColorValue(color) }}
+                   style={{ backgroundColor: color }}
                  ></div>
                </button>
              ))}
@@ -285,8 +284,15 @@ export default function ShopPage() {
 
   const products = data?.pages.flatMap(page => page) || [];
 
-  // Extract all available colors and sizes from loaded products
-  const availableColors = Array.from(new Set(products.flatMap(p => p.variants?.map(v => v.color) || []).filter(Boolean)));
+  // Extract all available base colors from loaded products (variants + single product)
+  const availableColors = Array.from(new Set(
+    products.flatMap(p => {
+       const variantColors = p.variants?.map(v => getBaseColor(v.color)) || [];
+       const singleColor = !p.hasVariants && p.color ? getBaseColor(p.color) : null;
+       return [...variantColors, singleColor];
+    }).filter(Boolean)
+  ));
+  
   const availableSizes = Array.from(new Set(products.flatMap(p => p.variants?.map(v => v.size) || []).filter(Boolean)));
 
   const handleAddToCart = (product, qty = 1, variant) => {

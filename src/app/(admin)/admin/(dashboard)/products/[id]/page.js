@@ -20,6 +20,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SectionLoader } from "@/components/Loader";
 import { useSettingsStore } from "@/store/settingsStore";
+import { getColorValue } from "@/lib/colors";
 
 export default function ProductDetailsAdmin({ params }) {
   const { id } = use(params);
@@ -92,8 +93,8 @@ export default function ProductDetailsAdmin({ params }) {
                 <video 
                   src={activeMedia.url}
                   autoPlay 
+                  controls
                   muted 
-                  loop 
                   playsInline
                   className="w-full h-full object-contain bg-black"
                 />
@@ -103,6 +104,7 @@ export default function ProductDetailsAdmin({ params }) {
                   alt={product.name}
                   fill
                   className="object-cover"
+                  unoptimized
                 />
             )}
           </div>
@@ -119,7 +121,7 @@ export default function ProductDetailsAdmin({ params }) {
                       <FiPlayCircle className="absolute text-3xl text-gray-900 bg-white/50 backdrop-blur-sm rounded-full p-1" />
                    </>
                 ) : (
-                   <Image src={media.url} alt="" width={100} height={100} className="w-full h-full object-cover" />
+                   <Image src={media.url} alt="" width={100} height={100} className="w-full h-full object-cover" unoptimized />
                 )}
               </button>
             ))}
@@ -161,8 +163,8 @@ export default function ProductDetailsAdmin({ params }) {
                       onClick={() => setSelectedVariant(v)}
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 flex items-center gap-2 ${selectedVariant === v ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-gray-600 border-transparent hover:border-gray-200'}`}
                     >
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
-                      {v.color} {v.size ? `/ ${v.size}` : ''} {v.length ? `/ ${v.length}` : ''}
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getColorValue(v.color) }}></div>
+                      {v.color} {v.size ? `/ ${v.size}` : ''} {v.length ? `/ ${v.length}` : ''} {v.age ? `/ ${v.age}` : ''}
                     </button>
                   ))}
                 </div>
@@ -191,6 +193,41 @@ export default function ProductDetailsAdmin({ params }) {
                 </span>
               </div>
             </div>
+
+            {!product.hasVariants && (product.color || product.size || product.length || product.age) && (
+              <div className="mt-8 p-6 bg-gray-50 rounded-2xl border border-gray-100 w-max min-w-[50%] space-y-3">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Product Specifications</p>
+                <div className="grid grid-cols-2 gap-x-8 gap-y-3 mt-4">
+                  {product.color && (
+                    <div className="flex items-center gap-2">
+                       <span className="text-sm font-medium text-gray-500">Color:</span>
+                       <span className="font-bold text-gray-900 text-sm flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: getColorValue(product.color) }} />
+                        {product.color}
+                       </span>
+                    </div>
+                  )}
+                  {product.size && (
+                    <div className="flex items-center gap-2">
+                       <span className="text-sm font-medium text-gray-500">Size:</span>
+                       <span className="font-bold text-gray-900 text-sm">{product.size}</span>
+                    </div>
+                  )}
+                  {product.length && (
+                    <div className="flex items-center gap-2">
+                       <span className="text-sm font-medium text-gray-500">Length:</span>
+                       <span className="font-bold text-gray-900 text-sm">{product.length}</span>
+                    </div>
+                  )}
+                  {product.age && (
+                    <div className="flex items-center gap-2">
+                       <span className="text-sm font-medium text-gray-500">Age:</span>
+                       <span className="font-bold text-gray-900 text-sm">{product.age}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="mt-8">
               <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -224,8 +261,9 @@ export default function ProductDetailsAdmin({ params }) {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <th className="px-6 py-4">Image</th>
                     <th className="px-6 py-4">Color</th>
-                    <th className="px-6 py-4">Size/Length</th>
+                    <th className="px-6 py-4">Size/Length/Age</th>
                     <th className="px-6 py-4">Price</th>
                     <th className="px-6 py-4">Stock</th>
                   </tr>
@@ -238,8 +276,17 @@ export default function ProductDetailsAdmin({ params }) {
                       className={`cursor-pointer transition-colors ${selectedVariant === v ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50/50'}`}
                     >
                       <td className="px-6 py-4">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-100 relative bg-gray-50 flex items-center justify-center">
+                          {v.images?.[0] ? (
+                            <Image src={v.images[0]} alt="" fill className="object-cover" unoptimized />
+                          ) : (
+                            <FiImage className="text-gray-300" />
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: v.color?.toLowerCase() || 'gray' }}></div>
+                          <div className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: getColorValue(v.color) }}></div>
                           <span className={`font-bold ${selectedVariant === v ? 'text-primary' : 'text-gray-900'}`}>{v.color}</span>
                         </div>
                       </td>
@@ -247,6 +294,8 @@ export default function ProductDetailsAdmin({ params }) {
                         {v.size && `Size: ${v.size}`}
                         {v.size && v.length && " / "}
                         {v.length && `Length: ${v.length}`}
+                        {(v.size || v.length) && v.age && " / "}
+                        {v.age && `Age: ${v.age}`}
                       </td>
                       <td className="px-6 py-4 font-bold text-gray-900">{formatPrice(v.price)}</td>
                       <td className="px-6 py-4">

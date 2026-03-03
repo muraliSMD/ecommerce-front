@@ -39,6 +39,7 @@ export default function ProductDetails({ initialProduct }) {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedLength, setSelectedLength] = useState("");
+  const [selectedAge, setSelectedAge] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedMedia, setSelectedMedia] = useState(null);
@@ -49,18 +50,37 @@ export default function ProductDetails({ initialProduct }) {
   }, []);
 
   const variants = useMemo(() => product?.variants || [], [product]);
-  const allColors = useMemo(
-    () => [...new Set(variants.map((v) => v.color).filter(Boolean))],
-    [variants]
-  );
-  const allSizes = useMemo(
-    () => [...new Set(variants.map((v) => v.size).filter(Boolean))],
-    [variants]
-  );
-  const allLengths = useMemo(
-    () => [...new Set(variants.map((v) => v.length).filter(Boolean))],
-    [variants]
-  );
+  const allColors = useMemo(() => {
+    const variantColors = variants.map((v) => v.color).filter(Boolean);
+    if (!product?.hasVariants && product?.color) {
+      return [...new Set([...variantColors, product.color])];
+    }
+    return [...new Set(variantColors)];
+  }, [variants, product]);
+
+  const allSizes = useMemo(() => {
+    const variantSizes = variants.map((v) => v.size).filter(Boolean);
+    if (!product?.hasVariants && product?.size) {
+      return [...new Set([...variantSizes, product.size])];
+    }
+    return [...new Set(variantSizes)];
+  }, [variants, product]);
+
+  const allLengths = useMemo(() => {
+    const variantLengths = variants.map((v) => v.length).filter(Boolean);
+    if (!product?.hasVariants && product?.length) {
+      return [...new Set([...variantLengths, product.length])];
+    }
+    return [...new Set(variantLengths)];
+  }, [variants, product]);
+
+  const allAges = useMemo(() => {
+    const variantAges = variants.map((v) => v.age).filter(Boolean);
+    if (!product?.hasVariants && product?.age) {
+      return [...new Set([...variantAges, product.age])];
+    }
+    return [...new Set(variantAges)];
+  }, [variants, product]);
 
   const availableSizesForColor = useMemo(() => {
     if (!selectedColor) return allSizes;
@@ -72,10 +92,15 @@ export default function ProductDetails({ initialProduct }) {
     return variants.filter((v) => v.color === selectedColor && v.length).map((v) => v.length);
   }, [variants, selectedColor, allLengths]);
 
+  const availableAgesForColor = useMemo(() => {
+    if (!selectedColor) return allAges;
+    return variants.filter((v) => v.color === selectedColor && v.age).map((v) => v.age);
+  }, [variants, selectedColor, allAges]);
+
   // Main Effect: Derive variant and media from selection states
   useEffect(() => {
     let variant = variants.find(
-      (v) => v.color === selectedColor && (v.size === selectedSize || v.length === selectedLength)
+      (v) => v.color === selectedColor && (v.size === selectedSize || v.length === selectedLength || v.age === selectedAge)
     );
 
     // If no exact match but we have a color, find ANY variant with that color
@@ -88,6 +113,11 @@ export default function ProductDetails({ initialProduct }) {
             } else if (variant.length && selectedLength !== variant.length) {
                 setSelectedLength(variant.length);
                 setSelectedSize("");
+                setSelectedAge("");
+            } else if (variant.age && selectedAge !== variant.age) {
+                setSelectedAge(variant.age);
+                setSelectedSize("");
+                setSelectedLength("");
             }
         }
     }
@@ -107,7 +137,7 @@ export default function ProductDetails({ initialProduct }) {
     }
     
     setQuantity(1);
-  }, [selectedColor, selectedSize, selectedLength, variants, product]);
+  }, [selectedColor, selectedSize, selectedLength, selectedAge, variants, product]);
 
   // Initialization Effect: Run only once or when variants/params change on MOUNT
   useEffect(() => {
@@ -116,23 +146,39 @@ export default function ProductDetails({ initialProduct }) {
     const colorParam = searchParams.get('color');
     const sizeParam = searchParams.get('size');
     const lengthParam = searchParams.get('length');
+    const ageParam = searchParams.get('age');
 
-    if (colorParam && allColors.includes(colorParam)) {
-      setSelectedColor(colorParam);
-      if (sizeParam && variants.some(v => v.color === colorParam && v.size === sizeParam)) {
-          setSelectedSize(sizeParam);
-          setSelectedLength("");
-      } else if (lengthParam && variants.some(v => v.color === colorParam && v.length === lengthParam)) {
-          setSelectedLength(lengthParam);
-          setSelectedSize("");
+    if (variants.length > 0) {
+      if (colorParam && allColors.includes(colorParam)) {
+        setSelectedColor(colorParam);
+        if (sizeParam && variants.some(v => v.color === colorParam && v.size === sizeParam)) {
+            setSelectedSize(sizeParam);
+            setSelectedLength("");
+            setSelectedAge("");
+        } else if (lengthParam && variants.some(v => v.color === colorParam && v.length === lengthParam)) {
+            setSelectedLength(lengthParam);
+            setSelectedSize("");
+            setSelectedAge("");
+        } else if (ageParam && variants.some(v => v.color === colorParam && v.age === ageParam)) {
+            setSelectedAge(ageParam);
+            setSelectedSize("");
+            setSelectedLength("");
+        }
+      } else {
+        // Default to first variant
+        setSelectedColor(variants[0].color);
+        if (variants[0].size) setSelectedSize(variants[0].size);
+        if (variants[0].length) setSelectedLength(variants[0].length);
+        if (variants[0].age) setSelectedAge(variants[0].age);
       }
-    } else {
-      // Default to first variant
-      setSelectedColor(variants[0].color);
-      if (variants[0].size) setSelectedSize(variants[0].size);
-      if (variants[0].length) setSelectedLength(variants[0].length);
+    } else if (product && !product.hasVariants) {
+      // Single product attribute selection
+      if (product.color) setSelectedColor(product.color);
+      if (product.size) setSelectedSize(product.size);
+      if (product.length) setSelectedLength(product.length);
+      if (product.age) setSelectedAge(product.age);
     }
-  }, [variants, allColors, searchParams, mounted]);
+  }, [variants, allColors, searchParams, mounted, product]);
 
   // Fallback for products without variants
   useEffect(() => {
@@ -421,6 +467,42 @@ export default function ProductDetails({ initialProduct }) {
                   {product.numReviews || 0} Reviews
                 </button>
               </div>
+              
+              {/* Single Product Attributes */}
+              {!product.hasVariants && (product.color || product.size || product.length || product.age) && (
+                <div className="bg-gray-50/50 p-4 mt-6 rounded-2xl border border-gray-100 space-y-3 w-max min-w-[50%]">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Product Specifications</p>
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                    {product.color && (
+                      <div className="flex items-center gap-2">
+                         <span className="text-sm text-gray-500">Color:</span>
+                         <div className="flex items-center gap-1.5 font-bold text-gray-900 text-sm">
+                            <div className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: getColorValue(product.color) }} />
+                            {product.color}
+                         </div>
+                      </div>
+                    )}
+                    {product.size && (
+                      <div className="flex items-center gap-2">
+                         <span className="text-sm text-gray-500">Size:</span>
+                         <span className="font-bold text-gray-900 text-sm">{product.size}</span>
+                      </div>
+                    )}
+                    {product.length && (
+                      <div className="flex items-center gap-2">
+                         <span className="text-sm text-gray-500">Length:</span>
+                         <span className="font-bold text-gray-900 text-sm">{product.length}</span>
+                      </div>
+                    )}
+                    {product.age && (
+                      <div className="flex items-center gap-2">
+                         <span className="text-sm text-gray-500">Age:</span>
+                         <span className="font-bold text-gray-900 text-sm">{product.age}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="h-px bg-gray-200 w-full" />
@@ -508,7 +590,7 @@ export default function ProductDetails({ initialProduct }) {
                       <button
                         key={length}
                         disabled={disabled}
-                        onClick={() => { setSelectedLength(length); setSelectedSize(""); }}
+                        onClick={() => { setSelectedLength(length); setSelectedSize(""); setSelectedAge(""); }}
                         className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
                           disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
                           selectedLength === length
@@ -523,6 +605,35 @@ export default function ProductDetails({ initialProduct }) {
                 </div>
               </div>
             )}
+
+            {/* Ages */}
+            {allAges.length > 0 && (
+              <div className="space-y-4">
+                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Age Group</p>
+                <div className="flex gap-2.5 flex-wrap">
+                  {allAges.map((age) => {
+                    const disabled = !availableAgesForColor.includes(age);
+                    return (
+                      <button
+                        key={age}
+                        disabled={disabled}
+                        onClick={() => { setSelectedAge(age); setSelectedSize(""); setSelectedLength(""); }}
+                        className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
+                          disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                          selectedAge === age
+                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                            : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                        }`}
+                      >
+                        {age}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+
 
             {/* Quantity and Actions */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">

@@ -16,9 +16,10 @@ const reviewSchema = new mongoose.Schema(
 );
 
 const variantSchema = new mongoose.Schema({
-  color: { type: String, required: true },
+  color: { type: String },
   size: { type: String },
   length: { type: String },
+  age: { type: String },
   stock: { type: Number, default: 0 },  // stock per variant
   price: { type: Number, required: true },
   mrp: { type: Number }, // Base price / Original price
@@ -35,7 +36,13 @@ const productSchema = new mongoose.Schema(
     sku: { type: String, unique: true, sparse: true },
     description: String,
     manufacturerInfo: String,
+    color: { type: String },
+    size: { type: String },
+    length: { type: String },
+    age: { type: String },
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+    collections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Collection" }],
+
     // subCategory field is deprecated, using recursive category structure instead
     images: { type: [String], default: [] }, // general product images
     videos: { type: [String], default: [] }, // product videos
