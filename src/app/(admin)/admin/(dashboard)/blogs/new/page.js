@@ -49,6 +49,30 @@ export default function EditBlogPage({ params }) {
     }
   });
 
+  const [uploading, setUploading] = useState(false);
+  
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    const dataForm = new FormData();
+    dataForm.append("file", file);
+    try {
+        const res = await fetch("/api/upload", { method: "POST", body: dataForm });
+        const data = await res.json();
+        if (res.ok) {
+            setFormData({ ...formData, coverImage: data.url });
+            toast.success("Image uploaded!");
+        } else {
+            toast.error(data.error || "Failed to upload image");
+        }
+    } catch (error) {
+        toast.error("An error occurred during upload");
+    } finally {
+        setUploading(false);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     createMutation.mutate(formData);
@@ -162,13 +186,17 @@ export default function EditBlogPage({ params }) {
                             </div>
                         )}
                         <input 
-                            type="text" 
+                            type="file"
+                            accept="image/*"
                             className="absolute inset-0 opacity-0 cursor-pointer"
-                            onChange={(e) => {
-                                const url = prompt("Enter Image URL"); 
-                                if(url) setFormData({...formData, coverImage: url})
-                            }}
+                            onChange={handleFileUpload}
+                            disabled={uploading}
                         />
+                        {uploading && (
+                             <div className="absolute inset-0 bg-white/80 flex items-center justify-center font-bold text-primary z-10 text-sm">
+                                 Uploading...
+                             </div>
+                        )}
                     </div>
                     {/* Fallback text input for URL */}
                     <input

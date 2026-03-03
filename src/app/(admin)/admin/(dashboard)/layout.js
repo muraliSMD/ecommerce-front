@@ -1,6 +1,7 @@
 import AdminSidebar from "@/components/AdminSidebar";
 import { getFullUserFromRequest, isAdmin } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import TransitionBar from "@/components/TransitionBar";
 
 export default async function AdminLayout({ children }) {
   // Server-side security check
@@ -12,6 +13,7 @@ export default async function AdminLayout({ children }) {
   
   return (
     <div className="flex bg-[#f9fafb] min-h-screen">
+      <TransitionBar />
       <AdminSidebar />
       <main className="flex-1 min-w-0 transition-all duration-300 md:ml-72 ml-0 p-4 pt-20 md:p-8 w-full">
         <div className="container mx-auto max-w-full">

@@ -476,10 +476,7 @@ export default function ProductDetails({ initialProduct }) {
                     {product.color && (
                       <div className="flex items-center gap-2">
                          <span className="text-sm text-gray-500">Color:</span>
-                         <div className="flex items-center gap-1.5 font-bold text-gray-900 text-sm">
-                            <div className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: getColorValue(product.color) }} />
-                            {product.color}
-                         </div>
+                         <span className="font-bold text-gray-900 text-sm">{product.color}</span>
                       </div>
                     )}
                     {product.size && (
@@ -537,13 +534,7 @@ export default function ProductDetails({ initialProduct }) {
                             <div className={`absolute inset-0 bg-black/20 ${selectedColor === color ? 'bg-black/0' : 'group-hover:bg-black/10'} transition-colors`} />
                           </>
                          ) : (
-                           <div className="flex items-center gap-2">
-                             <div 
-                               className="w-4 h-4 rounded-full border border-gray-200" 
-                               style={{ backgroundColor: getColorValue(color) }}
-                             />
-                             <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{color}</span>
-                           </div>
+                           <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{color}</span>
                          )}
                       </button>
                     )

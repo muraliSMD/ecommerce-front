@@ -124,10 +124,6 @@ export default function EditProduct({ params }) {
   const handleInputChange = (e) => {
     let { name, value } = e.target;
     
-    // Auto-format color inputs if it's a hex
-    if (name === "color") {
-        value = formatColorInput(value);
-    }
     
     let updatedProduct = { ...product, [name]: value };
 
@@ -302,10 +298,6 @@ export default function EditProduct({ params }) {
   const handleVariantChange = (index, field, value) => {
     const newVariants = [...product.variants];
     
-    // Auto-format color inputs if it's a hex
-    if (field === "color") {
-        value = formatColorInput(value);
-    }
     
     const updatedVariant = {
       ...newVariants[index],
@@ -789,7 +781,7 @@ export default function EditProduct({ params }) {
                 <input 
                   type="text" 
                   value={newVariant.color}
-                  onChange={(e) => setNewVariant({...newVariant, color: formatColorInput(e.target.value)})}
+                  onChange={(e) => setNewVariant({...newVariant, color: e.target.value})}
                   placeholder="e.g. Black"
                   className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
