@@ -1,9 +1,10 @@
 import { z } from "zod";
 
 export const variantSchema = z.object({
-  color: z.string().min(1, "Color is required"),
+  color: z.string().optional().nullable(),
   size: z.string().optional().nullable(),
   length: z.string().optional().nullable(),
+  age: z.string().optional().nullable(),
   stock: z.number().int().min(0, "Stock cannot be negative"),
   price: z.number().positive("Price must be positive"),
   mrp: z.number().optional().nullable(),
@@ -18,6 +19,10 @@ export const productSchema = z.object({
   description: z.string().optional().nullable(),
   manufacturerInfo: z.string().optional().nullable(),
   category: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Category ID").optional().nullable(),
+  color: z.string().optional().nullable(),
+  size: z.string().optional().nullable(),
+  length: z.string().optional().nullable(),
+  age: z.string().optional().nullable(),
   images: z.array(z.string()).optional(),
   videos: z.array(z.string()).optional(),
   price: z.number().positive("Price must be positive"),

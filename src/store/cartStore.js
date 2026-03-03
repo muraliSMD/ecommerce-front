@@ -62,7 +62,8 @@ export const useCartStore = create(
                 (!isEmptyVariant(i.variant) && !isEmptyVariant(variant) && 
                  i.variant.color === variant.color && 
                  i.variant.size === variant.size &&
-                 i.variant.length === variant.length) ||
+                 i.variant.length === variant.length &&
+                 i.variant.age === variant.age) ||
                 // Both are empty/null variants
                 (isEmptyVariant(i.variant) && isEmptyVariant(variant))
               )
@@ -124,7 +125,8 @@ export const useCartStore = create(
               (i.variant && variant && (
                   i.variant.color !== variant.color || 
                   i.variant.size !== variant.size ||
-                  i.variant.length !== variant.length
+                  i.variant.length !== variant.length ||
+                  i.variant.age !== variant.age
               )) ||
               (i.variant && !variant) ||
               (!i.variant && variant)

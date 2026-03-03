@@ -74,7 +74,14 @@ export async function GET(request) {
     // Advanced Filtering
     if (colors) {
         const colorArray = colors.split(',');
-        filter['variants.color'] = { $in: colorArray.map(c => new RegExp(c, 'i')) };
+        const regexArray = colorArray.map(c => new RegExp(c, 'i'));
+        filter.$or = filter.$or || [];
+        filter.$or.push({
+            $or: [
+                { 'variants.color': { $in: regexArray } },
+                { 'color': { $in: regexArray } }
+            ]
+        });
     }
 
     if (sizes) {

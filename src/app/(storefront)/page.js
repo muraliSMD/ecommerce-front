@@ -13,6 +13,65 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
 
+const CollectionSlider = ({ collection }) => {
+  const addToCart = useCartStore((state) => state.addToCart);
+  const sliderRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (sliderRef.current) {
+      const { scrollLeft, clientWidth } = sliderRef.current;
+      const scrollTo = direction === 'left' ? scrollLeft - (clientWidth / 2) : scrollLeft + (clientWidth / 2);
+      sliderRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
+      <div className="bg-[#eef2ff] rounded-[2.5rem] p-6 md:p-8 border border-indigo-200 shadow-sm relative overflow-hidden">
+        <div className="flex justify-between items-center mb-6 px-2">
+          <div>
+            <h2 className="text-xl md:text-2xl font-display font-bold text-gray-900">
+              {collection.name}
+            </h2>
+            {collection.description && <p className="text-gray-500 text-sm mt-1 max-w-xl">{collection.description}</p>}
+          </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => scroll('left')}
+              className="w-10 h-10 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm active:scale-95"
+              title="Scroll Left"
+            >
+              <FiChevronLeft className="text-lg" />
+            </button>
+            <button 
+              onClick={() => scroll('right')}
+              className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
+              title="Scroll Right"
+            >
+              <FiChevronRight className="text-lg" />
+            </button>
+          </div>
+        </div>
+
+        <div 
+          ref={sliderRef}
+          className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {collection.products.map((p) => (
+            <div key={p._id} className="w-[135px] sm:w-[150px] md:w-[180px] flex-shrink-0 snap-start">
+              <ProductCard
+                product={p}
+                onAddToCart={(prod, qty = 1, variant) => addToCart(prod, qty, variant)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default function Home() {
   const addToCart = useCartStore((state) => state.addToCart);
   const categorySliderRef = useRef(null);
@@ -63,8 +122,14 @@ export default function Home() {
   // Fetch Featured Products
   const { data: featuredProducts, isLoading: isFeaturedLoading } = useProducts({ isFeatured: true, limit: 10 });
 
-  // Fetch New Arrivals
-  const { data: newArrivals, isLoading: isNewArrivalsLoading } = useProducts({ sort: 'newest', limit: 10 });
+  // Fetch Collections
+  const { data: collections, isLoading: isCollectionsLoading } = useQuery({
+    queryKey: ["collections-home"],
+    queryFn: async () => {
+      const { data } = await api.get("/collections");
+      return data;
+    },
+  });
 
   return (
     <main className="bg-surface min-h-screen pt-28 md:pt-32">
@@ -176,47 +241,16 @@ export default function Home() {
           </section>
       )}
 
-      {/* New Arrivals (Fresh Drops) Section */}
-      <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
-        <div className="bg-[#dbeafe] rounded-[2.5rem] p-6 md:p-8 border border-blue-200 shadow-sm">
-          <div className="flex justify-between items-center mb-6 px-2">
-            <h2 className="text-xl md:text-2xl font-display font-bold text-gray-900">
-              Fresh Drops
-            </h2>
-            <Link 
-              href="/shop" 
-              className="w-10 h-10 md:w-12 md:h-12 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
-            >
-              <FiArrowRight className="text-lg md:text-xl" />
-            </Link>
-          </div>
-
-          {isNewArrivalsLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="animate-pulse bg-white/50 h-[260px] rounded-[2rem]" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-              {newArrivals?.map((p, i) => (
-                <motion.div
-                  key={p._id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                >
-                  <ProductCard
-                    product={p}
-                    onAddToCart={(prod) => addToCart(prod, 1)}
-                  />
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Dynamic Collections Sections */}
+      {isCollectionsLoading ? (
+        <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
+          <div className="animate-pulse bg-[#eef2ff] rounded-[2.5rem] p-6 md:p-8 h-[400px]" />
+        </section>
+      ) : (
+        collections?.filter(collection => collection.products && collection.products.length > 0).map(collection => (
+          <CollectionSlider key={collection._id} collection={collection} />
+        ))
+      )}
 
       {/* Newsletter Section */}
       <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">

@@ -26,8 +26,7 @@ import CategorySelector from "@/components/admin/CategorySelector";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";
-import { getColorValue } from "@/lib/colors";
-
+import { getColorValue, formatColorInput } from "@/lib/colors";
 
 export default function AddProduct() {
   const router = useRouter();
@@ -64,10 +63,14 @@ export default function AddProduct() {
     hasVariants: false,
     metaTitle: "",
     metaDescription: "",
-    metaKeywords: ""
+    metaKeywords: "",
+    color: "",
+    size: "",
+    length: "",
+    age: ""
   });
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
 
   const addProductMutation = useMutation({
     mutationFn: async (data) => {
@@ -85,7 +88,13 @@ export default function AddProduct() {
   });
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    
+    // Auto-format color inputs if it's a hex
+    if (name === "color") {
+        value = formatColorInput(value);
+    }
+    
     let updatedProduct = { ...product, [name]: value };
 
     // Auto-calculate logic for single product
@@ -230,8 +239,11 @@ export default function AddProduct() {
   };
 
   const addVariant = () => {
-    if (!newVariant.color || (!newVariant.size && !newVariant.length) || !newVariant.price) {
-      return toast.error("Please fill color, size/length and price for variant");
+    if (!newVariant.color && !newVariant.size && !newVariant.length && !newVariant.age) {
+      return toast.error("Please provide at least one variant option (Color, Size, Length, or Age)");
+    }
+    if (!newVariant.price) {
+      return toast.error("Please provide variant price");
     }
     setProduct({ 
       ...product, 
@@ -245,11 +257,43 @@ export default function AddProduct() {
         videos: newVariant.videos || []
       }] 
     });
-    setNewVariant({ color: "", size: "", length: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+    setNewVariant({ color: "", size: "", length: "", age: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
   };
 
   const removeVariant = (index) => {
     const newVariants = product.variants.filter((_, i) => i !== index);
+    setProduct({ ...product, variants: newVariants });
+  };
+
+  const handleVariantChange = (index, field, value) => {
+    const newVariants = [...product.variants];
+    
+    // Auto-format color inputs if it's a hex
+    if (field === "color") {
+        value = formatColorInput(value);
+    }
+    
+    const updatedVariant = {
+      ...newVariants[index],
+      [field]: field === 'stock' || field === 'price' || field === 'mrp' || field === 'discount' ? Number(value) : value
+    };
+
+    // Auto-calculate for variant list
+    if (field === "price" || field === "mrp") {
+      const price = field === "price" ? Number(value) : Number(updatedVariant.price);
+      const mrp = field === "mrp" ? Number(value) : Number(updatedVariant.mrp);
+      if (mrp > 0 && price > 0) {
+        updatedVariant.discount = Math.round(((mrp - price) / mrp) * 100);
+      }
+    } else if (field === "discount") {
+      const discount = Number(value);
+      const mrp = Number(updatedVariant.mrp);
+      if (mrp > 0 && discount >= 0) {
+        updatedVariant.price = Math.round(mrp * (1 - discount / 100));
+      }
+    }
+
+    newVariants[index] = updatedVariant;
     setProduct({ ...product, variants: newVariants });
   };
 
@@ -476,18 +520,66 @@ export default function AddProduct() {
 
             {/* Single Product Stock */}
             {!product.hasVariants && (
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Available Stock</label>
-                  <input 
-                    type="number" 
-                    name="stock"
-                    value={product.stock}
-                    onChange={handleInputChange}
-                    placeholder="0"
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
-                    required={!product.hasVariants}
-                  />
+              <div className="space-y-6 bg-gray-50/50 p-6 rounded-3xl border border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Available Stock</label>
+                    <input 
+                      type="number" 
+                      name="stock"
+                      value={product.stock}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                      required={!product.hasVariants}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Color</label>
+                    <input 
+                      type="text" 
+                      name="color"
+                      value={product.color}
+                      onChange={handleInputChange}
+                      placeholder="e.g. Black"
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Size</label>
+                    <input 
+                      type="text" 
+                      name="size"
+                      value={product.size}
+                      onChange={handleInputChange}
+                      placeholder="e.g. XL"
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Length</label>
+                    <input 
+                      type="text" 
+                      name="length"
+                      value={product.length}
+                      onChange={handleInputChange}
+                      placeholder="e.g. 5m"
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Age Group</label>
+                    <input 
+                      type="text" 
+                      name="age"
+                      value={product.age}
+                      onChange={handleInputChange}
+                      placeholder="e.g. 18-24"
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    />
+                  </div>
                 </div>
+              </div>
             )}
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Description</label>
@@ -514,102 +606,95 @@ export default function AddProduct() {
             <h2 className="text-2xl font-display font-bold flex items-center gap-3">
               <FiImage className="text-primary" /> Product Media
             </h2>
-            <button 
-              type="button" 
-              onClick={addImageField}
-              className="text-primary font-bold text-sm flex items-center gap-2 hover:underline"
-            >
-              <FiPlus /> Add Image URL
-            </button>
+            <div className="flex items-center gap-4">
+              {uploading && <span className="text-xs text-primary animate-pulse">Uploading...</span>}
+              <label className="cursor-pointer bg-white hover:bg-gray-50 text-primary px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 border border-primary/20 shadow-sm">
+                <FiUpload /> Upload Image
+                <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={(e) => {
+                        const firstEmptyIdx = product.images.findIndex(img => !img || !img.trim());
+                        const targetIdx = firstEmptyIdx !== -1 ? firstEmptyIdx : product.images.length;
+                        handleFileUpload(e, targetIdx, 'image');
+                    }}
+                    disabled={uploading}
+                />
+              </label>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {product.images.map((img, idx) => (
-              <div key={idx} className="space-y-2">
-                <div className="relative group">
-                  <input 
-                    type="text" 
-                    value={img}
-                    onChange={(e) => handleImageChange(idx, e.target.value)}
-                    placeholder="https://..."
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all pr-12"
-                  />
-                  <button 
-                    onClick={() => removeImageField(idx)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <FiTrash2 size={18} />
-                  </button>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-gray-200">
-                        <FiUpload /> Upload
-                        <input 
-                            type="file" 
-                            className="hidden" 
-                            accept="image/*"
-                            onChange={(e) => handleFileUpload(e, idx)}
-                            disabled={uploading}
-                        />
-                    </label>
-                    {uploading && <span className="text-xs text-primary animate-pulse">Uploading...</span>}
-                </div>
+          <div className="flex flex-wrap gap-4">
+            {product.images.map((img, idx) => {
+              if (!img || img.trim() === "") return null;
+              return (
+              <div key={idx} className="relative w-24 h-24 rounded-2xl overflow-hidden border border-gray-200 flex-shrink-0 group/img bg-gray-50">
+                <Image src={img.trim()} alt="" fill className="object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeImageField(idx)}
+                  className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                >
+                  <FiTrash2 size={20} />
+                </button>
               </div>
-            ))}
+            )})}
+            {product.images.every(img => !img || img.trim() === "") && (
+              <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 bg-gray-50/50">
+                <FiImage size={28} />
+              </div>
+            )}
           </div>
-          <p className="text-xs text-gray-400 mt-6">Paste direct links or upload images.</p>
+          <p className="text-xs text-gray-400 mt-6">Upload product images showing different angles and details.</p>
         </section>
 
         {/* Videos */}
         <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-black/5 border border-gray-100">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-display font-bold flex items-center gap-3">
-              <FiImage className="text-primary" /> Product Videos
+              <FiPlayCircle className="text-primary" /> Product Videos
             </h2>
-            <button 
-              type="button" 
-              onClick={addVideoField}
-              className="text-primary font-bold text-sm flex items-center gap-2 hover:underline"
-            >
-              <FiPlus /> Add Video URL
-            </button>
+            <div className="flex items-center gap-4">
+              {videoUploading && <span className="text-xs text-primary animate-pulse">Uploading...</span>}
+              <label className="cursor-pointer bg-white hover:bg-gray-50 text-primary px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 border border-primary/20 shadow-sm">
+                <FiUpload /> Upload Video
+                <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="video/*"
+                    onChange={(e) => {
+                        const firstEmptyIdx = product.videos.findIndex(vid => !vid || !vid.trim());
+                        const targetIdx = firstEmptyIdx !== -1 ? firstEmptyIdx : product.videos.length;
+                        handleFileUpload(e, targetIdx, 'video');
+                    }}
+                    disabled={videoUploading}
+                />
+              </label>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {product.videos.map((vid, idx) => (
-              <div key={idx} className="space-y-2">
-                <div className="relative group">
-                  <input 
-                    type="text" 
-                    value={vid}
-                    onChange={(e) => handleVideoChange(idx, e.target.value)}
-                    placeholder="https://..."
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all pr-12"
-                  />
-                  <button 
-                    onClick={() => removeVideoField(idx)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <FiTrash2 size={18} />
-                  </button>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                    <label className="cursor-pointer bg-gray-50 hover:bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-2 border border-gray-200">
-                        <FiUpload /> Upload Video
-                        <input 
-                            type="file" 
-                            className="hidden" 
-                            accept="video/*"
-                            onChange={(e) => handleFileUpload(e, idx, 'video')}
-                            disabled={videoUploading}
-                        />
-                    </label>
-                    {videoUploading && <span className="text-xs text-primary animate-pulse">Uploading...</span>}
-                </div>
+          <div className="flex flex-wrap gap-4">
+            {product.videos.map((vid, idx) => {
+              if (!vid || vid.trim() === "") return null;
+              return (
+              <div key={idx} className="relative w-40 h-24 rounded-2xl overflow-hidden border border-gray-200 flex-shrink-0 group/img bg-black">
+                <video src={vid.trim()} className="w-full h-full object-cover opacity-80" />
+                <FiPlayCircle className="absolute inset-0 m-auto text-white/50 text-3xl pointer-events-none" />
+                <button
+                  type="button"
+                  onClick={() => removeVideoField(idx)}
+                  className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
+                >
+                  <FiTrash2 size={20} />
+                </button>
               </div>
-            ))}
+            )})}
+            {product.videos.every(vid => !vid || vid.trim() === "") && (
+              <div className="w-40 h-24 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 bg-gray-50/50">
+                <FiPlayCircle size={28} />
+              </div>
+            )}
           </div>
-          <p className="text-xs text-gray-400 mt-6">Paste direct links or upload videos (mp4, webm, etc).</p>
+          <p className="text-xs text-gray-400 mt-6">Upload videos (mp4, webm, etc) showing the product in motion.</p>
         </section>
 
         {/* SEO & Visibility */}
@@ -666,13 +751,13 @@ export default function AddProduct() {
           
           {/* New Variant Form */}
           <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
                 <input 
                   type="text" 
                   value={newVariant.color}
-                  onChange={(e) => setNewVariant({...newVariant, color: e.target.value})}
+                  onChange={(e) => setNewVariant({...newVariant, color: formatColorInput(e.target.value)})}
                   placeholder="e.g. Black"
                   className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
@@ -694,6 +779,16 @@ export default function AddProduct() {
                   value={newVariant.length || ""}
                   onChange={(e) => setNewVariant({...newVariant, length: e.target.value})}
                   placeholder="e.g. 5m"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Age</label>
+                <input 
+                  type="text" 
+                  value={newVariant.age || ""}
+                  onChange={(e) => setNewVariant({...newVariant, age: e.target.value})}
+                  placeholder="e.g. 18-24"
                   className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
               </div>
@@ -781,25 +876,78 @@ export default function AddProduct() {
           <div className="space-y-4">
             {product.variants.map((v, i) => (
               <div key={i} className="flex flex-col p-5 bg-surface rounded-2xl border border-gray-100 group gap-4">
-                <div className="flex items-center justify-between">
                 <div className="flex flex-col lg:flex-row gap-4 flex-1 items-start lg:items-center flex-wrap">
                   <div className="flex items-center gap-2 min-w-[100px]">
-                      <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: getColorValue(v.color) }}></div>
-
-
-                      <span className="font-bold text-gray-900">{v.color}</span>
-                    </div>
-                    {v.size && <span className="font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-md text-sm">Size: {v.size}</span>}
-                    {v.length && <span className="font-bold text-gray-500 bg-gray-50 px-2 py-1 rounded-md text-sm">Length: {v.length}</span>}
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-bold text-gray-900">{mounted ? getCurrencySymbol() : ""}{v.price}</span>
-                      {v.mrp && Number(v.mrp) > Number(v.price) && <span className="text-gray-400 line-through text-xs">{mounted ? getCurrencySymbol() : ""}{v.mrp}</span>}
-                    </div>
-                    <span className="text-sm font-medium text-gray-500 bg-gray-50 px-2 py-1 rounded-md">{v.stock} in stock</span>
+                    <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: getColorValue(v.color) }}></div>
+                    <input 
+                        type="text"
+                        value={v.color}
+                        onChange={(e) => handleVariantChange(i, 'color', e.target.value)}
+                        className="font-bold text-gray-900 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-primary outline-none transition-colors w-24"
+                    />
                   </div>
+                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                    <span className="text-xs text-gray-500 font-medium">Size:</span>
+                    <input type="text" value={v.size || ""} onChange={(e) => handleVariantChange(i, 'size', e.target.value)} className="bg-transparent text-sm font-bold text-gray-700 outline-none w-12" placeholder="-" />
+                  </div>
+                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                    <span className="text-xs text-gray-500 font-medium">Length:</span>
+                    <input type="text" value={v.length || ""} onChange={(e) => handleVariantChange(i, 'length', e.target.value)} className="bg-transparent text-sm font-bold text-gray-700 outline-none w-12" placeholder="-" />
+                  </div>
+                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                    <span className="text-xs text-gray-500 font-medium">Age:</span>
+                    <input type="text" value={v.age || ""} onChange={(e) => handleVariantChange(i, 'age', e.target.value)} className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16" placeholder="-" />
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase">Price</span>
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{mounted ? getCurrencySymbol() : ""}</span>
+                        <input 
+                            type="number" 
+                            value={v.price} 
+                            onChange={(e) => handleVariantChange(i, 'price', e.target.value)}
+                            className="w-24 bg-white border border-gray-100 pl-6 pr-2 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                        />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase">MRP</span>
+                    <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{mounted ? getCurrencySymbol() : ""}</span>
+                        <input 
+                            type="number" 
+                            value={v.mrp || ""} 
+                            onChange={(e) => handleVariantChange(i, 'mrp', e.target.value)}
+                            className="w-24 bg-white border border-gray-100 pl-6 pr-2 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                        />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase">Disc %</span>
+                    <input 
+                        type="number" 
+                        value={v.discount || ""} 
+                        onChange={(e) => handleVariantChange(i, 'discount', e.target.value)}
+                        className="w-16 bg-white border border-gray-100 px-2 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400 uppercase">Stock</span>
+                    <input 
+                        type="number" 
+                        value={v.stock} 
+                        onChange={(e) => handleVariantChange(i, 'stock', e.target.value)}
+                        className="w-20 bg-white border border-gray-100 px-3 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                    />
+                  </div>
+                  
                   <button 
                     onClick={() => removeVariant(i)}
-                    className="p-2 text-gray-300 hover:text-red-500 bg-white rounded-lg border border-transparent hover:border-red-100 transition-colors"
+                    className="p-2 text-gray-300 hover:text-red-500 bg-white rounded-lg border border-transparent hover:border-red-100 transition-colors md:ml-auto mt-2 md:mt-0"
                   >
                     <FiTrash2 />
                   </button>
@@ -823,7 +971,7 @@ export default function AddProduct() {
                   <div className="flex gap-3 overflow-x-auto pb-2">
                     {v.images?.map((img, imgIdx) => (
                       <div key={imgIdx} className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0 group/img">
-                        <Image src={img} fill alt="" className="object-cover" unoptimized />
+                        <Image src={img.trim()} alt="" fill className="object-cover" />
                         <button
                           onClick={() => removeVariantImage(i, imgIdx)}
                           className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity"
