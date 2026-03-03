@@ -47,12 +47,12 @@ export default function ProductCard({ product, onAddToCart }) {
             <p className="text-[9px] font-bold text-primary uppercase tracking-widest truncate">
               {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "Essentials")}
             </p>
-            <h3 className="text-xs font-display font-bold text-gray-900 truncate" title={product.name}>{product.name}</h3>
+            <h3 className="text-xs font-display font-bold text-text-main truncate" title={product.name}>{product.name}</h3>
           </div>
           <div className="text-right">
-            <p className="text-xs font-bold text-gray-900 whitespace-nowrap">{formatPrice(product.price)}</p>
+            <p className="text-xs font-bold text-text-main whitespace-nowrap">{formatPrice(product.price)}</p>
             {Number(product.mrp) > Number(product.price) && (
-              <p className="text-[10px] text-gray-400 line-through">
+              <p className="text-[10px] text-text-muted line-through">
                 {formatPrice(product.mrp)}
               </p>
             )}
@@ -60,7 +60,7 @@ export default function ProductCard({ product, onAddToCart }) {
         </div>
 
         {hasVariants ? (
-          <Link href={`/product/${product.slug || product._id}`} className="mt-2 flex items-center justify-center gap-1.5 w-full bg-gray-900 text-white py-1.5 rounded-lg text-[10px] font-bold hover:bg-primary transition-all active:scale-95">
+          <Link href={`/product/${product.slug || product._id}`} className="mt-2 flex items-center justify-center gap-1.5 w-full bg-btn-dark text-btn-text py-1.5 rounded-lg text-[10px] font-bold hover:bg-btn-dark-hover transition-all active:scale-95">
             Details <FiArrowRight size={10} />
           </Link>
         ) : (() => {
@@ -70,8 +70,8 @@ export default function ProductCard({ product, onAddToCart }) {
             disabled={isOutOfStock}
             className={`mt-2 flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm border ${
               isOutOfStock 
-                ? "bg-gray-50 text-gray-400 border-gray-100 cursor-not-allowed" 
-                : "bg-white text-gray-900 border-gray-200 hover:bg-primary hover:text-white hover:border-primary"
+                ? "bg-gray-50 text-text-muted border-gray-100 cursor-not-allowed" 
+                : "bg-white text-text-main border-gray-200 hover:bg-btn-dark-hover hover:text-btn-text hover:border-btn-dark-hover"
             }`}
             onClick={(e) => {
               e.preventDefault();
