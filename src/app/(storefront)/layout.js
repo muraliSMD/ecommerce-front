@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TransitionBar from "@/components/TransitionBar";
 
 export default function StorefrontLayout({ children }) {
   const pathname = usePathname();
@@ -10,6 +11,7 @@ export default function StorefrontLayout({ children }) {
 
   return (
     <>
+      <TransitionBar />
       {!isAuthRoute && <Header />}
       <main className="flex-1">{children}</main>
       {!isAuthRoute && <Footer />}

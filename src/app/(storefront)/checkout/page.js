@@ -426,7 +426,7 @@ export default function CheckoutPage() {
                     </div>
                     <h2 className="text-2xl font-display font-bold">Shipping Details</h2>
                 </div>
-                {!showAddressForm && addresses.length > 0 && (
+                {!showAddressForm && userInfo && addresses.length > 0 && (
                      <button 
                         onClick={() => {
                             setShowAddressForm(true);
@@ -441,7 +441,7 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {!showAddressForm && addresses.length > 0 ? (
+              {!showAddressForm && userInfo && addresses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {addresses.map((addr) => (
                           <div 
@@ -595,24 +595,26 @@ export default function CheckoutPage() {
                                     placeholder="Near Central Park"
                                 />
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Type</label>
-                                <div className="flex gap-4">
-                                    {["Home", "Office", "Other"].map(label => (
-                                        <button
-                                            key={label}
-                                            onClick={() => setFormData({...formData, label})}
-                                            className={`px-6 py-3 rounded-xl font-bold border-2 transition-all ${
-                                                formData.label === label 
-                                                ? "border-primary bg-primary text-white" 
-                                                : "border-gray-200 text-gray-500 hover:border-gray-300"
-                                            }`}
-                                        >
-                                            {label}
-                                        </button>
-                                    ))}
+                            {userInfo && (
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Type</label>
+                                    <div className="flex gap-4">
+                                        {["Home", "Office", "Other"].map(label => (
+                                            <button
+                                                key={label}
+                                                onClick={() => setFormData({...formData, label})}
+                                                className={`px-6 py-3 rounded-xl font-bold border-2 transition-all ${
+                                                    formData.label === label 
+                                                    ? "border-primary bg-primary text-white" 
+                                                    : "border-gray-200 text-gray-500 hover:border-gray-300"
+                                                }`}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         <div className="flex items-center gap-4 pt-4 border-t border-gray-100">

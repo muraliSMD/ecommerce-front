@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { format } from "date-fns";
 import ReactMarkdown from 'react-markdown';
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -16,6 +17,14 @@ export default function BlogPostPage() {
     queryKey: ["blog", slug],
     queryFn: async () => {
       const { data } = await api.get(`/blogs/${slug}`);
+      return data;
+    },
+  });
+
+  const { data: otherBlogs } = useQuery({
+    queryKey: ["blogs"],
+    queryFn: async () => {
+      const { data } = await api.get("/blogs?published=true");
       return data;
     },
   });
@@ -35,7 +44,9 @@ export default function BlogPostPage() {
   return (
     <main className="bg-surface min-h-screen pb-12 pt-32 lg:pt-36">
         {/* Hero Section */}
-        <div className="container mx-auto px-4 md:px-8 max-w-4xl">
+        <div className="container mx-auto px-4 md:px-8 max-w-7xl">
+         <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <article className="flex-1 w-full max-w-4xl">
             <div className="mb-8">
                 <Breadcrumbs 
                     items={[
@@ -72,9 +83,46 @@ export default function BlogPostPage() {
                 </div>
             )}
             
-            <div className="prose prose-lg prose-gray mx-auto prose-headings:font-display prose-headings:font-bold prose-a:text-primary prose-img:rounded-xl">
+            <div className="prose prose-lg prose-gray prose-headings:font-display prose-headings:font-bold prose-a:text-primary prose-img:rounded-xl">
                 <ReactMarkdown>{blog.content}</ReactMarkdown>
             </div>
+          </article>
+          
+          {/* Sidebar */}
+          <aside className="w-full lg:w-1/3 lg:max-w-sm shrink-0">
+             <div className="sticky top-32 space-y-8 bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+                 <h3 className="font-display font-bold text-xl border-b pb-4 border-gray-100">Other Posts</h3>
+                 <div className="flex flex-col gap-6">
+                     {(otherBlogs || []).filter(b => b.slug !== slug).slice(0, 4).map((relatedBlog) => (
+                         <Link 
+                             key={relatedBlog._id} 
+                             href={`/blog/${relatedBlog.slug}`}
+                             className="group flex gap-4 items-center"
+                         >
+                             <div className="w-20 h-20 rounded-xl overflow-hidden relative bg-gray-100 flex-shrink-0">
+                                 {relatedBlog.coverImage ? (
+                                     <Image 
+                                         src={relatedBlog.coverImage} 
+                                         alt={relatedBlog.title} 
+                                         fill 
+                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                     />
+                                 ) : (
+                                     <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-[10px] bg-gray-50">No Image</div>
+                                 )}
+                             </div>
+                             <div>
+                                 <div className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">
+                                     {format(new Date(relatedBlog.createdAt), "MMM d, yyyy")}
+                                 </div>
+                                 <h4 className="font-bold text-gray-900 group-hover:text-primary transition-colors text-sm line-clamp-2">{relatedBlog.title}</h4>
+                             </div>
+                         </Link>
+                     ))}
+                 </div>
+             </div>
+          </aside>
+         </div>
         </div>
     </main>
   );

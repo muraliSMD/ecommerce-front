@@ -117,17 +117,5 @@ export function getClosestColorName(hexStr) {
 }
 
 export function formatColorInput(input) {
-  if (!input) return input;
-  const trimmed = input.trim();
-  
-  // If input is exactly a hex code, format it
-  if (/^#([A-Fa-f0-9]{3}){1,2}$/i.test(trimmed)) {
-      const closest = getClosestColorName(trimmed);
-      if (closest) {
-          // Capitalize first letter of every word
-          const capName = closest.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-          return `${capName} (${trimmed.toUpperCase()})`;
-      }
-  }
   return input;
 }

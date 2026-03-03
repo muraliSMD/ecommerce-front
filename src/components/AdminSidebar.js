@@ -34,6 +34,7 @@ const navItems = [
   { label: "Coupons", href: "/admin/coupons", icon: FiTag },
   { label: "Tickets", href: "/admin/tickets", icon: FiMessageSquare },
   { label: "Blog", href: "/admin/blogs", icon: FiEdit2 },
+  { label: "Gallery", href: "/admin/gallery", icon: FiImage },
   { label: "Hero Slider", href: "/admin/hero-slides", icon: FiImage },
   { label: "Subscribers", href: "/admin/subscribers", icon: FiMail },
   { label: "Messages", href: "/admin/messages", icon: FiMessageSquare },
