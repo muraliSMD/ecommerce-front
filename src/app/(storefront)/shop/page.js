@@ -403,7 +403,7 @@ export default function ShopPage() {
 
 
           {/* Product Grid */}
-          <div className="flex-1 bg-[#dbeafe] rounded-[2.5rem] p-6 md:p-8 border border-blue-200 shadow-sm relative overflow-hidden">
+          <div className="flex-1 bg-bg-section rounded-[2.5rem] p-6 md:p-8 border border-blue-200 shadow-sm relative overflow-hidden">
             {/* Top Bar */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
               <p className="text-gray-900 font-medium hidden sm:block">
@@ -528,7 +528,7 @@ export default function ShopPage() {
                                         {product.variants && product.variants.length > 1 ? (
                                             <Link 
                                                 href={`/product/${product._id}`} 
-                                                className="bg-gray-900 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-gray-900/10 active:scale-95 flex items-center gap-2"
+                                                className="bg-btn-dark text-btn-text px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-btn-dark-hover transition-colors shadow-lg shadow-gray-900/10 active:scale-95 flex items-center gap-2"
                                             >
                                                 Select Options
                                             </Link>
@@ -544,7 +544,7 @@ export default function ShopPage() {
                                                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 ${
                                                     isOutOfStock
                                                         ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
-                                                        : "bg-gray-900 text-white hover:bg-primary"
+                                                        : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
                                                 }`}
                                             >
                                                 {isOutOfStock ? "Out of Stock" : "Add to Cart"}

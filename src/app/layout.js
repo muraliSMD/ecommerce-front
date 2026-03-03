@@ -76,7 +76,7 @@ export default async function RootLayout({ children }) {
 
     return (
     <html lang="en">
-      <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-surface min-h-screen antialiased`} suppressHydrationWarning={true}>
+      <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-bg-main min-h-screen antialiased`} suppressHydrationWarning={true}>
         <QueryProvider>
           <SettingsInitializer />
           <AuthModal />

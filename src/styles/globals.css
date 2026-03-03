@@ -9,6 +9,15 @@
   
   --color-surface: oklch(0.99 0.005 260); /* Very light cool gray */
   --color-surface-dark: oklch(0.96 0.01 260);
+
+  /* Global UI Tokens */
+  --color-bg-section: #dbeafe; /* Primary section background like on Shop view */
+  --color-bg-card: #ffffff;
+  --color-text-main: #111827; 
+  --color-text-muted: #6b7280;
+  --color-btn-dark: #111827; 
+  --color-btn-dark-hover: oklch(0.55 0.25 260);
+  --color-btn-text: #ffffff;
   
   --font-sans: var(--font-open-sans), "Open Sans", ui-sans-serif, system-ui;
   --font-display: var(--font-montserrat), "Montserrat", ui-sans-serif, system-ui;
