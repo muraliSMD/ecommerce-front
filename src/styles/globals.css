@@ -100,6 +100,24 @@ html {
   background: oklch(0.7 0.1 260);
 }
 
+/* Dark/Sidebar Scrollbar utility */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* Animations & Transitions */
 a, button, .transition-all-custom {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

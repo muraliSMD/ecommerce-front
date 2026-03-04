@@ -126,7 +126,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-grow px-4 space-y-2">
+      <nav className="flex-grow overflow-y-auto px-4 space-y-2 custom-scrollbar">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
