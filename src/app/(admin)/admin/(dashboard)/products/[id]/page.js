@@ -20,13 +20,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { SectionLoader } from "@/components/Loader";
 import { useSettingsStore } from "@/store/settingsStore";
-import { getColorValue } from "@/lib/colors";
+import { getColorValue, getClosestColorName } from "@/lib/colors";
 
 export default function ProductDetailsAdmin({ params }) {
   const { id } = use(params);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(null);
+
+  const resolveColorName = (color) => {
+    if (!color) return "";
+    if (color.startsWith("#")) {
+      const name = getClosestColorName(color);
+      return name || color;
+    }
+    return color;
+  };
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["admin-product", id],
@@ -163,7 +172,7 @@ export default function ProductDetailsAdmin({ params }) {
                       onClick={() => setSelectedVariant(v)}
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border-2 flex items-center gap-2 ${selectedVariant === v ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-gray-600 border-transparent hover:border-gray-200'}`}
                     >
-                      {v.color} {v.size ? `/ ${v.size}` : ''} {v.length ? `/ ${v.length}` : ''} {v.age ? `/ ${v.age}` : ''}
+                      {resolveColorName(v.color)} {v.size ? `/ ${v.size}` : ''} {v.length ? `/ ${v.length}` : ''} {v.age ? `/ ${v.age}` : ''}
                     </button>
                   ))}
                 </div>
@@ -201,7 +210,7 @@ export default function ProductDetailsAdmin({ params }) {
                     <div className="flex items-center gap-2">
                        <span className="text-sm font-medium text-gray-500">Color:</span>
                        <span className="font-bold text-gray-900 text-sm flex items-center gap-2">
-                        {product.color}
+                        {resolveColorName(product.color)}
                        </span>
                     </div>
                   )}
@@ -283,7 +292,7 @@ export default function ProductDetailsAdmin({ params }) {
                         </div>
                       </td>
                        <td className="px-6 py-4">
-                        <span className={`font-bold ${selectedVariant === v ? 'text-primary' : 'text-gray-900'}`}>{v.color}</span>
+                        <span className={`font-bold ${selectedVariant === v ? 'text-primary' : 'text-gray-900'}`}>{resolveColorName(v.color)}</span>
                        </td>
                       <td className="px-6 py-4 font-medium text-gray-600">
                         {v.size && `Size: ${v.size}`}

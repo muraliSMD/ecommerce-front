@@ -16,7 +16,7 @@ import {
   FiList 
 } from "react-icons/fi";
 import Link from "next/link";
-import { getColorValue, getBaseColor } from "@/lib/colors";
+import { getColorValue, getBaseColor, getClosestColorName } from "@/lib/colors";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { ProductCardSkeleton } from "@/components/Skeleton";
@@ -119,7 +119,7 @@ const FilterContent = ({
                  key={color}
                  onClick={() => setSelectedColor(selectedColor === color ? null : color)}
                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-200'}`}
-                 title={color.charAt(0).toUpperCase() + color.slice(1)}
+                 title={color.startsWith('#') ? getClosestColorName(color) : (color.charAt(0).toUpperCase() + color.slice(1))}
                >
                  <div 
                    className="w-6 h-6 rounded-full border border-gray-100" 

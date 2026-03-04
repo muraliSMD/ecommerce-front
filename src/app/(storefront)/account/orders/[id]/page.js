@@ -11,6 +11,7 @@ import ReviewModal from "@/components/ReviewModal";
 import { FiStar, FiDownload } from "react-icons/fi";
 import { generateInvoice } from "@/lib/invoiceGenerator";
 import InlineOrderReview from "@/components/InlineOrderReview";
+import { getClosestColorName } from "@/lib/colors";
 
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,6 +22,15 @@ export default function OrderDetailsPage() {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const { settings } = useSettingsStore();
   const queryClient = useQueryClient();
+
+  const resolveColorName = (color) => {
+    if (!color) return "";
+    if (color.startsWith("#")) {
+      const name = getClosestColorName(color);
+      return name || color;
+    }
+    return color;
+  };
   
   const [mounted, setMounted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -185,9 +195,9 @@ export default function OrderDetailsPage() {
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="font-bold text-gray-900">{item.product?.name || "Product"}</h4>
-                                    {item.variant && (
+                                     {item.variant && (
                                         <p className="text-sm text-gray-500">
-                                            {item.variant.color} / {item.variant.size}
+                                            {resolveColorName(item.variant.color)} / {item.variant.size}
                                         </p>
                                     )}
                                         <p className="text-sm text-gray-900 font-bold mt-1">Qty: {item.quantity}</p>

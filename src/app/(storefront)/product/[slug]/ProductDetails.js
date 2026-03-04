@@ -10,7 +10,7 @@ import ZoomImage from "@/components/ZoomImage";
 import toast from "react-hot-toast";
 import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle } from "react-icons/fi";
 import Image from "next/image";
-import { getColorValue } from "@/lib/colors";
+import { getColorValue, getClosestColorName } from "@/lib/colors";
 import { useSettingsStore } from "@/store/settingsStore";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
@@ -234,7 +234,7 @@ export default function ProductDetails({ initialProduct }) {
 
     if (navigator.share) {
       try {
-        const shareText = `Check out ${product.name}${selectedColor ? ` in ${selectedColor}` : ''}${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedLength ? ` (Length: ${selectedLength})` : ''}!`;
+        const shareText = `Check out ${product.name}${selectedColor ? ` in ${resolveColorName(selectedColor)}` : ''}${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedLength ? ` (Length: ${selectedLength})` : ''}!`;
         await navigator.share({
           title: product.name,
           text: shareText,
@@ -274,6 +274,15 @@ export default function ProductDetails({ initialProduct }) {
       ? selectedVariant.images.filter(i => typeof i === 'string' && i.trim() !== '')
       : product.images?.filter(i => typeof i === 'string' && i.trim() !== '')) || []).map(img => ({ url: img, type: 'image' }))
   ];
+
+  const resolveColorName = (color) => {
+    if (!color) return "";
+    if (color.startsWith("#")) {
+      const name = getClosestColorName(color);
+      return name || color;
+    }
+    return color;
+  };
 
   return (
     <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
@@ -476,7 +485,7 @@ export default function ProductDetails({ initialProduct }) {
                     {product.color && (
                       <div className="flex items-center gap-2">
                          <span className="text-sm text-gray-500">Color:</span>
-                         <span className="font-bold text-gray-900 text-sm">{product.color}</span>
+                         <span className="font-bold text-gray-900 text-sm">{resolveColorName(product.color)}</span>
                       </div>
                     )}
                     {product.size && (
@@ -508,7 +517,7 @@ export default function ProductDetails({ initialProduct }) {
             {allColors.length > 0 && (
               <div className="space-y-4">
                 <p className="font-bold text-sm uppercase tracking-wider text-gray-400">
-                  Colour: <span className="text-gray-900 ml-2">{selectedColor}</span>
+                  Colour: <span className="text-gray-900 ml-2">{resolveColorName(selectedColor)}</span>
                 </p>
                 <div className="flex gap-3 flex-wrap">
                   {allColors.map((color) => {
@@ -534,7 +543,7 @@ export default function ProductDetails({ initialProduct }) {
                             <div className={`absolute inset-0 bg-black/20 ${selectedColor === color ? 'bg-black/0' : 'group-hover:bg-black/10'} transition-colors`} />
                           </>
                          ) : (
-                           <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{color}</span>
+                           <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{resolveColorName(color)}</span>
                          )}
                       </button>
                     )

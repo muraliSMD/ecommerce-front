@@ -27,6 +27,7 @@ import RichTextEditor from "@/components/admin/RichTextEditor";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";
 import { getColorValue, formatColorInput } from "@/lib/colors";
+import ColorPreview from "@/components/admin/ColorPreview";
 
 export default function EditProduct({ params }) {
   const router = useRouter();
@@ -567,6 +568,7 @@ export default function EditProduct({ params }) {
                       placeholder="e.g. Black"
                       className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                     />
+                    <ColorPreview color={product.color} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Size</label>
@@ -785,6 +787,7 @@ export default function EditProduct({ params }) {
                   placeholder="e.g. Black"
                   className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
+                <ColorPreview color={newVariant.color} />
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
