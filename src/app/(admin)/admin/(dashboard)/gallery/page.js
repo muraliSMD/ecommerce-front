@@ -446,7 +446,7 @@ export default function AdminGallery() {
                  
                  {item.caption && (
                     <div className="p-1.5 md:p-2">
-                        <p className="text-[8px] md:text-[10px] text-gray-600 line-clamp-1 italic">"{item.caption}"</p>
+                        <p className="text-[8px] md:text-[10px] text-gray-600 line-clamp-1 italic">&quot;{item.caption}&quot;</p>
                     </div>
                  )}
              </div>
