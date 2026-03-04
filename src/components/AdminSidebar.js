@@ -155,9 +155,10 @@ export default function AdminSidebar() {
           </div>
         )}
         <button
-          onClick={() => {
-            logout();
+          onClick={async () => {
+            await logout();
             router.push("/admin/login");
+            router.refresh();
           }}
           className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl text-gray-400 hover:bg-red-500/10 hover:text-red-500 transition-all font-bold text-sm tracking-wide"
         >

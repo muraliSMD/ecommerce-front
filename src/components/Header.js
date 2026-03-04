@@ -305,7 +305,7 @@ export default function Header() {
                         <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-colors">
                             <FiHeart size={14} /> Wishlist
                         </Link>
-                        <button onClick={logout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors text-left mt-1">
+                        <button onClick={async () => { await logout(); router.refresh(); }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors text-left mt-1">
                             <FiLogOut size={14} /> Logout
                         </button>
                     </div>
@@ -601,7 +601,7 @@ export default function Header() {
                         <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-gray-600 p-2 hover:bg-white rounded-lg transition-colors">
                            <FiHeart /> Wishlist ({wishlistCount})
                         </Link>
-                        <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="flex items-center gap-3 text-red-500 p-2 hover:bg-white rounded-lg w-full transition-colors">
+                        <button onClick={async () => { await logout(); setIsMobileMenuOpen(false); router.refresh(); }} className="flex items-center gap-3 text-red-500 p-2 hover:bg-white rounded-lg w-full transition-colors">
                            <FiLogOut /> Logout
                         </button>
                      </div>
