@@ -3,11 +3,21 @@ import Image from "next/image";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore";
 import { motion, AnimatePresence } from "framer-motion";
+import { getClosestColorName } from "@/lib/colors";
 
 export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const price = Number(item.variant?.price ?? item.product.price ?? 0);
   const image = item.variant?.images?.[0] || item.product.images?.[0] || "/placeholder.png";
+
+  const resolveColorName = (color) => {
+    if (!color) return "";
+    if (color.startsWith("#")) {
+      const name = getClosestColorName(color);
+      return name || color;
+    }
+    return color;
+  };
 
   return (
     <div className="group bg-white rounded-[2rem] p-4 flex gap-6 items-center border border-gray-100 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-black/5">
@@ -26,7 +36,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
             <h3 className="text-lg font-display font-bold text-gray-900 line-clamp-1">{item.product.name}</h3>
             {item.variant && (
               <p className="text-xs font-bold uppercase tracking-wider text-primary/60 mt-1">
-                {item.variant.color} • {item.variant.size}
+                {resolveColorName(item.variant.color)} • {item.variant.size}
               </p>
             )}
           </div>

@@ -28,6 +28,7 @@ import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
 import { PageLoader } from "@/components/Loader";
+import { getClosestColorName } from "@/lib/colors";
 
 export default function AdminOrderDetails() {
   const { id } = useParams();
@@ -35,6 +36,15 @@ export default function AdminOrderDetails() {
   console.log("Rendering AdminOrderDetails, ID:", id);
   const queryClient = useQueryClient();
   const { formatPrice, settings } = useSettingsStore();
+
+  const resolveColorName = (color) => {
+    if (!color) return "";
+    if (color.startsWith("#")) {
+      const name = getClosestColorName(color);
+      return name || color;
+    }
+    return color;
+  };
 
   const { data: order, isLoading } = useQuery({
     queryKey: ["admin-order", id],
@@ -241,9 +251,9 @@ export default function AdminOrderDetails() {
                                                     SKU: {item.product.sku}
                                                 </span>
                                             )}
-                                            {item.variant?.color && (
+                                             {item.variant?.color && (
                                                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                                                    {item.variant.color}
+                                                    {resolveColorName(item.variant.color)}
                                                 </span>
                                             )}
                                             {item.variant?.size && (
