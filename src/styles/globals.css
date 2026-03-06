@@ -6,26 +6,32 @@
   --color-primary-light: oklch(0.75 0.15 260);
   --color-secondary: oklch(0.65 0.22 310); /* Vibrant Magenta/Pink */
   --color-accent: oklch(0.85 0.15 180); /* Teal/Cyan */
-  
+
   --color-surface: oklch(0.99 0.005 260); /* Very light cool gray */
   --color-surface-dark: oklch(0.96 0.01 260);
 
   /* Global UI Tokens */
   --color-bg-section: #dbeafe; /* Primary section background like on Shop view */
   --color-bg-card: #ffffff;
-  --color-text-main: #111827; 
+  --color-text-main: #111827;
   --color-text-muted: #6b7280;
-  --color-btn-dark: #111827; 
+  --color-btn-dark: #111827;
   --color-btn-dark-hover: oklch(0.55 0.25 260);
   --color-btn-text: #ffffff;
-  
+
   --font-sans: var(--font-open-sans), "Open Sans", ui-sans-serif, system-ui;
-  --font-display: var(--font-montserrat), "Montserrat", ui-sans-serif, system-ui;
+  --font-display:
+    var(--font-montserrat), "Montserrat", ui-sans-serif, system-ui;
 
   --animate-float: float 6s ease-in-out infinite;
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
 
@@ -63,7 +69,9 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
 }
 
 .text-gradient {
@@ -119,18 +127,22 @@ html {
 }
 
 /* Animations & Transitions */
-a, button, .transition-all-custom {
+a,
+button,
+.transition-all-custom {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 
-    0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
@@ -139,7 +151,21 @@ a, button, .transition-all-custom {
   @apply px-4 md:px-8 lg:px-12;
 }
 
-h1, h2, h3, h4, h5, h6 {
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }

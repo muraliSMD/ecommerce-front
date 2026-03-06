@@ -3,12 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ZoomImage from "@/components/ZoomImage";
 import toast from "react-hot-toast";
-import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle } from "react-icons/fi";
+import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import Image from "next/image";
 import { getColorValue, getClosestColorName } from "@/lib/colors";
 import { useSettingsStore } from "@/store/settingsStore";
@@ -16,6 +16,64 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import ReviewsSection from "@/components/ReviewsSection";
 import { useWishlistStore } from "@/store/wishlistStore";
+
+const VariantSlider = ({ children, title, orderClass = "" }) => {
+  const scrollRef = useRef(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener('resize', checkScroll);
+    return () => window.removeEventListener('resize', checkScroll);
+  }, [checkScroll, children]);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className={`space-y-4 relative group/slider ${orderClass}`}>
+      {title && <p className="font-bold text-sm uppercase tracking-wider text-gray-400">{title}</p>}
+      <div className="relative">
+        {showLeftArrow && (
+          <button 
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white/90 backdrop-blur-sm border border-gray-100 shadow-xl p-2 rounded-full text-gray-900 hover:bg-primary hover:text-white transition-all opacity-0 group-hover/slider:opacity-100 hidden md:flex"
+          >
+            <FiChevronLeft size={20} />
+          </button>
+        )}
+        <div 
+          ref={scrollRef}
+          onScroll={checkScroll}
+          className="flex gap-2.5 flex-nowrap overflow-x-auto pb-4 scrollbar-hide w-full cursor-grab active:cursor-grabbing snap-x"
+        >
+          {children}
+        </div>
+        {showRightArrow && (
+          <button 
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white/90 backdrop-blur-sm border border-gray-100 shadow-xl p-2 rounded-full text-gray-900 hover:bg-primary hover:text-white transition-all opacity-0 group-hover/slider:opacity-100 hidden md:flex"
+          >
+            <FiChevronRight size={20} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default function ProductDetails({ initialProduct }) {
   const slug = initialProduct?.slug;
@@ -40,6 +98,9 @@ export default function ProductDetails({ initialProduct }) {
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedLength, setSelectedLength] = useState("");
   const [selectedAge, setSelectedAge] = useState("");
+  const [selectedWithBlouse, setSelectedWithBlouse] = useState("");
+  const [selectedBlouseMeter, setSelectedBlouseMeter] = useState("");
+  const [selectedSilkType, setSelectedSilkType] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedMedia, setSelectedMedia] = useState(null);
@@ -50,9 +111,12 @@ export default function ProductDetails({ initialProduct }) {
   }, []);
 
   const variants = useMemo(() => product?.variants || [], [product]);
+  const isSaree = product.category?.name?.toLowerCase().includes("saree") || 
+                  (typeof product.category === 'string' && product.category.toLowerCase().includes("saree"));
+
   const allColors = useMemo(() => {
     const variantColors = variants.map((v) => v.color).filter(Boolean);
-    if (!product?.hasVariants && product?.color) {
+    if (product?.color) {
       return [...new Set([...variantColors, product.color])];
     }
     return [...new Set(variantColors)];
@@ -60,7 +124,7 @@ export default function ProductDetails({ initialProduct }) {
 
   const allSizes = useMemo(() => {
     const variantSizes = variants.map((v) => v.size).filter(Boolean);
-    if (!product?.hasVariants && product?.size) {
+    if (product?.size) {
       return [...new Set([...variantSizes, product.size])];
     }
     return [...new Set(variantSizes)];
@@ -68,7 +132,7 @@ export default function ProductDetails({ initialProduct }) {
 
   const allLengths = useMemo(() => {
     const variantLengths = variants.map((v) => v.length).filter(Boolean);
-    if (!product?.hasVariants && product?.length) {
+    if (product?.length) {
       return [...new Set([...variantLengths, product.length])];
     }
     return [...new Set(variantLengths)];
@@ -76,10 +140,34 @@ export default function ProductDetails({ initialProduct }) {
 
   const allAges = useMemo(() => {
     const variantAges = variants.map((v) => v.age).filter(Boolean);
-    if (!product?.hasVariants && product?.age) {
+    if (product?.age) {
       return [...new Set([...variantAges, product.age])];
     }
     return [...new Set(variantAges)];
+  }, [variants, product]);
+
+  const allBlouseOptions = useMemo(() => {
+    const variantOptions = variants.map((v) => v.withBlouse).filter(Boolean);
+    if (product?.withBlouse) {
+      return [...new Set([...variantOptions, product.withBlouse])];
+    }
+    return [...new Set(variantOptions)];
+  }, [variants, product]);
+
+  const allBlouseMeters = useMemo(() => {
+    const variantMeters = variants.map((v) => v.blouseMeter).filter(Boolean);
+    if (product?.blouseMeter) {
+      return [...new Set([...variantMeters, product.blouseMeter])];
+    }
+    return [...new Set(variantMeters)];
+  }, [variants, product]);
+
+  const allSilkTypes = useMemo(() => {
+    const variantTypes = variants.map((v) => v.silkType).filter(Boolean);
+    if (product?.silkType) {
+      return [...new Set([...variantTypes, product.silkType])];
+    }
+    return [...new Set(variantTypes)];
   }, [variants, product]);
 
   const availableSizesForColor = useMemo(() => {
@@ -93,19 +181,43 @@ export default function ProductDetails({ initialProduct }) {
   }, [variants, selectedColor, allLengths]);
 
   const availableAgesForColor = useMemo(() => {
-    if (!selectedColor) return allAges;
     return variants.filter((v) => v.color === selectedColor && v.age).map((v) => v.age);
-  }, [variants, selectedColor, allAges]);
+  }, [variants, selectedColor]);
+
+  const availableBlouseOptionsForColor = useMemo(() => {
+    if (!selectedColor) return allBlouseOptions;
+    return variants.filter((v) => v.color === selectedColor && v.withBlouse).map((v) => v.withBlouse);
+  }, [variants, selectedColor, allBlouseOptions]);
+
+  const availableBlouseMetersForColor = useMemo(() => {
+    if (!selectedColor) return allBlouseMeters;
+    return variants.filter((v) => v.color === selectedColor && v.blouseMeter).map((v) => v.blouseMeter);
+  }, [variants, selectedColor, allBlouseMeters]);
+
+  const availableSilkTypesForColor = useMemo(() => {
+    if (!selectedColor) return allSilkTypes;
+    return variants.filter((v) => v.color === selectedColor && v.silkType).map((v) => v.silkType);
+  }, [variants, selectedColor, allSilkTypes]);
+
 
   // Main Effect: Derive variant and media from selection states
   useEffect(() => {
-    let variant = variants.find(
-      (v) => v.color === selectedColor && (v.size === selectedSize || v.length === selectedLength || v.age === selectedAge)
-    );
+    let variant = variants.find((v) => {
+      const matchColor = !selectedColor || v.color === selectedColor;
+      const matchSize = !selectedSize || v.size === selectedSize;
+      const matchLength = !selectedLength || v.length === selectedLength;
+      const matchAge = !selectedAge || v.age === selectedAge;
+      const matchBlouse = !selectedWithBlouse || v.withBlouse === selectedWithBlouse;
+      const matchBlouseMeter = !selectedBlouseMeter || v.blouseMeter === selectedBlouseMeter;
+      const matchSilk = !selectedSilkType || v.silkType === selectedSilkType;
+      
+      return matchColor && matchSize && matchLength && matchAge && matchBlouse && matchBlouseMeter && matchSilk;
+    });
 
-    // If no exact match but we have a color, find ANY variant with that color
+    // If no exact match but we have a color, find ANY variant with that color as fallback
     if (!variant && selectedColor) {
         variant = variants.find(v => v.color === selectedColor);
+    }
         if (variant) {
             if (variant.size && selectedSize !== variant.size) {
                 setSelectedSize(variant.size);
@@ -117,8 +229,6 @@ export default function ProductDetails({ initialProduct }) {
             } else if (variant.age && selectedAge !== variant.age) {
                 setSelectedAge(variant.age);
                 setSelectedSize("");
-                setSelectedLength("");
-            }
         }
     }
 
@@ -137,7 +247,7 @@ export default function ProductDetails({ initialProduct }) {
     }
     
     setQuantity(1);
-  }, [selectedColor, selectedSize, selectedLength, selectedAge, variants, product]);
+  }, [selectedColor, selectedSize, selectedLength, selectedAge, selectedWithBlouse, selectedBlouseMeter, selectedSilkType, variants, product]);
 
   // Initialization Effect: Run only once or when variants/params change on MOUNT
   useEffect(() => {
@@ -147,6 +257,9 @@ export default function ProductDetails({ initialProduct }) {
     const sizeParam = searchParams.get('size');
     const lengthParam = searchParams.get('length');
     const ageParam = searchParams.get('age');
+    const blouseParam = searchParams.get('blouse');
+    const blouseMeterParam = searchParams.get('blouseMeter');
+    const silkParam = searchParams.get('silk');
 
     if (variants.length > 0) {
       if (colorParam && allColors.includes(colorParam)) {
@@ -164,12 +277,25 @@ export default function ProductDetails({ initialProduct }) {
             setSelectedSize("");
             setSelectedLength("");
         }
+        
+        if (blouseParam && allBlouseOptions.includes(blouseParam)) {
+            setSelectedWithBlouse(blouseParam);
+        }
+        if (blouseMeterParam && allBlouseMeters.includes(blouseMeterParam)) {
+            setSelectedBlouseMeter(blouseMeterParam);
+        }
+        if (silkParam && allSilkTypes.includes(silkParam)) {
+            setSelectedSilkType(silkParam);
+        }
       } else {
         // Default to first variant
         setSelectedColor(variants[0].color);
         if (variants[0].size) setSelectedSize(variants[0].size);
         if (variants[0].length) setSelectedLength(variants[0].length);
         if (variants[0].age) setSelectedAge(variants[0].age);
+        if (variants[0].withBlouse) setSelectedWithBlouse(variants[0].withBlouse);
+        if (variants[0].blouseMeter) setSelectedBlouseMeter(variants[0].blouseMeter);
+        if (variants[0].silkType) setSelectedSilkType(variants[0].silkType);
       }
     } else if (product && !product.hasVariants) {
       // Single product attribute selection
@@ -178,7 +304,7 @@ export default function ProductDetails({ initialProduct }) {
       if (product.length) setSelectedLength(product.length);
       if (product.age) setSelectedAge(product.age);
     }
-  }, [variants, allColors, searchParams, mounted, product]);
+  }, [variants, allColors, allBlouseOptions, allBlouseMeters, allSilkTypes, searchParams, mounted, product]);
 
   // Fallback for products without variants
   useEffect(() => {
@@ -381,15 +507,14 @@ export default function ProductDetails({ initialProduct }) {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-5 space-y-6 md:space-y-8"
+            className="lg:col-span-5 flex flex-col gap-6 md:gap-8"
           >
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-start order-1">
                 <span className="text-primary font-bold tracking-widest uppercase text-sm">
                   {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
                 </span>
                 
-                {/* Mobile Share & Wishlist */}
+                {/* Mobile Share & Wishlist - RESTORED TO TOP */}
                 <div className="flex lg:hidden gap-3">
                   <button 
                     onClick={() => {
@@ -418,11 +543,11 @@ export default function ProductDetails({ initialProduct }) {
                 </div>
               </div>
 
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 leading-tight">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 leading-tight order-3 lg:order-2">
                 {product.name}
               </h1>
               
-              <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center gap-4 order-4 lg:order-3">
                 {(() => {
                   const currentPrice = selectedVariant?.price ?? product.price;
                   const mrp = selectedVariant?.mrp ?? product.mrp;
@@ -456,7 +581,7 @@ export default function ProductDetails({ initialProduct }) {
               </div>
 
               {/* Star Rating Summary */}
-              <div className="flex items-center gap-2 mt-4">
+              <div className="flex items-center gap-2 order-5 lg:order-4">
                 <div className="flex gap-1 text-yellow-400 text-sm">
                   {[...Array(5)].map((_, i) => (
                      <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-gray-300"} />
@@ -477,9 +602,9 @@ export default function ProductDetails({ initialProduct }) {
                 </button>
               </div>
               
-              {/* Single Product Attributes */}
-              {!product.hasVariants && (product.color || product.size || product.length || product.age) && (
-                <div className="bg-gray-50/50 p-4 mt-6 rounded-2xl border border-gray-100 space-y-3 w-max min-w-[50%]">
+              {/* Product Specifications */}
+              {(product.color || product.size || product.length || product.age || product.silkType || product.withBlouse || product.blouseMeter) && (
+                <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-3 w-max min-w-[50%] order-6 lg:order-5">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Product Specifications</p>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                     {product.color && (
@@ -506,137 +631,228 @@ export default function ProductDetails({ initialProduct }) {
                          <span className="font-bold text-gray-900 text-sm">{product.age}</span>
                       </div>
                     )}
+                    {product.silkType && (
+                      <div className="flex items-center gap-2">
+                         <span className="text-sm text-gray-500">Silk:</span>
+                         <span className="font-bold text-gray-900 text-sm">{product.silkType}</span>
+                      </div>
+                    )}
+                    {product.withBlouse && (
+                      <div className="flex items-center gap-2">
+                         <span className="text-sm text-gray-500">Blouse:</span>
+                         <span className="font-bold text-gray-900 text-sm">{product.withBlouse}</span>
+                      </div>
+                    )}
+                    {product.blouseMeter && (
+                      <div className="flex items-center gap-2">
+                         <span className="text-sm text-gray-500">Blouse Length:</span>
+                         <span className="font-bold text-gray-900 text-sm">{product.blouseMeter}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
-            </div>
 
-            <div className="h-px bg-gray-200 w-full" />
+            <div className="h-px bg-gray-200 w-full order-7" />
 
             {/* Colors */}
             {allColors.length > 0 && (
-              <div className="space-y-4">
-                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">
-                  Colour: <span className="text-gray-900 ml-2">{resolveColorName(selectedColor)}</span>
-                </p>
-                <div className="flex gap-3 flex-wrap">
-                  {allColors.map((color) => {
-                    const colorVariantWithImage = variants.find(v => v.color === color && v.images && v.images.length > 0);
-                    const colorImage = colorVariantWithImage ? colorVariantWithImage.images[0] : null;
-                    
-                    return (
-                      <button
-                        key={color}
-                        title={color}
-                        onClick={() => setSelectedColor(color)}
-                        className={`transition-all font-medium text-sm md:text-base relative flex items-center justify-center overflow-hidden ${
-                          colorImage ? 'w-14 h-18 md:w-16 md:h-20 rounded-xl' : 'px-4 py-2 md:px-6 md:py-2.5 rounded-full'
-                        } ${
-                          selectedColor === color
-                            ? "border-2 border-primary ring-2 ring-primary/20 shadow-lg"
-                            : "border-2 border-gray-100 bg-white text-gray-600 hover:border-gray-300"
-                        }`}
-                      >
-                        {colorImage ? (
-                          <>
-                            <Image src={colorImage} alt={color} fill className="object-cover" />
-                            <div className={`absolute inset-0 bg-black/20 ${selectedColor === color ? 'bg-black/0' : 'group-hover:bg-black/10'} transition-colors`} />
-                          </>
-                         ) : (
-                           <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{resolveColorName(color)}</span>
-                         )}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
+              <VariantSlider 
+                title={<span>Colour: <span className="text-gray-900 ml-2">{resolveColorName(selectedColor)}</span></span>}
+                orderClass="order-2 lg:order-6"
+              >
+                {allColors.map((color) => {
+                  const colorVariantWithImage = variants.find(v => v.color === color && v.images && v.images.length > 0);
+                  const colorImage = colorVariantWithImage ? colorVariantWithImage.images[0] : null;
+                  
+                  return (
+                    <button
+                      key={color}
+                      title={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`transition-all flex-shrink-0 font-medium text-sm md:text-base relative flex items-center justify-center overflow-hidden snap-start ${
+                        colorImage ? 'w-14 h-18 md:w-16 md:h-20 rounded-xl' : 'px-4 py-2 md:px-6 md:py-2.5 rounded-full'
+                      } ${
+                        selectedColor === color
+                          ? "border-2 border-primary ring-2 ring-primary/20 shadow-lg"
+                          : "border-2 border-gray-100 bg-white text-gray-600 hover:border-gray-300"
+                      }`}
+                    >
+                      {colorImage ? (
+                        <>
+                          <Image src={colorImage} alt={color} fill className="object-cover" />
+                          <div className={`absolute inset-0 bg-black/20 ${selectedColor === color ? 'bg-black/0' : 'group-hover:bg-black/10'} transition-colors`} />
+                        </>
+                       ) : (
+                         <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{resolveColorName(color)}</span>
+                       )}
+                    </button>
+                  )
+                })}
+              </VariantSlider>
             )}
 
             {/* Sizes */}
             {allSizes.length > 0 && (
-              <div className="space-y-4">
-                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Size</p>
-                <div className="flex gap-2.5 flex-wrap">
-                  {allSizes.map((size) => {
-                    const disabled = !availableSizesForColor.includes(size);
-                    return (
-                      <button
-                        key={size}
-                        disabled={disabled}
-                        onClick={() => { setSelectedSize(size); setSelectedLength(""); }}
-                        className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
-                          disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                          selectedSize === size
-                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                            : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <VariantSlider title="Size" orderClass="order-2 lg:order-6">
+                {allSizes.map((size) => {
+                  const disabled = !availableSizesForColor.includes(size);
+                  return (
+                    <button
+                      key={size}
+                      disabled={disabled}
+                      onClick={() => { setSelectedSize(size); setSelectedLength(""); }}
+                      className={`min-w-[50px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
+                        disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                        selectedSize === size
+                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                          : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
+              </VariantSlider>
             )}
 
             {/* Lengths */}
             {allLengths.length > 0 && (
-              <div className="space-y-4">
-                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Length</p>
-                <div className="flex gap-2.5 flex-wrap">
-                  {allLengths.map((length) => {
-                    const disabled = !availableLengthsForColor.includes(length);
-                    return (
-                      <button
-                        key={length}
-                        disabled={disabled}
-                        onClick={() => { setSelectedLength(length); setSelectedSize(""); setSelectedAge(""); }}
-                        className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
-                          disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                          selectedLength === length
-                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                            : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                        }`}
-                      >
-                        {length}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <VariantSlider title="Length" orderClass="order-2 lg:order-6">
+                {allLengths.map((length) => {
+                  const disabled = !availableLengthsForColor.includes(length);
+                  return (
+                    <button
+                      key={length}
+                      disabled={disabled}
+                      onClick={() => { setSelectedLength(length); setSelectedSize(""); setSelectedAge(""); }}
+                      className={`min-w-[50px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
+                        disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                        selectedLength === length
+                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                          : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                      }`}
+                    >
+                      {length}
+                    </button>
+                  );
+                })}
+              </VariantSlider>
             )}
 
             {/* Ages */}
             {allAges.length > 0 && (
-              <div className="space-y-4">
-                <p className="font-bold text-sm uppercase tracking-wider text-gray-400">Age Group</p>
-                <div className="flex gap-2.5 flex-wrap">
-                  {allAges.map((age) => {
-                    const disabled = !availableAgesForColor.includes(age);
-                    return (
-                      <button
-                        key={age}
-                        disabled={disabled}
-                        onClick={() => { setSelectedAge(age); setSelectedSize(""); setSelectedLength(""); }}
-                        className={`min-w-[50px] h-12 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base ${
-                          disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                          selectedAge === age
-                            ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                            : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                        }`}
-                      >
-                        {age}
-                      </button>
-                    );
-                  })}
-                </div>
+              <VariantSlider title="Age Group" orderClass="order-2 lg:order-6">
+                {allAges.map((age) => {
+                  const disabled = !availableAgesForColor.includes(age);
+                  return (
+                    <button
+                      key={age}
+                      disabled={disabled}
+                      onClick={() => { setSelectedAge(age); setSelectedSize(""); setSelectedLength(""); }}
+                      className={`min-w-[100px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
+                        disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                        selectedAge === age
+                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                          : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                      }`}
+                    >
+                      {age}
+                    </button>
+                  );
+                })}
+              </VariantSlider>
+            )}
+
+            {/* Saree Specific Attributes Grouped */}
+            {isSaree && (allSilkTypes.length > 0 || allBlouseOptions.length > 0 || allBlouseMeters.length > 0) && (
+              <div className="flex flex-col md:flex-row gap-8 order-2 lg:order-6 w-full overflow-hidden">
+                {/* Silk Types */}
+                {allSilkTypes.length > 0 && (
+                  <div className="flex-1 min-w-0">
+                    <VariantSlider title="Silk Type">
+                      {allSilkTypes.map((type) => {
+                        const disabled = !availableSilkTypesForColor.includes(type);
+                        return (
+                          <button
+                            key={type}
+                            disabled={disabled}
+                            onClick={() => setSelectedSilkType(type)}
+                            className={`min-w-[120px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
+                              disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                              selectedSilkType === type
+                                ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                                : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                            }`}
+                          >
+                            {type}
+                          </button>
+                        );
+                      })}
+                    </VariantSlider>
+                  </div>
+                )}
+
+                {/* Blouse Options */}
+                {allBlouseOptions.length > 0 && (
+                  <div className="flex-1 min-w-0">
+                    <VariantSlider title="Blouse">
+                      {allBlouseOptions.map((opt) => {
+                        const disabled = !availableBlouseOptionsForColor.includes(opt);
+                        return (
+                          <button
+                            key={opt}
+                            disabled={disabled}
+                            onClick={() => setSelectedWithBlouse(opt)}
+                            className={`min-w-[120px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
+                              disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                              selectedWithBlouse === opt
+                                ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                                : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </VariantSlider>
+                  </div>
+                )}
+
+                {/* Blouse Meters */}
+                {allBlouseMeters.length > 0 && (
+                  <div className="flex-1 min-w-0">
+                    <VariantSlider title="Blouse Length">
+                      {allBlouseMeters.map((meter) => {
+                        const disabled = !availableBlouseMetersForColor.includes(meter);
+                        return (
+                          <button
+                            key={meter}
+                            disabled={disabled}
+                            onClick={() => setSelectedBlouseMeter(meter)}
+                            className={`min-w-[100px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
+                              disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                              selectedBlouseMeter === meter
+                                ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                                : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                            }`}
+                          >
+                            {meter}
+                          </button>
+                        );
+                      })}
+                    </VariantSlider>
+                  </div>
+                )}
               </div>
             )}
 
 
 
+            {/* Removed redundant Mobile buttons from here, they are back at the top row */}
+
             {/* Quantity and Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 order-8">
               <div className="flex items-center justify-between sm:justify-start bg-white border border-gray-100 rounded-2xl p-2 shadow-sm">
                 <button 
                   onClick={() => setQuantity(q => Math.max(1, q - 1))}
