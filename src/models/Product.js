@@ -26,6 +26,9 @@ const variantSchema = new mongoose.Schema({
   discount: { type: Number }, // Discount percentage
   images: { type: [String], default: [] }, // variant-specific images
   videos: { type: [String], default: [] }, // variant-specific videos
+  withBlouse: { type: String },
+  blouseMeter: { type: String },
+  silkType: { type: String },
 });
 
 
@@ -59,6 +62,9 @@ const productSchema = new mongoose.Schema(
     metaTitle: { type: String },
     metaDescription: { type: String },
     metaKeywords: { type: String },
+    withBlouse: { type: String },
+    blouseMeter: { type: String },
+    silkType: { type: String },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

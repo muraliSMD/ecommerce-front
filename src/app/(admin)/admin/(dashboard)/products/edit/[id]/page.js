@@ -15,7 +15,8 @@ import {
   FiGrid,
   FiUpload,
   FiGlobe,
-  FiPlayCircle
+  FiPlayCircle,
+  FiCopy
 } from "react-icons/fi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -26,8 +27,9 @@ import CategorySelector from "@/components/admin/CategorySelector";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";
-import { getColorValue, formatColorInput } from "@/lib/colors";
+import { formatColorInput, getColorValue } from "@/lib/colors";
 import ColorPreview from "@/components/admin/ColorPreview";
+import { SIZE_OPTIONS, LENGTH_OPTIONS, AGE_OPTIONS, BLOUSE_OPTIONS, BLOUSE_METER_OPTIONS, SILK_TYPE_OPTIONS } from "@/lib/constants";
 
 export default function EditProduct({ params }) {
   const router = useRouter();
@@ -60,10 +62,13 @@ export default function EditProduct({ params }) {
     color: "",
     size: "",
     length: "",
-    age: ""
+    age: "",
+    withBlouse: "",
+    blouseMeter: "",
+    silkType: ""
   });
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
 
   const { data: categories } = useQuery({
     queryKey: ["admin-categories"],
@@ -72,6 +77,8 @@ export default function EditProduct({ params }) {
       return data;
     },
   });
+
+  const isSaree = categories?.find(c => c._id === product.category)?.name?.toLowerCase().includes("saree");
 
   const { data: fetchedProduct, isLoading } = useQuery({
     queryKey: ["admin-product", id],
@@ -101,7 +108,10 @@ export default function EditProduct({ params }) {
         color: fetchedProduct.color || "",
         size: fetchedProduct.size || "",
         length: fetchedProduct.length || "",
-        age: fetchedProduct.age || ""
+        age: fetchedProduct.age || "",
+        withBlouse: fetchedProduct.withBlouse || "",
+        blouseMeter: fetchedProduct.blouseMeter || "",
+        silkType: fetchedProduct.silkType || ""
       });
     }
   }, [fetchedProduct]);
@@ -288,12 +298,21 @@ export default function EditProduct({ params }) {
         videos: newVariant.videos || []
       }] 
     });
-    setNewVariant({ color: "", size: "", length: "", age: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+    setNewVariant({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
   };
 
   const removeVariant = (index) => {
     const newVariants = product.variants.filter((_, i) => i !== index);
     setProduct({ ...product, variants: newVariants });
+  };
+
+  const duplicateVariant = (index) => {
+    const variantToCopy = product.variants[index];
+    setProduct({ 
+      ...product, 
+      variants: [...product.variants, { ...variantToCopy }] 
+    });
+    toast.success("Variant duplicated!");
   };
 
   const handleVariantChange = (index, field, value) => {
@@ -572,37 +591,92 @@ export default function EditProduct({ params }) {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Size</label>
-                    <input 
-                      type="text" 
+                    <select
                       name="size"
                       value={product.size}
                       onChange={handleInputChange}
-                      placeholder="e.g. XL"
-                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
-                    />
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all appearance-none"
+                    >
+                      <option value="">Select Size...</option>
+                      {SIZE_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Length</label>
-                    <input 
-                      type="text" 
+                    <select
                       name="length"
                       value={product.length}
                       onChange={handleInputChange}
-                      placeholder="e.g. 5m"
-                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
-                    />
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all appearance-none"
+                    >
+                      <option value="">Select Length...</option>
+                      {LENGTH_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Age Group</label>
-                    <input 
-                      type="text" 
+                    <select
                       name="age"
                       value={product.age}
                       onChange={handleInputChange}
-                      placeholder="e.g. 18-24"
-                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
-                    />
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all appearance-none"
+                    >
+                      <option value="">Select Age Group...</option>
+                      {AGE_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
                   </div>
+                  {isSaree && (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Blouse</label>
+                        <select
+                          name="withBlouse"
+                          value={product.withBlouse}
+                          onChange={handleInputChange}
+                          className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all appearance-none"
+                        >
+                          <option value="">Select Option...</option>
+                          {BLOUSE_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Blouse Meter</label>
+                        <select
+                          name="blouseMeter"
+                          value={product.blouseMeter}
+                          onChange={handleInputChange}
+                          className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all appearance-none"
+                        >
+                          <option value="">Select Meter...</option>
+                          {BLOUSE_METER_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Silk Type</label>
+                        <select
+                          name="silkType"
+                          value={product.silkType}
+                          onChange={handleInputChange}
+                          className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all appearance-none"
+                        >
+                          <option value="">Select Silk Type...</option>
+                          {SILK_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -791,34 +865,86 @@ export default function EditProduct({ params }) {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
-                <input 
-                  type="text" 
+                <select
                   value={newVariant.size || ""}
                   onChange={(e) => setNewVariant({...newVariant, size: e.target.value})}
-                  placeholder="e.g. XL"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
-                />
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors appearance-none"
+                >
+                  <option value="">Select Size...</option>
+                  {SIZE_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Length</label>
-                <input 
-                  type="text" 
+                <select
                   value={newVariant.length || ""}
                   onChange={(e) => setNewVariant({...newVariant, length: e.target.value})}
-                  placeholder="e.g. 5m"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
-                />
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors appearance-none"
+                >
+                  <option value="">Select Length...</option>
+                  {LENGTH_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Age</label>
-                <input 
-                  type="text" 
+                <select
                   value={newVariant.age || ""}
                   onChange={(e) => setNewVariant({...newVariant, age: e.target.value})}
-                  placeholder="e.g. 18-24"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
-                />
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors appearance-none"
+                >
+                  <option value="">Select Age Group...</option>
+                  {AGE_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
+              {isSaree && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase">Blouse</label>
+                    <select
+                      value={newVariant.withBlouse || ""}
+                      onChange={(e) => setNewVariant({...newVariant, withBlouse: e.target.value})}
+                      className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors appearance-none"
+                    >
+                      <option value="">Select...</option>
+                      {BLOUSE_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase">Blouse Meter</label>
+                    <select
+                      value={newVariant.blouseMeter || ""}
+                      onChange={(e) => setNewVariant({...newVariant, blouseMeter: e.target.value})}
+                      className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors appearance-none"
+                    >
+                      <option value="">Select...</option>
+                      {BLOUSE_METER_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase">Silk Type</label>
+                    <select
+                      value={newVariant.silkType || ""}
+                      onChange={(e) => setNewVariant({...newVariant, silkType: e.target.value})}
+                      className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors appearance-none"
+                    >
+                      <option value="">Select...</option>
+                      {SILK_TYPE_OPTIONS.map((opt) => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -914,16 +1040,75 @@ export default function EditProduct({ params }) {
                   </div>
                   <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
                     <span className="text-xs text-gray-500 font-medium">Size:</span>
-                    <input type="text" value={v.size || ""} onChange={(e) => handleVariantChange(i, 'size', e.target.value)} className="bg-transparent text-sm font-bold text-gray-700 outline-none w-12" placeholder="-" />
+                    <select 
+                      value={v.size || ""} 
+                      onChange={(e) => handleVariantChange(i, 'size', e.target.value)} 
+                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16 appearance-none"
+                    >
+                      <option value="">-</option>
+                      {SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                   </div>
                   <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
                     <span className="text-xs text-gray-500 font-medium">Length:</span>
-                    <input type="text" value={v.length || ""} onChange={(e) => handleVariantChange(i, 'length', e.target.value)} className="bg-transparent text-sm font-bold text-gray-700 outline-none w-12" placeholder="-" />
+                    <select 
+                      value={v.length || ""} 
+                      onChange={(e) => handleVariantChange(i, 'length', e.target.value)} 
+                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-20 appearance-none"
+                    >
+                      <option value="">-</option>
+                      {LENGTH_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                   </div>
                   <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
                     <span className="text-xs text-gray-500 font-medium">Age:</span>
-                    <input type="text" value={v.age || ""} onChange={(e) => handleVariantChange(i, 'age', e.target.value)} className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16" placeholder="-" />
+                    <select 
+                      value={v.age || ""} 
+                      onChange={(e) => handleVariantChange(i, 'age', e.target.value)} 
+                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-24 appearance-none"
+                    >
+                      <option value="">-</option>
+                      {AGE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
                   </div>
+
+                  {isSaree && (
+                    <>
+                      <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                        <span className="text-xs text-gray-500 font-medium">Blouse:</span>
+                        <select 
+                          value={v.withBlouse || ""} 
+                          onChange={(e) => handleVariantChange(i, 'withBlouse', e.target.value)} 
+                          className="bg-transparent text-sm font-bold text-gray-700 outline-none w-24 appearance-none"
+                        >
+                          <option value="">-</option>
+                          {BLOUSE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                        <span className="text-xs text-gray-500 font-medium">Blouse Mt:</span>
+                        <select 
+                          value={v.blouseMeter || ""} 
+                          onChange={(e) => handleVariantChange(i, 'blouseMeter', e.target.value)} 
+                          className="bg-transparent text-sm font-bold text-gray-700 outline-none w-20 appearance-none"
+                        >
+                          <option value="">-</option>
+                          {BLOUSE_METER_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                        <span className="text-xs text-gray-500 font-medium">Silk:</span>
+                        <select 
+                          value={v.silkType || ""} 
+                          onChange={(e) => handleVariantChange(i, 'silkType', e.target.value)} 
+                          className="bg-transparent text-sm font-bold text-gray-700 outline-none w-28 appearance-none"
+                        >
+                          <option value="">-</option>
+                          {SILK_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                        </select>
+                      </div>
+                    </>
+                  )}
                   
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-gray-400 uppercase">Price</span>
@@ -971,12 +1156,24 @@ export default function EditProduct({ params }) {
                     />
                   </div>
                   
-                  <button 
-                    onClick={() => removeVariant(i)}
-                    className="p-2 text-gray-300 hover:text-red-500 bg-white rounded-lg border border-transparent hover:border-red-100 transition-colors md:ml-auto mt-2 md:mt-0"
-                  >
-                    <FiTrash2 />
-                  </button>
+                  <div className="flex items-center gap-2 md:ml-auto mt-2 md:mt-0">
+                    <button 
+                      type="button"
+                      onClick={() => duplicateVariant(i)}
+                      title="Duplicate Variant"
+                      className="p-2 text-gray-300 hover:text-primary bg-white rounded-lg border border-transparent hover:border-primary/10 transition-colors"
+                    >
+                      <FiCopy />
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => removeVariant(i)}
+                      title="Remove Variant"
+                      className="p-2 text-gray-300 hover:text-red-500 bg-white rounded-lg border border-transparent hover:border-red-100 transition-colors"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Variant Images */}

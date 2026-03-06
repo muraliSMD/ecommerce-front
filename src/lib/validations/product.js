@@ -11,6 +11,9 @@ export const variantSchema = z.object({
   discount: z.number().min(0).max(100).optional().nullable(),
   images: z.array(z.string()).optional(),
   videos: z.array(z.string()).optional(),
+  withBlouse: z.string().optional().nullable(),
+  blouseMeter: z.string().optional().nullable(),
+  silkType: z.string().optional().nullable(),
 });
 
 export const productSchema = z.object({
@@ -36,4 +39,7 @@ export const productSchema = z.object({
   metaTitle: z.string().max(100).optional().nullable(),
   metaDescription: z.string().max(300).optional().nullable(),
   metaKeywords: z.string().max(200).optional().nullable(),
+  withBlouse: z.string().optional().nullable(),
+  blouseMeter: z.string().optional().nullable(),
+  silkType: z.string().optional().nullable(),
 });
