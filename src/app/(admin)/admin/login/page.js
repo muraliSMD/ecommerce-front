@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FiMail, FiLock, FiArrowRight, FiShield } from "react-icons/fi";
+import { FiMail, FiLock, FiArrowRight, FiShield, FiEye, FiEyeOff } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 
@@ -12,6 +12,7 @@ export default function AdminLogin() {
   const router = useRouter();
   const { login } = useUserStore();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -81,13 +82,20 @@ export default function AdminLogin() {
               <div className="relative group/input">
                 <FiLock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-primary transition-colors" />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="w-full bg-white/5 border border-white/10 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 px-14 py-5 rounded-[1.5rem] outline-none transition-all text-white placeholder:text-gray-600 font-medium"
                   placeholder="••••••••"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary transition-colors focus:outline-none"
+                >
+                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                </button>
               </div>
             </div>
 

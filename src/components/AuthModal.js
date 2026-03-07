@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
 import toast from "react-hot-toast";
-import { FiX, FiMail, FiLock, FiUser, FiArrowRight } from "react-icons/fi";
+import { FiX, FiMail, FiLock, FiUser, FiArrowRight, FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function AuthModal() {
   const queryClient = useQueryClient();
   const { isAuthModalOpen, authMode, setAuthModalOpen, login } = useUserStore();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -170,14 +171,21 @@ export default function AuthModal() {
                 <div className="relative group">
                 <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" />
                 <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-12 py-4 rounded-2xl outline-none transition-all"
+                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 pl-12 pr-12 py-4 rounded-2xl outline-none transition-all"
                     required
                 />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors focus:outline-none"
+                >
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                </button>
                 </div>
             )}
             
