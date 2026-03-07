@@ -4,19 +4,25 @@ frontend:
     preBuild:
       commands:
         - npm ci
+        - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.production
         - echo "MONGODB_URI=$MONGODB_URI" >> .env.production
         - echo "JWT_SECRET=$JWT_SECRET" >> .env.production
+        - echo "JWT_EXPIRES_IN=$JWT_EXPIRES_IN" >> .env.production
+        - echo "NEXT_PUBLIC_VAPID_PUBLIC_KEY=$NEXT_PUBLIC_VAPID_PUBLIC_KEY" >> .env.production
+        - echo "VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY" >> .env.production
+        - echo "VAPID_SUBJECT=$VAPID_SUBJECT" >> .env.production
+        - echo "NEXT_PUBLIC_RAZORPAY_KEY_ID=$NEXT_PUBLIC_RAZORPAY_KEY_ID" >> .env.production
+        - echo "RAZORPAY_KEY_ID=$RAZORPAY_KEY_ID" >> .env.production
+        - echo "RAZORPAY_KEY_SECRET=$RAZORPAY_KEY_SECRET" >> .env.production
         - echo "CLOUDINARY_NAME=$CLOUDINARY_NAME" >> .env.production
+        - echo "CLOUDINARY_URL=$CLOUDINARY_URL" >> .env.production
         - echo "CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY" >> .env.production
         - echo "CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET" >> .env.production
-        - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.production
         - echo "NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL" >> .env.production
-        - echo "NEXT_PUBLIC_CLOUDINARY_NAME=$NEXT_PUBLIC_CLOUDINARY_NAME" >> .env.production
+        - echo "NEXT_PUBLIC_CLOUDINARY_URL=$NEXT_PUBLIC_CLOUDINARY_URL" >> .env.production
+        - echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME" >> .env.production
         - echo "NEXT_PUBLIC_CLOUDINARY_API_KEY=$NEXT_PUBLIC_CLOUDINARY_API_KEY" >> .env.production
         - echo "NEXT_PUBLIC_CLOUDINARY_API_SECRET=$NEXT_PUBLIC_CLOUDINARY_API_SECRET" >> .env.production
-        - echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME" >> .env.production
-        - echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME" >> .env.production
-        - echo "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME" >> .env.production
 
     build:
       commands:
