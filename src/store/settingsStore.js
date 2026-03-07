@@ -28,6 +28,10 @@ export const useSettingsStore = create(
         supportEmail: "support@grabszy.com",
         supportPhone: "+91 8610773865",
         address: "54/1 Ottar Street, Omalur, Salem 636455, Tamil Nadu, India",
+        marketing: {
+          showChatbot: true,
+          whatsappNumber: ""
+        }
       },
       isLoading: false,
 

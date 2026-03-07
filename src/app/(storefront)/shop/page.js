@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { ProductCardSkeleton } from "@/components/Skeleton";
 import { FiChevronDown, FiX } from "react-icons/fi";
+import VariantSlider from "@/components/VariantSlider";
 
 // Helper to separate render
 const CategoryButton = ({ category, selectedCategory, setSelectedCategory, level = 0 }) => (
@@ -106,29 +107,30 @@ const FilterContent = ({
       {availableColors.length > 0 && (
         <div>
           <h3 className="font-bold text-gray-900 mb-4">Filter by Color</h3>
-          <div className="flex flex-wrap gap-3">
+          <VariantSlider>
             <button
+               type="button"
                onClick={() => setSelectedColor(null)}
-               className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${!selectedColor ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-200'}`}
+               className={`w-10 h-10 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all snap-start ${!selectedColor ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-gray-100 bg-white hover:border-gray-300'}`}
                title="All Colors"
             >
-               <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-red-500 via-green-500 to-blue-500"></div>
+               <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-red-500 via-green-500 to-blue-500 shadow-inner"></div>
             </button>
              {availableColors.map((color) => (
                <button
+                 type="button"
                  key={color}
                  onClick={() => setSelectedColor(selectedColor === color ? null : color)}
-                 className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedColor === color ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-200'}`}
+                 className={`w-10 h-10 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all snap-start ${selectedColor === color ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-gray-100 bg-white hover:border-gray-300'}`}
                  title={color.startsWith('#') ? getClosestColorName(color) : (color.charAt(0).toUpperCase() + color.slice(1))}
                >
                  <div 
-                   className="w-6 h-6 rounded-full border border-gray-100" 
+                   className="w-7 h-7 rounded-full border border-gray-100 shadow-sm" 
                    style={{ backgroundColor: color }}
                  ></div>
                </button>
              ))}
-
-          </div>
+          </VariantSlider>
         </div>
       )}
 
@@ -211,6 +213,22 @@ export default function ShopPage() {
     const timer = setTimeout(() => setDebouncedSearch(search), 500);
     return () => clearTimeout(timer);
   }, [search]);
+
+  // Track Recent Searches
+  useEffect(() => {
+    if (!debouncedSearch || debouncedSearch.trim().length < 2) return;
+    
+    const trackSearch = () => {
+        const recentSearches = JSON.parse(localStorage.getItem('recent_searches') || '[]');
+        const updatedSearches = [
+            debouncedSearch.trim(),
+            ...recentSearches.filter(s => s.toLowerCase() !== debouncedSearch.trim().toLowerCase())
+        ].slice(0, 5);
+        localStorage.setItem('recent_searches', JSON.stringify(updatedSearches));
+    };
+
+    trackSearch();
+  }, [debouncedSearch]);
 
   // Lock body scroll when filters open
   useEffect(() => {

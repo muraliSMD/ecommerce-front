@@ -73,3 +73,11 @@
   "userId": "698081fcc3e4cc458f359244",
   "role": "admin"
 } 
+2026-03-07 12:48:32 [[32minfo[39m]: Product duplicated {
+  "sourceId": "69a87bb5aa78661819998486",
+  "newId": "69abd1489afea5d0373ea8cf"
+} 
+2026-03-07 13:31:40 [[32minfo[39m]: Product duplicated {
+  "sourceId": "69abd1489afea5d0373ea8cf",
+  "newId": "69abdb6365afbff65d7b687c"
+} 

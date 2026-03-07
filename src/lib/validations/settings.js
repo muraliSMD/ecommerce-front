@@ -35,5 +35,6 @@ export const settingsSchema = z.object({
     offerDiscount: z.string().optional().nullable(),
     showSignupPopup: z.boolean(),
     showChatbot: z.boolean(),
+    whatsappNumber: z.string().optional().nullable(),
   }),
 });

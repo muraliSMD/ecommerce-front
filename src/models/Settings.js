@@ -47,6 +47,7 @@ const settingsSchema = new mongoose.Schema({
     offerDiscount: { type: String, default: "10% OFF" },
     showSignupPopup: { type: Boolean, default: true },
     showChatbot: { type: Boolean, default: true },
+    whatsappNumber: { type: String, default: "" },
   }
 }, { timestamps: true });
 
