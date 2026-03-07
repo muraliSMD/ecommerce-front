@@ -39,6 +39,10 @@ export default function AdminSettings() {
     taxRate: 0,
     shippingCharge: 0,
     signature: "",
+    paymentMethods: {
+      cod: true,
+      online: true
+    },
     maintenanceMode: false,
     seo: {
       metaTitle: "",
@@ -58,7 +62,8 @@ export default function AdminSettings() {
       offerCode: "",
       offerDiscount: "",
       showSignupPopup: true,
-      showChatbot: true
+      showChatbot: true,
+      whatsappNumber: ""
     }
   });
 
@@ -94,6 +99,10 @@ export default function AdminSettings() {
         taxRate: fetchedSettings.taxRate || 0,
         shippingCharge: fetchedSettings.shippingCharge || 0,
         signature: fetchedSettings.signature || "",
+        paymentMethods: {
+            cod: fetchedSettings.paymentMethods?.cod ?? true,
+            online: fetchedSettings.paymentMethods?.online ?? true
+        },
         maintenanceMode: fetchedSettings.maintenanceMode || false,
         seo: {
             metaTitle: fetchedSettings.seo?.metaTitle || "",
@@ -113,7 +122,8 @@ export default function AdminSettings() {
             offerCode: fetchedSettings.marketing?.offerCode || "",
             offerDiscount: fetchedSettings.marketing?.offerDiscount || "",
             showSignupPopup: fetchedSettings.marketing?.showSignupPopup ?? true,
-            showChatbot: fetchedSettings.marketing?.showChatbot ?? true
+            showChatbot: fetchedSettings.marketing?.showChatbot ?? true,
+            whatsappNumber: fetchedSettings.marketing?.whatsappNumber || ""
         }
       });
     }
@@ -796,6 +806,21 @@ export default function AdminSettings() {
                     <div className="bg-blue-50 p-6 rounded-2xl text-blue-800 text-sm leading-relaxed">
                         <FiMessageCircle className="mb-2 text-xl" />
                         The AI Chat Widget provides automated responses for common queries like order tracking and shipping policies. Disabling this will remove the floating chat icon from the storefront.
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-gray-100">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                             WhatsApp Number
+                        </label>
+                        <input 
+                            type="text" 
+                            name="marketing.whatsappNumber"
+                            value={settings.marketing.whatsappNumber}
+                            onChange={handleInputChange}
+                            placeholder="+91XXXXXXXXXX"
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                        />
+                        <p className="text-xs text-gray-400 italic">Include country code (e.g., +91). This number will be used for the floating WhatsApp button.</p>
                     </div>
                 </div>
             </div>
