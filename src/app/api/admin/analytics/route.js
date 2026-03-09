@@ -26,14 +26,14 @@ export async function GET(request) {
 
     // Parallelize count queries
     const [totalOrders, totalProducts, totalUsers] = await Promise.all([
-      Order.countDocuments(),
+      Order.countDocuments({ orderStatus: { $nin: ["Cancelled", "Abandoned"] } }),
       Product.countDocuments(),
       User.countDocuments({ role: "customer" }),
     ]);
 
     // Calculate Total Revenue based on period
     const revenueResult = await Order.aggregate([
-      { $match: { createdAt: { $gte: startDate }, orderStatus: { $ne: "Cancelled" } } },
+      { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
       { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
     ]);
     const totalRevenue = revenueResult[0]?.totalRevenue || 0;
@@ -43,7 +43,7 @@ export async function GET(request) {
       {
         $match: {
           createdAt: { $gte: startDate },
-          orderStatus: { $ne: "Cancelled" },
+          orderStatus: { $nin: ["Cancelled", "Abandoned"] },
         },
       },
       {
@@ -74,7 +74,7 @@ export async function GET(request) {
 
     // Sales by Category
     const salesByCategory = await Order.aggregate([
-        { $match: { createdAt: { $gte: startDate }, orderStatus: { $ne: "Cancelled" } } },
+        { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
         { $unwind: "$items" },
         {
             $lookup: {
@@ -106,7 +106,7 @@ export async function GET(request) {
 
     // Top Selling Products
     const topSellers = await Order.aggregate([
-        { $match: { createdAt: { $gte: startDate }, orderStatus: { $ne: "Cancelled" } } },
+        { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
         { $unwind: "$items" },
         {
             $group: {
