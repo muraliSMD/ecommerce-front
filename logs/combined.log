@@ -91,3 +91,13 @@
   "userId": "698081fcc3e4cc458f359244",
   "role": "admin"
 } 
+2026-03-09 14:51:24 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<e60ba188-8681-541a-0d68-11edb1a36489@grabszy.com>",
+  "to": "muralis.1995@gmail.com",
+  "subject": "Order Confirmation #GRY-ORD-00001 - GRABSZY"
+} 
+2026-03-09 15:04:42 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<220d6073-617e-143b-1d5b-17b80e2436c8@grabszy.com>",
+  "to": "muralis.1995@gmail.com",
+  "subject": "Order Confirmation #GRY-ORD-00002 - GRABSZY"
+} 

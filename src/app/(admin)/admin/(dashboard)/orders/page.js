@@ -121,6 +121,7 @@ export default function AdminOrders() {
                         order.orderStatus === 'Completed' ? 'bg-green-50 text-green-600' :
                         order.orderStatus === 'Delivered' ? 'bg-green-50 text-green-600' :
                         order.orderStatus === 'Processing' ? 'bg-blue-50 text-blue-600' :
+                        order.orderStatus === 'Abandoned' ? 'bg-gray-100 text-gray-400' :
                         'bg-orange-50 text-orange-600'
                       }`}>
                         {order.orderStatus || 'Pending'}
@@ -211,12 +212,13 @@ export default function AdminOrders() {
                             <select
                                 value={order.orderStatus}
                                 onChange={(e) => updateStatusMutation.mutate({ id: order._id, status: e.target.value })}
-                                disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}
+                                disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered' || order.orderStatus === 'Abandoned'}
                                 className={`w-full p-3 rounded-xl appearance-none outline-none font-bold text-xs uppercase tracking-wider border-2 transition-all cursor-pointer ${
                                     order.orderStatus === 'Pending' ? 'bg-yellow-50 text-yellow-600 border-yellow-100' :
                                     order.orderStatus === 'Processing' ? 'bg-blue-50 text-blue-600 border-blue-100' :
                                     order.orderStatus === 'Shipped' ? 'bg-purple-50 text-purple-600 border-purple-100' :
                                     order.orderStatus === 'Delivered' ? 'bg-green-50 text-green-600 border-green-100' :
+                                    order.orderStatus === 'Abandoned' ? 'bg-gray-50 text-gray-400 border-gray-100' :
                                     'bg-gray-50 text-gray-600 border-gray-100'
                                 }`}
                             >
@@ -225,6 +227,7 @@ export default function AdminOrders() {
                                 <option value="Shipped" className="text-purple-600 bg-purple-50">Shipped</option>
                                 <option value="Delivered" className="text-green-600 bg-green-50">Delivered</option>
                                 <option value="Cancelled" className="text-red-600 bg-red-50">Cancelled</option>
+                                <option value="Abandoned" className="text-gray-400 bg-gray-50">Abandoned</option>
                             </select>
                             <FiFilter className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 ${
                                  order.orderStatus === 'Pending' ? 'text-yellow-600' :

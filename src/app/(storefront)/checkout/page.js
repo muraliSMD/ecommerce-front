@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useCartStore } from "@/store/cartStore";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -276,6 +276,7 @@ export default function CheckoutPage() {
                     console.log("Razorpay modal dismissed");
                     setIsSubmitting(false);
                     toast("Payment cancelled");
+                    logAbandonedCheckout();
                 }
             }
         };
@@ -285,6 +286,7 @@ export default function CheckoutPage() {
                 console.error("Payment Failed", response.error);
                 toast.error(response.error.description || "Payment Failed");
                 setIsSubmitting(false);
+                logAbandonedCheckout();
         });
         paymentObject.open();
 
@@ -294,6 +296,71 @@ export default function CheckoutPage() {
         setIsSubmitting(false);
     }
   };
+
+  const hasLoggedAbandoned = useRef(false);
+
+  const logAbandonedCheckout = useCallback(async () => {
+    if (hasLoggedAbandoned.current || isOrderPlaced) return;
+    
+    // Only log if they have entered some data or have items
+    if (!billingDetail.name || items.length === 0) return;
+
+    try {
+        await fetch('/api/orders/abandoned', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                shippingAddress: {
+                    name: billingDetail.name,
+                    email: billingDetail.email || userInfo?.email || "",
+                    phone: billingDetail.phone,
+                    address1: billingDetail.address1,
+                    address2: billingDetail.address2 || "",
+                    address3: billingDetail.address3 || "",
+                    city: billingDetail.city,
+                    state: billingDetail.state || "",
+                    pincode: billingDetail.pincode,
+                    landmark: billingDetail.landmark || "",
+                    label: billingDetail.label || "Home",
+                    address: billingDetail.address || (billingDetail.address1 ? `${billingDetail.address1}, ${billingDetail.address2}, ${billingDetail.city}, ${billingDetail.pincode}` : "")
+                },
+                paymentMethod,
+                shippingCharge: shippingCost,
+                taxAmount: taxAmount,
+                discountAmount: appliedCoupon?.discountAmount || 0,
+                couponCode: appliedCoupon?.code || null,
+                totalAmount: total - (appliedCoupon?.discountAmount || 0),
+                items: items.map(i => ({
+                    product: i.product._id,
+                    quantity: i.quantity,
+                    variant: i.variant,
+                    price: i.variant?.price ?? i.product.price
+                }))
+            })
+        });
+        hasLoggedAbandoned.current = true;
+    } catch (err) {
+        console.error("Failed to log abandoned checkout", err);
+    }
+  }, [billingDetail, items, isOrderPlaced, userInfo, paymentMethod, shippingCost, taxAmount, appliedCoupon, total]);
+
+  useEffect(() => {
+    // Log when user leaves page if they have entered data
+    const handleBeforeUnload = () => {
+        if (!isOrderPlaced && billingDetail.name && items.length > 0) {
+            logAbandonedCheckout();
+        }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        // Also log on unmount if they haven't placed an order
+        if (!isOrderPlaced && billingDetail.name && items.length > 0) {
+            logAbandonedCheckout();
+        }
+    };
+  }, [billingDetail.name, items.length, isOrderPlaced, logAbandonedCheckout]);
 
   const handlePlaceOrder = async () => {
     // Guest checkout allowed
@@ -434,7 +501,8 @@ export default function CheckoutPage() {
                                 name: "", email: "", phone: "", address1: "", address2: "", address3: "", city: "", state: "", pincode: "", landmark: "", label: "Home"
                             });
                         }}
-                        className="flex items-center gap-2 text-primary font-bold hover:underline"
+                        disabled={isSubmitting}
+                        className="flex items-center gap-2 text-primary font-bold hover:underline disabled:opacity-50"
                      >
                         <FiPlus /> Add New
                      </button>
@@ -446,12 +514,12 @@ export default function CheckoutPage() {
                       {addresses.map((addr) => (
                           <div 
                             key={addr._id}
-                            onClick={() => setSelectedAddressId(addr._id)}
+                            onClick={() => !isSubmitting && setSelectedAddressId(addr._id)}
                             className={`border-2 rounded-2xl p-5 cursor-pointer transition-all relative ${
                                 selectedAddressId === addr._id 
                                 ? "border-primary bg-primary/5" 
                                 : "border-gray-100 hover:border-gray-200"
-                            }`}
+                            } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                                 <div className="flex items-center gap-2 mb-2">
                                     {(addr.label === "Home" || !addr.label) && <FiHome className="text-primary" />}
@@ -492,7 +560,8 @@ export default function CheckoutPage() {
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="Full Name"
                                 />
                             </div>
@@ -503,7 +572,8 @@ export default function CheckoutPage() {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="john@example.com"
                                 />
                             </div>
@@ -514,7 +584,8 @@ export default function CheckoutPage() {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="+1 (555) 000-0000"
                                 />
                             </div>
@@ -525,7 +596,8 @@ export default function CheckoutPage() {
                                     name="address1"
                                     value={formData.address1}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="House No, Building Name"
                                 />
                             </div>
@@ -536,7 +608,8 @@ export default function CheckoutPage() {
                                     name="address2"
                                     value={formData.address2}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="Street, Area"
                                 />
                             </div>
@@ -547,7 +620,8 @@ export default function CheckoutPage() {
                                     name="address3"
                                     value={formData.address3}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="Landmark (Optional)"
                                 />
                             </div>
@@ -558,7 +632,8 @@ export default function CheckoutPage() {
                                     name="city"
                                     value={formData.city}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="New York"
                                 />
                             </div>
@@ -569,7 +644,8 @@ export default function CheckoutPage() {
                                     name="state"
                                     value={formData.state}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="NY"
                                 />
                             </div>
@@ -580,7 +656,8 @@ export default function CheckoutPage() {
                                     name="pincode"
                                     value={formData.pincode}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="10001"
                                 />
                             </div>
@@ -591,7 +668,8 @@ export default function CheckoutPage() {
                                     name="landmark"
                                     value={formData.landmark}
                                     onChange={handleInputChange}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300"
+                                    disabled={isSubmitting}
+                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="Near Central Park"
                                 />
                             </div>
@@ -603,11 +681,12 @@ export default function CheckoutPage() {
                                             <button
                                                 key={label}
                                                 onClick={() => setFormData({...formData, label})}
+                                                disabled={isSubmitting}
                                                 className={`px-6 py-3 rounded-xl font-bold border-2 transition-all ${
                                                     formData.label === label 
                                                     ? "border-primary bg-primary text-white" 
                                                     : "border-gray-200 text-gray-500 hover:border-gray-300"
-                                                }`}
+                                                } disabled:opacity-50`}
                                             >
                                                 {label}
                                             </button>
@@ -654,10 +733,11 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {(settings.paymentMethods?.cod ?? true) && (
                     <button
-                    onClick={() => setPaymentMethod("COD")}
+                    onClick={() => !isSubmitting && setPaymentMethod("COD")}
+                    disabled={isSubmitting}
                     className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
                         paymentMethod === "COD" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
-                    }`}
+                    } disabled:opacity-50`}
                     >
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "COD" ? "border-primary" : "border-gray-300"}`}>
                         {paymentMethod === "COD" && <div className="w-3 h-3 bg-primary rounded-full" />}
@@ -671,10 +751,11 @@ export default function CheckoutPage() {
 
                 {(settings.paymentMethods?.online ?? true) && (
                     <button
-                    onClick={() => setPaymentMethod("Online")}
+                    onClick={() => !isSubmitting && setPaymentMethod("Online")}
+                    disabled={isSubmitting}
                     className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
                         paymentMethod === "Online" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
-                    }`}
+                    } disabled:opacity-50`}
                     >
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" ? "border-primary" : "border-gray-300"}`}>
                         {paymentMethod === "Online" && <div className="w-3 h-3 bg-primary rounded-full" />}
@@ -749,12 +830,12 @@ export default function CheckoutPage() {
                             value={couponCode} 
                             onChange={(e) => setCouponCode(e.target.value)}
                             placeholder="Promo Code" 
-                            disabled={appliedCoupon}
+                            disabled={appliedCoupon || isSubmitting}
                             className="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white w-full outline-none placeholder:text-gray-500 focus:border-primary transition-all disabled:opacity-50 uppercase font-mono"
                         />
                         <button 
                             onClick={() => handleApplyCoupon()}
-                            disabled={isValidatingCoupon || !couponCode || appliedCoupon}
+                            disabled={isValidatingCoupon || !couponCode || appliedCoupon || isSubmitting}
                             className="bg-white text-gray-900 px-4 rounded-xl font-bold text-sm hover:bg-gray-100 disabled:opacity-50 transition-all"
                         >
                             {isValidatingCoupon ? "..." : appliedCoupon ? "Applied" : "Apply"}

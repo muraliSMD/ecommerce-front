@@ -181,6 +181,7 @@ export default function AdminOrderDetails() {
                     order.orderStatus === 'Delivered' ? 'bg-green-100 text-green-700' :
                     order.orderStatus === 'Processing' ? 'bg-blue-100 text-blue-700' :
                     order.orderStatus === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                    order.orderStatus === 'Abandoned' ? 'bg-gray-100 text-gray-500' :
                     'bg-orange-100 text-orange-700'
                 }`}>
                     {order.orderStatus || 'Pending'}
@@ -402,6 +403,7 @@ export default function AdminOrderDetails() {
                             disabled={
                                 order.orderStatus === status || 
                                 order.orderStatus === 'Cancelled' || 
+                                order.orderStatus === 'Abandoned' ||
                                 (order.orderStatus === 'Delivered' && status === 'Cancelled')
                             }
                             className={`w-full py-3 px-4 rounded-xl flex items-center justify-between font-bold text-sm transition-all ${

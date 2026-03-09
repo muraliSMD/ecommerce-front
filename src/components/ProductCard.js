@@ -3,12 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FiPlus, FiArrowRight } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 import { useSettingsStore } from "@/store/settingsStore";
 
 export default function ProductCard({ product, onAddToCart }) {
   const hasVariants = product.variants && product.variants.length > 1;
   const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const router = useRouter();
 
   return (
     <div className="group card-hover p-2 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/50 overflow-hidden relative h-full flex flex-col">
@@ -66,21 +68,36 @@ export default function ProductCard({ product, onAddToCart }) {
         ) : (() => {
           const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);
           return (
-          <button
-            disabled={isOutOfStock}
-            className={`mt-2 flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm border ${
-              isOutOfStock 
-                ? "bg-gray-50 text-text-muted border-gray-100 cursor-not-allowed" 
-                : "bg-white text-text-main border-gray-200 hover:bg-btn-dark-hover hover:text-btn-text hover:border-btn-dark-hover"
-            }`}
-            onClick={(e) => {
-              e.preventDefault();
-              const variant = product.variants?.length === 1 ? product.variants[0] : null;
-              onAddToCart(product, 1, variant);
-            }}
-          >
-            {isOutOfStock ? "Out of Stock" : <><FiPlus size={10} /> Add</>}
-          </button>
+          <div className="mt-2 flex gap-2">
+            <button
+              disabled={isOutOfStock}
+              className={`flex-grow flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm border ${
+                isOutOfStock 
+                  ? "bg-gray-50 text-text-muted border-gray-100 cursor-not-allowed" 
+                  : "bg-white text-text-main border-gray-200 hover:bg-gray-50"
+              }`}
+              onClick={(e) => {
+                e.preventDefault();
+                const variant = product.variants?.length === 1 ? product.variants[0] : null;
+                onAddToCart(product, 1, variant);
+              }}
+            >
+              {isOutOfStock ? "Out of Stock" : <><FiPlus size={10} /> Add</>}
+            </button>
+            {!isOutOfStock && (
+              <button
+                className="flex-grow flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm bg-btn-dark text-white border-btn-dark hover:bg-black"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const variant = product.variants?.length === 1 ? product.variants[0] : null;
+                  onAddToCart(product, 1, variant);
+                  router.push('/checkout');
+                }}
+              >
+                Buy Now
+              </button>
+            )}
+          </div>
           );
         })()}
       </div>

@@ -158,12 +158,30 @@ export async function POST(request) {
     let slug = validatedData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     
     // Check if slug exists
-    let existingProduct = await Product.findOne({ slug });
-    if (existingProduct) {
+    let existingSlug = await Product.findOne({ slug });
+    if (existingSlug) {
         slug = `${slug}-${Date.now()}`;
     }
+
+    // Auto-generate SKU if not provided
+    let sku = validatedData.sku;
+    if (!sku || sku.trim() === "") {
+        const prefix = validatedData.name.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'PROD');
+        let isUnique = false;
+        let attempts = 0;
+        
+        while (!isUnique && attempts < 10) {
+            const random = Math.floor(1000 + Math.random() * 9000); // 4 digit random
+            sku = `${prefix}-${random}`;
+            const existingSku = await Product.findOne({ sku });
+            if (!existingSku) {
+                isUnique = true;
+            }
+            attempts++;
+        }
+    }
     
-    const newProduct = new Product({ ...validatedData, slug });
+    const newProduct = new Product({ ...validatedData, slug, sku });
     const savedProduct = await newProduct.save();
     return NextResponse.json(savedProduct, { status: 201 });
   } catch (error) {
