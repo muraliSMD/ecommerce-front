@@ -29,6 +29,7 @@ import ConfirmationModal from "@/components/ConfirmationModal";
 export default function AdminOrders() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [orderToDelete, setOrderToDelete] = useState(null);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
 
@@ -66,11 +67,16 @@ export default function AdminOrders() {
     }
   });
 
-  const filteredOrders = orders?.filter(o => 
-    o.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    o._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    o.shippingAddress?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredOrders = orders?.filter(o => {
+    const matchesSearch = 
+      o.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.shippingAddress?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === "All" || o.orderStatus === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  }) || [];
 
   if (isLoading) return (
     <div className="flex items-center justify-center min-h-[60vh]">
@@ -97,9 +103,28 @@ export default function AdminOrders() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="px-6 py-3 bg-surface text-gray-600 rounded-2xl border border-gray-100 flex items-center gap-2 font-bold text-sm hover:bg-white transition-all">
-          <FiFilter /> Filter Status
-        </button>
+        <div className="relative">
+          <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <select 
+            className="pl-12 pr-10 py-3 bg-surface text-gray-600 rounded-2xl border border-gray-100 font-bold text-sm hover:bg-white transition-all outline-none appearance-none cursor-pointer"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="All">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Abandoned">Abandoned</option>
+            <option value="Cancellation Requested">Cancellation Requested</option>
+            <option value="Return Requested">Return Requested</option>
+            <option value="Returned">Returned</option>
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+            <FiArrowRight className="rotate-90" size={12} />
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
