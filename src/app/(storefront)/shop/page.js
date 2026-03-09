@@ -13,11 +13,12 @@ import {
   FiSearch, 
   FiFilter, 
   FiGrid, 
-  FiList 
+  FiList,
+  FiArrowRight
 } from "react-icons/fi";
 import Link from "next/link";
 import { getColorValue, getBaseColor, getClosestColorName } from "@/lib/colors";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ProductCardSkeleton } from "@/components/Skeleton";
 import { FiChevronDown, FiX } from "react-icons/fi";
@@ -207,6 +208,7 @@ export default function ShopPage() {
 
   const addToCart = useCartStore((state) => state.addToCart);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
+  const router = useRouter();
 
   // Debounce Search
   useEffect(() => {
@@ -553,20 +555,34 @@ export default function ShopPage() {
                                         ) : (() => {
                                             const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);
                                             return (
-                                            <button 
-                                                disabled={isOutOfStock}
-                                                onClick={() => {
-                                                    const variant = product.variants?.length === 1 ? product.variants[0] : null;
-                                                    handleAddToCart(product, 1, variant);
-                                                }}
-                                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 ${
-                                                    isOutOfStock
-                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
-                                                        : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
-                                                }`}
-                                            >
-                                                {isOutOfStock ? "Out of Stock" : "Add to Cart"}
-                                            </button>
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    disabled={isOutOfStock}
+                                                    onClick={() => {
+                                                        const variant = product.variants?.length === 1 ? product.variants[0] : null;
+                                                        handleAddToCart(product, 1, variant);
+                                                    }}
+                                                    className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 ${
+                                                        isOutOfStock
+                                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                                            : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
+                                                    }`}
+                                                >
+                                                    {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+                                                </button>
+                                                {!isOutOfStock && (
+                                                    <button 
+                                                        onClick={() => {
+                                                            const variant = product.variants?.length === 1 ? product.variants[0] : null;
+                                                            handleAddToCart(product, 1, variant);
+                                                            router.push('/checkout');
+                                                        }}
+                                                        className="px-6 py-2.5 rounded-xl text-sm font-bold bg-primary text-white hover:bg-secondary transition-colors shadow-lg shadow-primary/10 active:scale-95 flex items-center gap-2"
+                                                    >
+                                                        Buy Now <FiArrowRight size={16} />
+                                                    </button>
+                                                )}
+                                            </div>
                                             );
                                         })()}
                                         <Link href={`/product/${product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">

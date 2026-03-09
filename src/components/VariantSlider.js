@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-const VariantSlider = ({ children, title, orderClass = "" }) => {
+const VariantSlider = ({ children, title, orderClass = "", compact = false }) => {
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -30,8 +30,8 @@ const VariantSlider = ({ children, title, orderClass = "" }) => {
   };
 
   return (
-    <div className={`space-y-4 relative group/slider ${orderClass}`}>
-      {title && <p className="font-bold text-sm uppercase tracking-wider text-gray-400">{title}</p>}
+    <div className={`space-y-2 md:space-y-4 relative group/slider ${orderClass} ${compact ? 'flex flex-col' : ''}`}>
+      {title && <p className="font-bold text-xs md:text-sm uppercase tracking-wider text-gray-400">{title}</p>}
       <div className="relative">
         {showLeftArrow && (
           <button 
@@ -45,7 +45,7 @@ const VariantSlider = ({ children, title, orderClass = "" }) => {
         <div 
           ref={scrollRef}
           onScroll={checkScroll}
-          className="flex gap-2.5 flex-nowrap overflow-x-auto pb-4 scrollbar-hide w-full cursor-grab active:cursor-grabbing snap-x"
+          className="flex gap-1.5 flex-nowrap overflow-x-auto pb-4 scrollbar-hide w-max max-w-full cursor-grab active:cursor-grabbing snap-x"
         >
           {children}
         </div>

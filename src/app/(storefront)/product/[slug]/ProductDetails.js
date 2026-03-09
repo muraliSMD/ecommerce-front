@@ -8,7 +8,7 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ZoomImage from "@/components/ZoomImage";
 import toast from "react-hot-toast";
-import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiShoppingBag, FiHeart, FiShare2, FiMinus, FiPlus, FiStar, FiPlayCircle, FiChevronLeft, FiChevronRight, FiArrowRight } from "react-icons/fi";
 import Image from "next/image";
 import { getColorValue, getClosestColorName } from "@/lib/colors";
 import { useSettingsStore } from "@/store/settingsStore";
@@ -474,40 +474,13 @@ export default function ProductDetails({ initialProduct }) {
                   {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
                 </span>
                 
-                {/* Mobile Share & Wishlist - RESTORED TO TOP */}
-                <div className="flex lg:hidden gap-3">
-                  <button 
-                    onClick={() => {
-                       if (isInWishlist(product._id)) {
-                          removeItem(product._id);
-                          toast.success("Removed from Wishlist");
-                       } else {
-                          addItem(product);
-                          toast.success("Added to Wishlist");
-                       }
-                    }}
-                    className={`w-10 h-10 flex items-center justify-center border-2 rounded-xl transition-all ${
-                        isInWishlist(product._id) 
-                        ? "border-red-100 bg-red-50 text-red-500" 
-                        : "border-gray-100 text-gray-400"
-                    }`}
-                  >
-                    <FiHeart size={20} className={isInWishlist(product._id) ? "fill-current" : ""} />
-                  </button>
-                  <button 
-                    onClick={handleShare}
-                    className="w-10 h-10 flex items-center justify-center border-2 rounded-xl border-gray-100 text-gray-400 active:bg-gray-50"
-                  >
-                    <FiShare2 size={20} />
-                  </button>
-                </div>
               </div>
 
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 leading-tight order-3 lg:order-2">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 leading-tight order-2">
                 {product.name}
               </h1>
               
-              <div className="flex items-center gap-4 order-4 lg:order-3">
+              <div className="flex items-center gap-4 order-3">
                 {(() => {
                   const currentPrice = selectedVariant?.price ?? product.price;
                   const mrp = selectedVariant?.mrp ?? product.mrp;
@@ -516,17 +489,17 @@ export default function ProductDetails({ initialProduct }) {
                   return (
                     <>
                       {discount > 0 && (
-                        <div className="flex items-center gap-1 text-[#008a48] font-bold text-2xl">
-                          <span className="text-3xl">↓</span>
+                        <div className="flex items-center gap-1 text-[#008a48] font-bold text-lg md:text-2xl">
+                          <span className="text-xl md:text-3xl">↓</span>
                           <span>{discount}%</span>
                         </div>
                       )}
                       {Number(mrp) > Number(currentPrice) && (
-                        <p className="text-2xl text-gray-400 line-through">
+                        <p className="text-lg md:text-2xl text-gray-400 line-through">
                           {mounted ? formatPrice(mrp).replace(/[^\d,.₹$]/g, '') : mrp}
                         </p>
                       )}
-                      <p className="text-3xl font-bold text-gray-900">
+                      <p className="text-xl md:text-3xl font-bold text-gray-900">
                         {mounted ? formatPrice(currentPrice) : currentPrice}
                       </p>
                     </>
@@ -541,7 +514,7 @@ export default function ProductDetails({ initialProduct }) {
               </div>
 
               {/* Star Rating Summary */}
-              <div className="flex items-center gap-2 order-5 lg:order-4">
+              <div className="flex items-center gap-2 order-4">
                 <div className="flex gap-1 text-yellow-400 text-sm">
                   {[...Array(5)].map((_, i) => (
                      <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-gray-300"} />
@@ -564,62 +537,62 @@ export default function ProductDetails({ initialProduct }) {
               
               {/* Product Specifications */}
               {(product.color || product.size || product.length || product.age || product.silkType || product.withBlouse || product.blouseMeter) && (
-                <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-3 w-max min-w-[50%] order-6 lg:order-5">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Product Specifications</p>
+                <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-3 w-max min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
+                  <p className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Product Specifications</p>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                     {product.color && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm text-gray-500">Color:</span>
-                         <span className="font-bold text-gray-900 text-sm">{resolveColorName(product.color)}</span>
+                         <span className="text-sm md:text-base text-gray-500">Color:</span>
+                         <span className="font-bold text-gray-900 text-base">{resolveColorName(product.color)}</span>
                       </div>
                     )}
                     {product.size && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm text-gray-500">Size:</span>
-                         <span className="font-bold text-gray-900 text-sm">{product.size}</span>
+                         <span className="text-sm md:text-base text-gray-500">Size:</span>
+                         <span className="font-bold text-gray-900 text-base">{product.size}</span>
                       </div>
                     )}
                     {product.length && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm text-gray-500">Length:</span>
-                         <span className="font-bold text-gray-900 text-sm">{product.length}</span>
+                         <span className="text-sm md:text-base text-gray-500">Length:</span>
+                         <span className="font-bold text-gray-900 text-base">{product.length}</span>
                       </div>
                     )}
                     {product.age && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm text-gray-500">Age:</span>
-                         <span className="font-bold text-gray-900 text-sm">{product.age}</span>
+                         <span className="text-sm md:text-base text-gray-500">Age:</span>
+                         <span className="font-bold text-gray-900 text-base">{product.age}</span>
                       </div>
                     )}
                     {product.silkType && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm text-gray-500">Silk:</span>
-                         <span className="font-bold text-gray-900 text-sm">{product.silkType}</span>
+                         <span className="text-sm md:text-base text-gray-500">Silk:</span>
+                         <span className="font-bold text-gray-900 text-base">{product.silkType}</span>
                       </div>
                     )}
                     {product.withBlouse && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm text-gray-500">Blouse:</span>
-                         <span className="font-bold text-gray-900 text-sm">{product.withBlouse}</span>
+                         <span className="text-sm md:text-base text-gray-500">Blouse:</span>
+                         <span className="font-bold text-gray-900 text-base">{product.withBlouse}</span>
                       </div>
                     )}
                     {product.blouseMeter && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm text-gray-500">Blouse Length:</span>
-                         <span className="font-bold text-gray-900 text-sm">{product.blouseMeter}</span>
+                         <span className="text-sm md:text-base text-gray-500">Blouse Length:</span>
+                         <span className="font-bold text-gray-900 text-base">{product.blouseMeter}</span>
                       </div>
                     )}
                   </div>
                 </div>
               )}
 
-            <div className="h-px bg-gray-200 w-full order-7" />
+            <div className="h-px bg-gray-200 w-full order-10" />
 
             {/* Colors */}
             {allColors.length > 0 && (
               <VariantSlider 
                 title={<span>Colour: <span className="text-gray-900 ml-2">{resolveColorName(selectedColor)}</span></span>}
-                orderClass="order-2 lg:order-6"
+                orderClass="order-5 lg:order-6 mt-4 md:mt-0"
               >
                 {allColors.map((color) => {
                   const colorVariantWithImage = variants.find(v => v.color === color && v.images && v.images.length > 0);
@@ -630,7 +603,7 @@ export default function ProductDetails({ initialProduct }) {
                       key={color}
                       title={color}
                       onClick={() => setSelectedColor(color)}
-                      className={`transition-all flex-shrink-0 font-medium text-sm md:text-base relative flex items-center justify-center overflow-hidden snap-start ${
+                      className={`transition-all flex-shrink-0 font-medium text-sm md:text-base relative flex items-center justify-center overflow-hidden snap-start m-[2px] ${
                         colorImage ? 'w-14 h-18 md:w-16 md:h-20 rounded-xl' : 'px-4 py-2 md:px-6 md:py-2.5 rounded-full'
                       } ${
                         selectedColor === color
@@ -652,229 +625,254 @@ export default function ProductDetails({ initialProduct }) {
               </VariantSlider>
             )}
 
-            {/* Sizes */}
-            {allSizes.length > 0 && (
-              <VariantSlider title="Size" orderClass="order-2 lg:order-6">
-                {allSizes.map((size) => {
-                  const disabled = !availableSizesForColor.includes(size);
-                  return (
-                    <button
-                      key={size}
-                      disabled={disabled}
-                      onClick={() => { setSelectedSize(size); setSelectedLength(""); }}
-                      className={`min-w-[50px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
-                        disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                        selectedSize === size
-                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                          : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  );
-                })}
-              </VariantSlider>
-            )}
+            {/* Attributes Slider for Mobile & Web */}
+            <VariantSlider orderClass="order-6 mt-2 md:mt-0 gap-4 lg:gap-2">
+              {/* Sizes */}
+              {allSizes.length > 0 && (
+                <div className="flex-shrink-0 min-w-max snap-start">
+                  <VariantSlider title={<span className="ml-2">Size</span>} compact={true}>
+                    {allSizes.map((size) => {
+                      const disabled = !availableSizesForColor.includes(size);
+                      return (
+                        <button
+                          key={size}
+                          disabled={disabled}
+                          onClick={() => { setSelectedSize(size); setSelectedLength(""); }}
+                          className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            selectedSize === size
+                              ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
+                  </VariantSlider>
+                </div>
+              )}
 
-            {/* Lengths */}
-            {allLengths.length > 0 && (
-              <VariantSlider title="Length" orderClass="order-2 lg:order-6">
-                {allLengths.map((length) => {
-                  const disabled = !availableLengthsForColor.includes(length);
-                  return (
-                    <button
-                      key={length}
-                      disabled={disabled}
-                      onClick={() => { setSelectedLength(length); setSelectedSize(""); setSelectedAge(""); }}
-                      className={`min-w-[50px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
-                        disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                        selectedLength === length
-                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                          : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                      }`}
-                    >
-                      {length}
-                    </button>
-                  );
-                })}
-              </VariantSlider>
-            )}
+              {/* Lengths */}
+              {allLengths.length > 0 && (
+                <div className="flex-shrink-0 min-w-max snap-start">
+                  <VariantSlider title={<span className="ml-2">Length</span>} compact={true}>
+                    {allLengths.map((length) => {
+                      const disabled = !availableLengthsForColor.includes(length);
+                      return (
+                        <button
+                          key={length}
+                          disabled={disabled}
+                          onClick={() => { setSelectedLength(length); setSelectedSize(""); setSelectedAge(""); }}
+                          className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            selectedLength === length
+                              ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                          }`}
+                        >
+                          {length}
+                        </button>
+                      );
+                    })}
+                  </VariantSlider>
+                </div>
+              )}
 
-            {/* Ages */}
-            {allAges.length > 0 && (
-              <VariantSlider title="Age Group" orderClass="order-2 lg:order-6">
-                {allAges.map((age) => {
-                  const disabled = !availableAgesForColor.includes(age);
-                  return (
-                    <button
-                      key={age}
-                      disabled={disabled}
-                      onClick={() => { setSelectedAge(age); setSelectedSize(""); setSelectedLength(""); }}
-                      className={`min-w-[100px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
-                        disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                        selectedAge === age
-                          ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                          : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                      }`}
-                    >
-                      {age}
-                    </button>
-                  );
-                })}
-              </VariantSlider>
-            )}
+              {/* Ages */}
+              {allAges.length > 0 && (
+                <div className="flex-shrink-0 min-w-max snap-start">
+                  <VariantSlider title={<span className="ml-2">Age Group</span>} compact={true}>
+                    {allAges.map((age) => {
+                      const disabled = !availableAgesForColor.includes(age);
+                      return (
+                        <button
+                          key={age}
+                          disabled={disabled}
+                          onClick={() => { setSelectedAge(age); setSelectedSize(""); setSelectedLength(""); }}
+                          className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            selectedAge === age
+                              ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                          }`}
+                        >
+                          {age}
+                        </button>
+                      );
+                    })}
+                  </VariantSlider>
+                </div>
+              )}
 
-            {/* Saree Specific Attributes Grouped */}
-            {isSaree && (allSilkTypes.length > 0 || allBlouseOptions.length > 0 || allBlouseMeters.length > 0) && (
-              <div className="flex flex-col md:flex-row gap-8 order-2 lg:order-6 w-full overflow-hidden">
-                {/* Silk Types */}
-                {allSilkTypes.length > 0 && (
-                  <div className="flex-1 min-w-0">
-                    <VariantSlider title="Silk Type">
-                      {allSilkTypes.map((type) => {
-                        const disabled = !availableSilkTypesForColor.includes(type);
-                        return (
-                          <button
-                            key={type}
-                            disabled={disabled}
-                            onClick={() => setSelectedSilkType(type)}
-                            className={`min-w-[120px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
-                              disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                              selectedSilkType === type
-                                ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                                : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                            }`}
-                          >
-                            {type}
-                          </button>
-                        );
-                      })}
-                    </VariantSlider>
-                  </div>
-                )}
+              {/* Silk Types */}
+              {isSaree && allSilkTypes.length > 0 && (
+                <div className="flex-shrink-0 min-w-max snap-start">
+                  <VariantSlider title={<span className="ml-2">Silk Type</span>} compact={true}>
+                    {allSilkTypes.map((type) => {
+                      const disabled = !availableSilkTypesForColor.includes(type);
+                      return (
+                        <button
+                          key={type}
+                          disabled={disabled}
+                          onClick={() => setSelectedSilkType(type)}
+                          className={`min-w-[120px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            selectedSilkType === type
+                              ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      );
+                    })}
+                  </VariantSlider>
+                </div>
+              )}
 
-                {/* Blouse Options */}
-                {allBlouseOptions.length > 0 && (
-                  <div className="flex-1 min-w-0">
-                    <VariantSlider title="Blouse">
-                      {allBlouseOptions.map((opt) => {
-                        const disabled = !availableBlouseOptionsForColor.includes(opt);
-                        return (
-                          <button
-                            key={opt}
-                            disabled={disabled}
-                            onClick={() => setSelectedWithBlouse(opt)}
-                            className={`min-w-[120px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
-                              disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                              selectedWithBlouse === opt
-                                ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                                : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                            }`}
-                          >
-                            {opt}
-                          </button>
-                        );
-                      })}
-                    </VariantSlider>
-                  </div>
-                )}
+              {/* Blouse Options */}
+              {isSaree && allBlouseOptions.length > 0 && (
+                <div className="flex-shrink-0 min-w-max snap-start">
+                  <VariantSlider title={<span className="ml-2">Blouse</span>} compact={true}>
+                    {allBlouseOptions.map((opt) => {
+                      const disabled = !availableBlouseOptionsForColor.includes(opt);
+                      return (
+                        <button
+                          key={opt}
+                          disabled={disabled}
+                          onClick={() => setSelectedWithBlouse(opt)}
+                          className={`min-w-[120px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            selectedWithBlouse === opt
+                              ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </VariantSlider>
+                </div>
+              )}
 
-                {/* Blouse Meters */}
-                {allBlouseMeters.length > 0 && (
-                  <div className="flex-1 min-w-0">
-                    <VariantSlider title="Blouse Length">
-                      {allBlouseMeters.map((meter) => {
-                        const disabled = !availableBlouseMetersForColor.includes(meter);
-                        return (
-                          <button
-                            key={meter}
-                            disabled={disabled}
-                            onClick={() => setSelectedBlouseMeter(meter)}
-                            className={`min-w-[100px] h-12 flex-shrink-0 rounded-xl md:rounded-2xl border-2 transition-all flex items-center justify-center font-bold text-sm md:text-base snap-start ${
-                              disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
-                              selectedBlouseMeter === meter
-                                ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                                : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
-                            }`}
-                          >
-                            {meter}
-                          </button>
-                        );
-                      })}
-                    </VariantSlider>
-                  </div>
-                )}
-              </div>
-            )}
+              {/* Blouse Meters */}
+              {isSaree && allBlouseMeters.length > 0 && (
+                <div className="flex-shrink-0 min-w-max snap-start">
+                  <VariantSlider title={<span className="ml-2">Blouse Length</span>} compact={true}>
+                    {allBlouseMeters.map((meter) => {
+                      const disabled = !availableBlouseMetersForColor.includes(meter);
+                      return (
+                        <button
+                          key={meter}
+                          disabled={disabled}
+                          onClick={() => setSelectedBlouseMeter(meter)}
+                          className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start ${
+                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            selectedBlouseMeter === meter
+                              ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                          }`}
+                        >
+                          {meter}
+                        </button>
+                      );
+                    })}
+                  </VariantSlider>
+                </div>
+              )}
+            </VariantSlider>
 
-
-
-            {/* Removed redundant Mobile buttons from here, they are back at the top row */}
+            <div className="h-px bg-gray-200 w-full order-7 mt-6" />
 
             {/* Quantity and Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 order-8">
-              <div className="flex items-center justify-between sm:justify-start bg-white border border-gray-100 rounded-2xl p-2 shadow-sm">
+            {/* Quantity and Actions */}
+            <div className="flex flex-col gap-6 pt-4 order-8">
+              {/* Utility Section: Quantity, Wishlist, Share */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
+                  <button 
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
+                    disabled={isOutOfStock}
+                  >
+                    <FiMinus />
+                  </button>
+                  <span className="w-10 text-center font-bold text-lg">{quantity}</span>
+                  <button 
+                    onClick={() => setQuantity(q => Math.min(stock, q + 1))}
+                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
+                    disabled={isOutOfStock || quantity >= stock}
+                  >
+                    <FiPlus />
+                  </button>
+                </div>
+
                 <button 
-                  onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
-                  disabled={isOutOfStock}
+                  onClick={() => {
+                    if (isInWishlist(product._id)) {
+                      removeItem(product._id);
+                      toast.success("Removed from Wishlist");
+                    } else {
+                      addItem(product);
+                      toast.success("Added to Wishlist");
+                    }
+                  }}
+                  className={`w-14 h-14 flex items-center justify-center border-2 rounded-2xl transition-all ${
+                      isInWishlist(product._id) 
+                      ? "border-red-100 bg-red-50 text-red-500" 
+                      : "border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50"
+                  }`}
+                  title="Wishlist"
                 >
-                  <FiMinus />
+                  <FiHeart size={24} className={isInWishlist(product._id) ? "fill-current" : ""} />
                 </button>
-                <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+
                 <button 
-                  onClick={() => setQuantity(q => Math.min(stock, q + 1))}
-                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
-                  disabled={isOutOfStock || quantity >= stock}
+                  onClick={handleShare}
+                  className="w-14 h-14 flex items-center justify-center border-2 rounded-2xl transition-all border-gray-100 text-gray-400 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
+                  title="Share Product"
                 >
-                  <FiPlus />
+                  <FiShare2 size={24} />
                 </button>
               </div>
 
-              <button
-                disabled={!canAdd}
-                onClick={() => {
-                  addToCart(product, quantity, selectedVariant);
-                  toast.success("Added to GRABSZY Cart!");
-                  setQuantity(1);
-                }}
-                className={`flex-grow flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl ${
-                  !canAdd 
-                    ? "bg-gray-200 cursor-not-allowed" 
-                    : "bg-primary hover:bg-secondary shadow-primary/20"
-                }`}
-              >
-                <FiShoppingBag size={20} />
-                {isOutOfStock ? "Out of Stock" : "Add to Cart"}
-              </button>
+              {/* Purchase Section: Add to Cart & Buy Now */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  disabled={!canAdd}
+                  onClick={() => {
+                    addToCart(product, quantity, selectedVariant);
+                    toast.success("Added to GRABSZY Cart!");
+                    setQuantity(1);
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
+                    !canAdd 
+                      ? "bg-gray-200 cursor-not-allowed" 
+                      : "bg-primary hover:bg-secondary shadow-primary/20"
+                  }`}
+                >
+                  <FiShoppingBag size={20} />
+                  {isOutOfStock ? "Out of Stock" : "Add to Cart"}
+                </button>
 
-              <button 
-                onClick={() => {
-                   if (isInWishlist(product._id)) {
-                      removeItem(product._id);
-                      toast.success("Removed from Wishlist");
-                   } else {
-                      addItem(product);
-                      toast.success("Added to Wishlist");
-                   }
-                }}
-                className={`hidden lg:flex w-14 h-14 md:w-[68px] md:h-auto items-center justify-center border-2 rounded-2xl transition-all ${
-                    isInWishlist(product._id) 
-                    ? "border-red-100 bg-red-50 text-red-500" 
-                    : "border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50"
-                }`}
-                title="Wishlist"
-              >
-                <FiHeart size={24} className={isInWishlist(product._id) ? "fill-current" : ""} />
-              </button>
-
-              <button 
-                onClick={handleShare}
-                className="hidden lg:flex w-14 h-14 md:w-[68px] md:h-auto items-center justify-center border-2 rounded-2xl transition-all border-gray-100 text-gray-400 hover:text-primary hover:border-primary/30 hover:bg-primary/5"
-                title="Share Product"
-              >
-                <FiShare2 size={24} />
-              </button>
+                <button
+                  disabled={!canAdd}
+                  onClick={() => {
+                    addToCart(product, quantity, selectedVariant);
+                    router.push('/checkout');
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
+                    !canAdd 
+                      ? "bg-gray-200 cursor-not-allowed" 
+                      : "bg-btn-dark hover:bg-black shadow-gray-900/20"
+                  }`}
+                >
+                  <FiArrowRight size={20} />
+                  {isOutOfStock ? "Out of Stock" : "Buy Now"}
+                </button>
+              </div>
             </div>
 
             <AnimatePresence>

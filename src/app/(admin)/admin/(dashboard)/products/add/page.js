@@ -49,8 +49,6 @@ export default function AddProduct() {
     },
   });
 
-  const isSaree = categories?.find(c => c._id === product.category)?.name?.toLowerCase().includes("saree");
-  
   const [product, setProduct] = useState({
     name: "",
     slug: "",
@@ -76,6 +74,8 @@ export default function AddProduct() {
     blouseMeter: "",
     silkType: ""
   });
+
+  const isSaree = categories?.find(c => c._id === product.category)?.name?.toLowerCase().includes("saree");
 
   const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
 
@@ -451,6 +451,7 @@ export default function AddProduct() {
                 placeholder="e.g. TEE-BLK-XL"
                 className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all font-mono text-sm"
               />
+              <p className="text-xs text-gray-400">Leave empty to auto-generate unique SKU.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-2">
