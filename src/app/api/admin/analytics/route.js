@@ -110,26 +110,80 @@ export async function GET(request) {
         { $unwind: "$items" },
         {
             $group: {
-                _id: "$items.product",
+                _id: {
+                    product: "$items.product",
+                    variant: {
+                        color: "$items.variant.color",
+                        size: "$items.variant.size",
+                        length: "$items.variant.length"
+                    }
+                },
                 totalQty: { $sum: "$items.quantity" },
                 revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } }
             }
         },
         { $sort: { totalQty: -1 } },
-        { $limit: 5 },
+        { $limit: 10 },
         {
             $lookup: {
                 from: "products",
-                localField: "_id",
+                localField: "_id.product",
                 foreignField: "_id",
                 as: "product"
             }
         },
         { $unwind: "$product" },
         {
+            $addFields: {
+                matchedVariant: {
+                    $filter: {
+                        input: "$product.variants",
+                        as: "v",
+                        cond: {
+                            $and: [
+                                { $eq: ["$$v.color", "$_id.variant.color"] },
+                                { $eq: ["$$v.size", "$_id.variant.size"] },
+                                { $eq: ["$$v.length", "$_id.variant.length"] }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        {
             $project: {
-                name: "$product.name",
-                image: { $arrayElemAt: ["$product.images", 0] },
+                name: {
+                    $concat: [
+                        "$product.name",
+                        {
+                            $let: {
+                                vars: {
+                                    vStr: {
+                                        $trim: {
+                                            input: {
+                                                $concat: [
+                                                    { $cond: ["$_id.variant.color", { $concat: [" ", "$_id.variant.color"] }, ""] },
+                                                    { $cond: ["$_id.variant.size", { $concat: [", ", "$_id.variant.size"] }, ""] },
+                                                    { $cond: ["$_id.variant.length", { $concat: [", ", "$_id.variant.length"] }, ""] }
+                                                ]
+                                            },
+                                            chars: " ,"
+                                        }
+                                    }
+                                },
+                                in: { $cond: [{ $gt: [{ $strLenCP: "$$vStr" }, 0] }, { $concat: [" (", "$$vStr", ")"] }, ""] }
+                            }
+                        }
+                    ]
+                },
+                image: {
+                    $let: {
+                        vars: {
+                            variantImage: { $arrayElemAt: [{ $arrayElemAt: ["$matchedVariant.images", 0] }, 0] }
+                        },
+                        in: { $ifNull: ["$$variantImage", { $arrayElemAt: ["$product.images", 0] }] }
+                    }
+                },
                 totalQty: 1,
                 revenue: 1
             }

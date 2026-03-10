@@ -55,67 +55,69 @@ export default function AdminBlogsPage() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left">
-            <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                    <th className="p-4 font-bold text-gray-500 text-sm">Title</th>
-                    <th className="p-4 font-bold text-gray-500 text-sm">Status</th>
-                    <th className="p-4 font-bold text-gray-500 text-sm">Author</th>
-                    <th className="p-4 font-bold text-gray-500 text-sm">Date</th>
-                    <th className="p-4 font-bold text-gray-500 text-sm text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {blogs?.map((blog) => (
-                    <tr key={blog._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                        <td className="p-4">
-                            <p className="font-bold text-gray-900">{blog.title}</p>
-                            <p className="text-xs text-gray-400 font-mono">/{blog.slug}</p>
-                        </td>
-                        <td className="p-4">
-                            {blog.isPublished ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
-                                    <FiEye size={12} /> Published
-                                </span>
-                            ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold">
-                                    <FiEyeOff size={12} /> Draft
-                                </span>
-                            )}
-                        </td>
-                        <td className="p-4 text-sm text-gray-600">
-                            {blog.author?.name || "Unknown"}
-                        </td>
-                        <td className="p-4 text-sm text-gray-600">
-                            {format(new Date(blog.createdAt), "MMM d, yyyy")}
-                        </td>
-                        <td className="p-4">
-                            <div className="flex justify-end gap-2">
-                                <Link
-                                    href={`/admin/blogs/${blog.slug}`} // Or ID if preferred
-                                    className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                                >
-                                    <FiEdit2 size={18} />
-                                </Link>
-                                <button 
-                                    onClick={() => handleDelete(blog)}
-                                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                >
-                                    <FiTrash2 size={18} />
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-                {blogs?.length === 0 && (
+        <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[800px]">
+                <thead className="bg-gray-50 border-b border-gray-100">
                     <tr>
-                        <td colSpan={5} className="p-8 text-center text-gray-500">
-                            No blog posts found. Create one to get started.
-                        </td>
+                        <th className="p-4 font-bold text-gray-500 text-sm">Title</th>
+                        <th className="p-4 font-bold text-gray-500 text-sm">Status</th>
+                        <th className="p-4 font-bold text-gray-500 text-sm">Author</th>
+                        <th className="p-4 font-bold text-gray-500 text-sm">Date</th>
+                        <th className="p-4 font-bold text-gray-500 text-sm text-right">Actions</th>
                     </tr>
-                )}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {blogs?.map((blog) => (
+                        <tr key={blog._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                            <td className="p-4">
+                                <p className="font-bold text-gray-900">{blog.title}</p>
+                                <p className="text-xs text-gray-400 font-mono">/{blog.slug}</p>
+                            </td>
+                            <td className="p-4">
+                                {blog.isPublished ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
+                                        <FiEye size={12} /> Published
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-bold">
+                                        <FiEyeOff size={12} /> Draft
+                                    </span>
+                                )}
+                            </td>
+                            <td className="p-4 text-sm text-gray-600">
+                                {blog.author?.name || "Unknown"}
+                            </td>
+                            <td className="p-4 text-sm text-gray-600">
+                                {format(new Date(blog.createdAt), "MMM d, yyyy")}
+                            </td>
+                            <td className="p-4">
+                                <div className="flex justify-end gap-2">
+                                    <Link
+                                        href={`/admin/blogs/${blog.slug}`} // Or ID if preferred
+                                        className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                                    >
+                                        <FiEdit2 size={18} />
+                                    </Link>
+                                    <button 
+                                        onClick={() => handleDelete(blog)}
+                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    >
+                                        <FiTrash2 size={18} />
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                    {blogs?.length === 0 && (
+                        <tr>
+                            <td colSpan={5} className="p-8 text-center text-gray-500">
+                                No blog posts found. Create one to get started.
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
       </div>
 
       {blogToDelete && (

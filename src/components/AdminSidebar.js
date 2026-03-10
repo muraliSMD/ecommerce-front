@@ -16,9 +16,9 @@ import {
   FiImage,
   FiTag,
   FiEdit2,
-  FiMessageSquare,
   FiMail,
-  FiLayers
+  FiLayers,
+  FiHelpCircle
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
@@ -38,6 +38,7 @@ const navItems = [
   { label: "Hero Slider", href: "/admin/hero-slides", icon: FiImage },
   { label: "Subscribers", href: "/admin/subscribers", icon: FiMail },
   { label: "Messages", href: "/admin/messages", icon: FiMessageSquare },
+  { label: "FAQs", href: "/admin/faqs", icon: FiHelpCircle },
   { label: "Settings", href: "/admin/settings", icon: FiSettings },
 ];
 
