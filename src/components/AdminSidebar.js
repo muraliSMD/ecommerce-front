@@ -16,6 +16,7 @@ import {
   FiImage,
   FiTag,
   FiEdit2,
+  FiMessageSquare,
   FiMail,
   FiLayers,
   FiHelpCircle
