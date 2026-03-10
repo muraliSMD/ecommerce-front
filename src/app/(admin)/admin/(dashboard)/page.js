@@ -188,7 +188,7 @@ export default function AdminDashboard() {
                     <td className="py-5 font-mono text-xs text-gray-400">#{order._id.slice(-8)}</td>
                     <td className="py-5">
                       <p className="font-bold text-gray-900">{order.shippingAddress?.name || "Guest"}</p>
-                      <p className="text-xs text-gray-400">{order.user?.email || "No email"}</p>
+                      <p className="text-xs text-gray-400">{order.user?.email || order.shippingAddress?.email || "No email"}</p>
                     </td>
                     <td className="py-5">
                       <span className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-tighter ${
