@@ -198,7 +198,7 @@ export default function Header() {
                                 {searchResults.map((product) => product && (
                                     <li key={product._id}>
                                         <Link 
-                                            href={`/product/${product._id}`}
+                                            href={`/product/${product.slug || product._id}`}
                                             className="flex items-center gap-4 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
                                         >
                                             <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden relative flex-shrink-0">

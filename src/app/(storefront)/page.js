@@ -162,7 +162,7 @@ export default function Home() {
           
           {isCategoriesLoading ? (
             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">
-                 {[...Array(8)].map((_, i) => <div key={i} className="min-w-[96px] md:min-w-[128px] aspect-square bg-white/50 rounded-2xl animate-pulse"></div>)}
+                 {[...Array(8)].map((_, i) => <div key={i} className="min-w-[68px] md:min-w-[92px] aspect-square bg-white/50 rounded-2xl animate-pulse"></div>)}
             </div>
           ) : (
             <div 
@@ -171,7 +171,7 @@ export default function Home() {
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
             {categories?.filter(c => c.level > 0 && c.isActive !== false).map((cat, i) => (
-                <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id} className="group w-[96px] sm:w-[112px] md:w-[128px] lg:w-[144px] flex-shrink-0 snap-start">
+                <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id} className="group w-[68px] sm:w-[80px] md:w-[92px] lg:w-[104px] flex-shrink-0 snap-start">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
