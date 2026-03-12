@@ -45,6 +45,7 @@ export default function ProductDetails({ initialProduct }) {
   const [selectedWithBlouse, setSelectedWithBlouse] = useState("");
   const [selectedBlouseMeter, setSelectedBlouseMeter] = useState("");
   const [selectedSilkType, setSelectedSilkType] = useState("");
+  const [selectedNSize, setSelectedNSize] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedMedia, setSelectedMedia] = useState(null);
@@ -113,6 +114,14 @@ export default function ProductDetails({ initialProduct }) {
     }
     return [...new Set(variantTypes)];
   }, [variants, product]);
+  
+  const allNSizes = useMemo(() => {
+    const variantNSizes = variants.map((v) => v.nSize).filter(Boolean);
+    if (product?.nSize) {
+      return [...new Set([...variantNSizes, product.nSize])];
+    }
+    return [...new Set(variantNSizes)];
+  }, [variants, product]);
 
   const availableSizesForColor = useMemo(() => {
     if (!selectedColor) return allSizes;
@@ -139,9 +148,13 @@ export default function ProductDetails({ initialProduct }) {
   }, [variants, selectedColor, allBlouseMeters]);
 
   const availableSilkTypesForColor = useMemo(() => {
-    if (!selectedColor) return allSilkTypes;
     return variants.filter((v) => v.color === selectedColor && v.silkType).map((v) => v.silkType);
   }, [variants, selectedColor, allSilkTypes]);
+
+  const availableNSizesForColor = useMemo(() => {
+    if (!selectedColor) return allNSizes;
+    return variants.filter((v) => v.color === selectedColor && v.nSize).map((v) => v.nSize);
+  }, [variants, selectedColor, allNSizes]);
 
 
   // Main Effect: Derive variant and media from selection states
@@ -154,8 +167,9 @@ export default function ProductDetails({ initialProduct }) {
       const matchBlouse = !selectedWithBlouse || v.withBlouse === selectedWithBlouse;
       const matchBlouseMeter = !selectedBlouseMeter || v.blouseMeter === selectedBlouseMeter;
       const matchSilk = !selectedSilkType || v.silkType === selectedSilkType;
+      const matchNSize = !selectedNSize || v.nSize === selectedNSize;
       
-      return matchColor && matchSize && matchLength && matchAge && matchBlouse && matchBlouseMeter && matchSilk;
+      return matchColor && matchSize && matchLength && matchAge && matchBlouse && matchBlouseMeter && matchSilk && matchNSize;
     });
 
     // If no exact match but we have a color, find ANY variant with that color as fallback
@@ -173,6 +187,8 @@ export default function ProductDetails({ initialProduct }) {
             } else if (variant.age && selectedAge !== variant.age) {
                 setSelectedAge(variant.age);
                 setSelectedSize("");
+            } else if (variant.nSize && selectedNSize !== variant.nSize) {
+                setSelectedNSize(variant.nSize);
         }
     }
 
@@ -191,7 +207,7 @@ export default function ProductDetails({ initialProduct }) {
     }
     
     setQuantity(1);
-  }, [selectedColor, selectedSize, selectedLength, selectedAge, selectedWithBlouse, selectedBlouseMeter, selectedSilkType, variants, product]);
+  }, [selectedColor, selectedSize, selectedLength, selectedAge, selectedWithBlouse, selectedBlouseMeter, selectedSilkType, selectedNSize, variants, product]);
 
   // Track Recent Views
   useEffect(() => {
@@ -220,6 +236,7 @@ export default function ProductDetails({ initialProduct }) {
     const blouseParam = searchParams.get('blouse');
     const blouseMeterParam = searchParams.get('blouseMeter');
     const silkParam = searchParams.get('silk');
+    const nSizeParam = searchParams.get('nSize');
 
     if (variants.length > 0) {
       if (colorParam && allColors.includes(colorParam)) {
@@ -228,14 +245,22 @@ export default function ProductDetails({ initialProduct }) {
             setSelectedSize(sizeParam);
             setSelectedLength("");
             setSelectedAge("");
+            setSelectedNSize("");
         } else if (lengthParam && variants.some(v => v.color === colorParam && v.length === lengthParam)) {
             setSelectedLength(lengthParam);
             setSelectedSize("");
             setSelectedAge("");
+            setSelectedNSize("");
         } else if (ageParam && variants.some(v => v.color === colorParam && v.age === ageParam)) {
             setSelectedAge(ageParam);
             setSelectedSize("");
             setSelectedLength("");
+            setSelectedNSize("");
+        } else if (nSizeParam && variants.some(v => v.color === colorParam && v.nSize === nSizeParam)) {
+            setSelectedNSize(nSizeParam);
+            setSelectedSize("");
+            setSelectedLength("");
+            setSelectedAge("");
         }
         
         if (blouseParam && allBlouseOptions.includes(blouseParam)) {
@@ -253,6 +278,7 @@ export default function ProductDetails({ initialProduct }) {
         if (variants[0].size) setSelectedSize(variants[0].size);
         if (variants[0].length) setSelectedLength(variants[0].length);
         if (variants[0].age) setSelectedAge(variants[0].age);
+        if (variants[0].nSize) setSelectedNSize(variants[0].nSize);
         if (variants[0].withBlouse) setSelectedWithBlouse(variants[0].withBlouse);
         if (variants[0].blouseMeter) setSelectedBlouseMeter(variants[0].blouseMeter);
         if (variants[0].silkType) setSelectedSilkType(variants[0].silkType);
@@ -263,8 +289,9 @@ export default function ProductDetails({ initialProduct }) {
       if (product.size) setSelectedSize(product.size);
       if (product.length) setSelectedLength(product.length);
       if (product.age) setSelectedAge(product.age);
+      if (product.nSize) setSelectedNSize(product.nSize);
     }
-  }, [variants, allColors, allBlouseOptions, allBlouseMeters, allSilkTypes, searchParams, mounted, product]);
+  }, [variants, allColors, allBlouseOptions, allBlouseMeters, allSilkTypes, allNSizes, searchParams, mounted, product]);
 
   // Fallback for products without variants
   useEffect(() => {
@@ -292,12 +319,19 @@ export default function ProductDetails({ initialProduct }) {
     if (selectedSize) {
       params.set('size', selectedSize);
       params.delete('length');
+      params.delete('nSize');
     } else if (selectedLength) {
       params.set('length', selectedLength);
       params.delete('size');
+      params.delete('nSize');
+    } else if (selectedNSize) {
+      params.set('nSize', selectedNSize);
+      params.delete('size');
+      params.delete('length');
     } else {
       params.delete('size');
       params.delete('length');
+      params.delete('nSize');
     }
 
     const queryString = params.toString();
@@ -305,7 +339,7 @@ export default function ProductDetails({ initialProduct }) {
     
     // Use replace to avoid polluting history on every click, or push if you want it trackable
     router.replace(newPath, { scroll: false });
-  }, [selectedColor, selectedSize, selectedLength, pathname, router, mounted, searchParams]);
+  }, [selectedColor, selectedSize, selectedLength, selectedNSize, pathname, router, mounted, searchParams]);
 
   const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -582,6 +616,12 @@ export default function ProductDetails({ initialProduct }) {
                          <span className="font-bold text-gray-900 text-base">{product.blouseMeter}</span>
                       </div>
                     )}
+                     {product.nSize && (
+                       <div className="flex items-center gap-2">
+                          <span className="text-sm md:text-base text-gray-500">N-Size:</span>
+                          <span className="font-bold text-gray-900 text-base">{product.nSize}</span>
+                       </div>
+                     )}
                   </div>
                 </div>
               )}
@@ -698,6 +738,32 @@ export default function ProductDetails({ initialProduct }) {
                           }`}
                         >
                           {age}
+                        </button>
+                      );
+                    })}
+                  </VariantSlider>
+                </div>
+              )}
+
+              {/* Numerical Sizes */}
+              {allNSizes.length > 0 && (
+                <div className="flex-shrink-0 min-w-max snap-start">
+                  <VariantSlider title={<span className="ml-2">N-Size</span>} compact={true}>
+                    {allNSizes.map((nSize) => {
+                      const disabled = !availableNSizesForColor.includes(nSize);
+                      return (
+                        <button
+                          key={nSize}
+                          disabled={disabled}
+                          onClick={() => { setSelectedNSize(nSize); setSelectedSize(""); setSelectedLength(""); setSelectedAge(""); }}
+                          className={`min-w-[60px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            selectedNSize === nSize
+                              ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
+                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                          }`}
+                        >
+                          {nSize}
                         </button>
                       );
                     })}
