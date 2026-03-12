@@ -1075,6 +1075,15 @@ export default function AddProduct() {
                       {AGE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
                   </div>
+                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                    <span className="text-xs text-gray-500 font-medium">N-Size:</span>
+                    <input 
+                      type="text" 
+                      value={v.nSize || ""} 
+                      onChange={(e) => handleVariantChange(i, 'nSize', e.target.value)} 
+                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16"
+                    />
+                  </div>
                   
                   {isSaree && (
                     <>
