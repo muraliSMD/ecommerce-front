@@ -20,6 +20,7 @@ const variantSchema = new mongoose.Schema({
   size: { type: String },
   length: { type: String },
   age: { type: String },
+  nSize: { type: String },
   stock: { type: Number, default: 0 },  // stock per variant
   price: { type: Number, required: true },
   mrp: { type: Number }, // Base price / Original price
@@ -43,6 +44,7 @@ const productSchema = new mongoose.Schema(
     size: { type: String },
     length: { type: String },
     age: { type: String },
+    nSize: { type: String },
     category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     collections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Collection" }],
 
