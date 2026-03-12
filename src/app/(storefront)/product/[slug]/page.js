@@ -7,10 +7,10 @@ import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params, searchParams }) {
   const { slug } = await params;
-  const { color, size, length } = await searchParams;
+  const { color, size, length, nSize } = await searchParams;
 
   await dbConnect();
-  const product = await Product.findOne({ slug }).select("name description images variants").lean();
+  const product = await Product.findOne({ slug }).select("name description images variants price mrp discount").lean();
 
   if (!product) return { title: "Product Not Found" };
 
@@ -19,18 +19,19 @@ export async function generateMetadata({ params, searchParams }) {
   
   // Find matching variant if params exist
   let variant = null;
-  if (color || size || length) {
+  if (color || size || length || nSize) {
     variant = product.variants?.find(v => 
       (!color || v.color === color) && 
       (!size || v.size === size) && 
-      (!length || v.length === length)
+      (!length || v.length === length) &&
+      (!nSize || v.nSize === nSize)
     );
   }
 
   // Determine share image: variant image -> first product image -> fallback
   const shareImage = variant?.images?.[0] || product.images?.[0] || `${siteUrl}/og-image.jpg`;
   
-  const variantText = variant ? ` (${variant.color || ''}${variant.size ? ` ${variant.size}` : ''}${variant.length ? ` ${variant.length}` : ''})` : '';
+  const variantText = variant ? ` (${variant.color || ''}${variant.size ? ` ${variant.size}` : ''}${variant.length ? ` ${variant.length}` : ''}${variant.nSize ? ` ${variant.nSize}` : ''})` : '';
   const title = `${product.name}${variantText} | GRABSZY`;
 
   // Dynamic OG image URL
