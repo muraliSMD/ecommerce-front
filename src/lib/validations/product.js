@@ -19,6 +19,7 @@ export const variantSchema = z.object({
 export const productSchema = z.object({
   name: z.string().trim().min(2, "Product name is too short").max(200, "Product name is too long"),
   sku: z.string().trim().optional().nullable(),
+  slug: z.string().trim().optional().nullable(),
   description: z.string().optional().nullable(),
   manufacturerInfo: z.string().optional().nullable(),
   category: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid Category ID").optional().nullable(),

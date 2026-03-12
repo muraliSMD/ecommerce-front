@@ -67,7 +67,24 @@ export async function PUT(request, { params }) {
         }, { status: 400 });
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, validation.data, { new: true });
+    const updateData = { ...validation.data };
+
+    if (updateData.slug) {
+        updateData.slug = updateData.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        const collision = await Product.findOne({ slug: updateData.slug, _id: { $ne: id } });
+        if (collision) {
+            updateData.slug = `${updateData.slug}-${Date.now()}`;
+        }
+    }
+
+    if (updateData.sku) {
+        const collision = await Product.findOne({ sku: updateData.sku, _id: { $ne: id } });
+        if (collision) {
+            return NextResponse.json({ message: "SKU already exists" }, { status: 400 });
+        }
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true });
     
     if (!updatedProduct) {
       return NextResponse.json({ message: "Product not found" }, { status: 404 });

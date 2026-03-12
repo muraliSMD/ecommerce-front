@@ -12,28 +12,30 @@ export default function Breadcrumbs({ items }) {
 
   if (items) {
     return (
-      <nav aria-label="Breadcrumb" className="text-sm mb-4">
-        <ol className="flex items-center gap-2 text-gray-600 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
-          {items.map((item, idx) => {
-            const isLast = idx === items.length - 1;
-            // Truncate only if it's not the first few items or if label is very long
-            const displayLabel = idx > 1 ? truncate(item.label, isLast ? 20 : 25) : item.label;
-            
-            return (
-              <li key={idx} className="flex items-center gap-1 flex-shrink-0">
-                {idx > 0 && <span className="opacity-40">/</span>}
-                {!isLast ? (
-                  <Link href={item.href} className="hover:underline whitespace-nowrap">
-                    {displayLabel}
-                  </Link>
-                ) : (
-                  <span className="text-gray-800 font-medium whitespace-nowrap">{displayLabel}</span>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-      </nav>
+      <div className="container mx-auto px-4 md:px-8 py-2">
+        <nav aria-label="Breadcrumb" className="text-sm">
+          <ol className="flex items-center gap-2 text-gray-500 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
+            {items.map((item, idx) => {
+              const isLast = idx === items.length - 1;
+              // Truncate only if it's not the first few items or if label is very long
+              const displayLabel = idx > 1 ? truncate(item.label, isLast ? 20 : 25) : item.label;
+              
+              return (
+                <li key={idx} className="flex items-center gap-1 flex-shrink-0">
+                  {idx > 0 && <span className="opacity-40">/</span>}
+                  {!isLast ? (
+                    <Link href={item.href} className="hover:text-primary transition-colors whitespace-nowrap">
+                      {displayLabel}
+                    </Link>
+                  ) : (
+                    <span className="text-gray-900 font-medium whitespace-nowrap">{displayLabel}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </nav>
+      </div>
     );
   }
 
@@ -41,39 +43,41 @@ export default function Breadcrumbs({ items }) {
   const segments = pathname.split("/").filter(Boolean);
 
   return (
-    <nav aria-label="Breadcrumb" className="text-sm mb-4">
-      <ol className="flex items-center gap-2 text-gray-600 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
-        {/* Always render Home first */}
-        <li>
-          <Link href="/" className="hover:underline">
-            Home
-          </Link>
-        </li>
+    <div className="container mx-auto px-4 md:px-8 py-2">
+      <nav aria-label="Breadcrumb" className="text-sm">
+        <ol className="flex items-center gap-2 text-gray-500 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
+          {/* Always render Home first */}
+          <li>
+            <Link href="/" className="hover:text-primary transition-colors">
+              Home
+            </Link>
+          </li>
 
-        {segments.map((segment, idx) => {
-          const href = "/" + segments.slice(0, idx + 1).join("/");
-          const isLast = idx === segments.length - 1;
-          
-          let label = decodeURIComponent(segment)
-            .replace(/-/g, " ")
-            .replace(/\b\w/g, (l) => l.toUpperCase());
-          
-          label = truncate(label, isLast ? 20 : 25);
+          {segments.map((segment, idx) => {
+            const href = "/" + segments.slice(0, idx + 1).join("/");
+            const isLast = idx === segments.length - 1;
+            
+            let label = decodeURIComponent(segment)
+              .replace(/-/g, " ")
+              .replace(/\b\w/g, (l) => l.toUpperCase());
+            
+            label = truncate(label, isLast ? 20 : 25);
 
-          return (
-            <li key={idx} className="flex items-center gap-1 flex-shrink-0">
-              <span className="opacity-40">/</span>
-              {!isLast ? (
-                <Link href={href} className="hover:underline whitespace-nowrap">
-                  {label}
-                </Link>
-              ) : (
-                <span className="text-gray-800 whitespace-nowrap">{label}</span>
-              )}
-            </li>
-          );
-        })}
-      </ol>
-    </nav>
+            return (
+              <li key={idx} className="flex items-center gap-1 flex-shrink-0">
+                <span className="opacity-40">/</span>
+                {!isLast ? (
+                  <Link href={href} className="hover:text-primary transition-colors whitespace-nowrap">
+                    {label}
+                  </Link>
+                ) : (
+                  <span className="text-gray-900 font-medium whitespace-nowrap">{label}</span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    </div>
   );
 }

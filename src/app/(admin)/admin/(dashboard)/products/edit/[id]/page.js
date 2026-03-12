@@ -68,6 +68,8 @@ export default function EditProduct({ params }) {
     silkType: ""
   });
 
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(true); // Default true for edit mode
+
   const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
 
   const { data: categories } = useQuery({
@@ -150,6 +152,12 @@ export default function EditProduct({ params }) {
       const mrp = Number(product.mrp);
       if (mrp > 0 && discount >= 0) {
         updatedProduct.price = Math.round(mrp * (1 - discount / 100));
+      }
+    } else if (name === "slug") {
+      setIsSlugManuallyEdited(true);
+    } else if (name === "name") {
+      if (!isSlugManuallyEdited) {
+        updatedProduct.slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
       }
     }
 

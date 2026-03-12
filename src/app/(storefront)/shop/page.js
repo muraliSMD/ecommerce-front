@@ -267,7 +267,8 @@ export default function ShopPage() {
     queryKey: ["categories"],
     queryFn: async () => {
       const { data } = await api.get("/categories");
-      return buildCategoryTree(data);
+      const activeCategories = data.filter(cat => cat.isActive !== false);
+      return buildCategoryTree(activeCategories);
     },
   });
 

@@ -170,7 +170,7 @@ export default function Home() {
               className="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-            {categories?.filter(c => c.level > 0).map((cat, i) => (
+            {categories?.filter(c => c.level > 0 && c.isActive !== false).map((cat, i) => (
                 <Link href={`/shop?category=${cat.slug || cat.name}`} key={cat._id} className="group w-[96px] sm:w-[112px] md:w-[128px] lg:w-[144px] flex-shrink-0 snap-start">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}

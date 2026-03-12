@@ -106,3 +106,12 @@
   "userId": "698081fcc3e4cc458f359244",
   "role": "admin"
 } 
+2026-03-10 18:32:10 [[32minfo[39m]: User logged in successfully {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244",
+  "role": "admin"
+} 
+2026-03-11 15:22:44 [[32minfo[39m]: Product duplicated {
+  "sourceId": "699d957d79d17274e156a8dc",
+  "newId": "69b13b6c2825aff5f66370c1"
+} 

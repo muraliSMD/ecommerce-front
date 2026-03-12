@@ -40,8 +40,11 @@ const CategoryItem = ({ category, allCategories, level = 0, onDelete, onEdit, on
 
         <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-                <span className="font-bold text-gray-900 truncate">{category.name}</span>
+                <span className={`font-bold truncate ${!category.isActive ? "text-gray-400 line-through" : "text-gray-900"}`}>{category.name}</span>
                 <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">/{category.slug}</span>
+                {!category.isActive && (
+                    <span className="text-[10px] bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border border-red-100">Hidden</span>
+                )}
             </div>
             {category.description && <p className="text-xs text-gray-500 truncate max-w-md">{category.description}</p>}
         </div>
@@ -96,7 +99,8 @@ export default function CategoriesPage() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [parentCategory, setParentCategory] = useState(null); // For adding subcategory
   
-  const [formData, setFormData] = useState({ name: "", description: "", image: "" });
+  const [formData, setFormData] = useState({ name: "", slug: "", sku: "", description: "", image: "", isActive: true });
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
@@ -209,7 +213,8 @@ export default function CategoriesPage() {
   const openAddModal = (parent = null) => {
     setParentCategory(parent);
     setEditingCategory(null);
-    setFormData({ name: "", description: "", image: "" });
+    setFormData({ name: "", slug: "", sku: "", description: "", image: "", isActive: true });
+    setIsSlugManuallyEdited(false);
     setIsModalOpen(true);
   };
 
@@ -218,9 +223,13 @@ export default function CategoriesPage() {
     setParentCategory(null); 
     setFormData({ 
         name: category.name, 
+        slug: category.slug || "",
+        sku: category.sku || "",
         description: category.description || "", 
-        image: category.image || "" 
+        image: category.image || "",
+        isActive: category.isActive !== false
     });
+    setIsSlugManuallyEdited(true);
     setIsModalOpen(true);
   };
 
@@ -334,9 +343,45 @@ export default function CategoriesPage() {
                             type="text" 
                             required
                             value={formData.name} 
-                            onChange={e => setFormData({...formData, name: e.target.value})}
+                            onChange={e => {
+                                const newName = e.target.value;
+                                setFormData(prev => ({
+                                    ...prev, 
+                                    name: newName,
+                                    slug: isSlugManuallyEdited ? prev.slug : newName.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
+                                }));
+                            }}
                             className="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20"
                             placeholder="Category Name"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-500 uppercase tracking-wider flex justify-between">
+                            <span>SKU</span>
+                            <span className="text-[10px] text-gray-400 font-normal normal-case">Optional - auto-generated if empty</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            value={formData.sku} 
+                            onChange={e => setFormData({...formData, sku: e.target.value})}
+                            className="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 font-mono text-sm"
+                            placeholder="CAT-SKU-123"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-500 uppercase tracking-wider flex justify-between">
+                            <span>Slug (URL)</span>
+                            <span className="text-[10px] text-gray-400 font-normal normal-case">Optional - auto-generated from name</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            value={formData.slug} 
+                            onChange={e => {
+                                setFormData({...formData, slug: e.target.value});
+                                setIsSlugManuallyEdited(true);
+                            }}
+                            className="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 font-mono text-sm"
+                            placeholder="category-slug"
                         />
                     </div>
                     <div className="space-y-2">
@@ -349,6 +394,22 @@ export default function CategoriesPage() {
                             rows={3}
                         />
                     </div>
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <div className="flex flex-col">
+                            <span className="text-sm font-bold text-gray-900">Visibility Status</span>
+                            <span className="text-xs text-gray-500">Enable or disable this category on storefront</span>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${formData.isActive ? "bg-primary" : "bg-gray-200"}`}
+                        >
+                            <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${formData.isActive ? "translate-x-5" : "translate-x-0"}`}
+                            />
+                        </button>
+                    </div>
+
                     <div className="flex gap-3 pt-4">
                         <button 
                             type="button" 

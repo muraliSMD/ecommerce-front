@@ -154,10 +154,15 @@ export async function POST(request) {
 
     const validatedData = validation.data;
     
-    // Generate slug from name
-    let slug = validatedData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    // Generate slug from name or use provided
+    let slug = validatedData.slug;
+    if (!slug || slug.trim() === "") {
+        slug = validatedData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    } else {
+        slug = slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    }
     
-    // Check if slug exists
+    // Check if slug exists and make unique if necessary
     let existingSlug = await Product.findOne({ slug });
     if (existingSlug) {
         slug = `${slug}-${Date.now()}`;
