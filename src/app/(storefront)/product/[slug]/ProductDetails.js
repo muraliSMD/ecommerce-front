@@ -18,6 +18,14 @@ import ReviewsSection from "@/components/ReviewsSection";
 import { useWishlistStore } from "@/store/wishlistStore";
 import VariantSlider from "@/components/VariantSlider";
 
+const resolveColorName = (color) => {
+  if (!color) return "";
+  const closest = getClosestColorName(color);
+  if (closest && closest.toLowerCase() !== color.toLowerCase()) {
+    return `${closest} (${color})`;
+  }
+  return color;
+};
 
 export default function ProductDetails({ initialProduct }) {
   const slug = initialProduct?.slug;
@@ -149,7 +157,7 @@ export default function ProductDetails({ initialProduct }) {
 
   const availableSilkTypesForColor = useMemo(() => {
     return variants.filter((v) => v.color === selectedColor && v.silkType).map((v) => v.silkType);
-  }, [variants, selectedColor, allSilkTypes]);
+  }, [variants, selectedColor]);
 
   const availableNSizesForColor = useMemo(() => {
     if (!selectedColor) return allNSizes;
@@ -227,7 +235,11 @@ export default function ProductDetails({ initialProduct }) {
 
   // Initialization Effect: Run only once or when variants/params change on MOUNT
   useEffect(() => {
-    if (!variants.length || mounted) return;
+    if (!mounted) {
+      if (!variants.length && product?.hasVariants) return;
+    } else {
+      return; 
+    }
 
     const colorParam = searchParams.get('color');
     const sizeParam = searchParams.get('size');
@@ -354,7 +366,7 @@ export default function ProductDetails({ initialProduct }) {
 
     if (navigator.share) {
       try {
-        const shareText = `Check out ${product.name}${selectedColor ? ` in ${resolveColorName(selectedColor)}` : ''}${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedLength ? ` (Length: ${selectedLength})` : ''}!`;
+        const shareText = `Check out ${product.name}${selectedColor ? ` in ${resolveColorName(selectedColor)}` : ''}${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedLength ? ` (Length: ${selectedLength})` : ''}${selectedNSize ? ` (N-Size: ${selectedNSize})` : ''}!`;
         await navigator.share({
           title: product.name,
           text: shareText,

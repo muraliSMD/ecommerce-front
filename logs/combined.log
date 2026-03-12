@@ -115,3 +115,16 @@
   "sourceId": "699d957d79d17274e156a8dc",
   "newId": "69b13b6c2825aff5f66370c1"
 } 
+2026-03-12 19:03:44 [[31merror[39m]: Error sending email {
+  "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <alerts@grabszy.com>: Sender address rejected: not owned by user support@grabszy.com",
+  "to": "support@grabszy.com",
+  "subject": "[STOCK ALERT] Pack of 3 Combo Mens Lungi checked with pure cotton with 2.15 mtrs (Blue-C11 / 2.2 mtrs) is low!"
+} 
+2026-03-12 19:03:44 [[31merror[39m]: Failed to send low stock alert email {
+  "error": "Email could not be sent"
+} 
+2026-03-12 19:03:47 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<b6632758-719c-7d39-3509-02c72e6f41e5@grabszy.com>",
+  "to": "muralis.1995@gmail.com",
+  "subject": "Order Confirmation #GRY-ORD-00006 - GRABSZY"
+} 

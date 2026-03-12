@@ -60,6 +60,7 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState("");
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
+  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
   const subtotal = items.reduce(
     (sum, i) => sum + (i.variant?.price ?? i.product.price) * i.quantity,
@@ -292,7 +293,7 @@ export default function CheckoutPage() {
 
     } catch (error) {
         console.error("Payment Flow Error", error);
-        toast.error("Failed to initiate payment");
+        toast.error("Failed to initiate payment. Please try again.");
         setIsSubmitting(false);
     }
   };
@@ -363,13 +364,6 @@ export default function CheckoutPage() {
   }, [billingDetail.name, items.length, isOrderPlaced, logAbandonedCheckout]);
 
   const handlePlaceOrder = async () => {
-    // Guest checkout allowed
-    // if (!userInfo) {
-    //   toast.error("Please login to place an order");
-    //   setAuthModalOpen(true, "login");
-    //   return;
-    // }
-
     const hasLegacyAddress = !!billingDetail.address;
     const hasNewAddress = billingDetail.address1 && billingDetail.city && billingDetail.pincode;
 
@@ -380,14 +374,19 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     
-    if (paymentMethod === "Online") {
-        await handleRazorpayPayment();
-    } else {
-        submitOrderToBackend({});
+    try {
+        if (paymentMethod === "Online") {
+            await handleRazorpayPayment();
+        } else {
+            await submitOrderToBackend({});
+        }
+    } catch (error) {
+        console.error("Critical error during checkout:", error);
+        toast.error("An error occurred. Please try again.");
+        setIsSubmitting(false);
     }
   };
 
-  const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
   const submitOrderToBackend = async (extraPaymentInfo = {}) => {
       try {
