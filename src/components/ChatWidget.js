@@ -186,7 +186,7 @@ export default function ChatWidget() {
                                         {trendingProducts.map(p => (
                                             <Link 
                                                 key={p._id}
-                                                href={`/product/${p.slug}`}
+                                                href={`/product/${p.slug || p._id}`}
                                                 className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl hover:bg-white transition-colors group"
                                             >
                                                 <div className="w-10 h-10 rounded-lg overflow-hidden relative border border-gray-100 flex-shrink-0">
@@ -206,7 +206,7 @@ export default function ChatWidget() {
                                         {recentViews.map(p => (
                                             <Link 
                                                 key={p.id}
-                                                href={`/product/${p.slug}`}
+                                                href={`/product/${p.slug || p.id}`}
                                                 className="flex items-center gap-2 p-2 bg-gray-50 rounded-xl hover:bg-white transition-colors group"
                                             >
                                                 <div className="w-10 h-10 rounded-lg overflow-hidden relative border border-gray-100 flex-shrink-0">

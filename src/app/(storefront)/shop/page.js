@@ -523,7 +523,7 @@ export default function ShopPage() {
                                 exit={{ opacity: 0 }}
                                 className="bg-white p-4 rounded-[2rem] border border-gray-100 flex flex-col sm:flex-row gap-6 items-start sm:items-center group hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all"
                             >
-                                 <Link href={`/product/${product._id}`} className="block w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 bg-surface rounded-2xl overflow-hidden relative">
+                                 <Link href={`/product/${product.slug || product._id}`} className="block w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 bg-surface rounded-2xl overflow-hidden relative">
                                     <Image 
                                         src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                                         alt={product.name}
@@ -537,7 +537,7 @@ export default function ShopPage() {
                                             <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
                                                 {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "Collection")}
                                             </p>
-                                            <Link href={`/product/${product._id}`}>
+                                             <Link href={`/product/${product.slug || product._id}`}>
                                                 <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-primary transition-colors">{product.name}</h3>
                                             </Link>
                                         </div>
@@ -548,7 +548,7 @@ export default function ShopPage() {
                                         {/* Logic similar to ProductCard: View Details if multiple variants, else Quick Add */}
                                         {product.variants && product.variants.length > 1 ? (
                                             <Link 
-                                                href={`/product/${product._id}`} 
+                                                href={`/product/${product.slug || product._id}`} 
                                                 className="bg-btn-dark text-btn-text px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-btn-dark-hover transition-colors shadow-lg shadow-gray-900/10 active:scale-95 flex items-center gap-2"
                                             >
                                                 Select Options
@@ -586,7 +586,7 @@ export default function ShopPage() {
                                             </div>
                                             );
                                         })()}
-                                        <Link href={`/product/${product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
+                                        <Link href={`/product/${product.slug || product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
                                             View Details
                                         </Link>
                                     </div>
