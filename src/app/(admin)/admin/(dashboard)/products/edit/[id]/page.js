@@ -65,12 +65,13 @@ export default function EditProduct({ params }) {
     age: "",
     withBlouse: "",
     blouseMeter: "",
-    silkType: ""
+    silkType: "",
+    nSize: ""
   });
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(true); // Default true for edit mode
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", nSize: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
 
   const { data: categories } = useQuery({
     queryKey: ["admin-categories"],
@@ -113,7 +114,8 @@ export default function EditProduct({ params }) {
         age: fetchedProduct.age || "",
         withBlouse: fetchedProduct.withBlouse || "",
         blouseMeter: fetchedProduct.blouseMeter || "",
-        silkType: fetchedProduct.silkType || ""
+        silkType: fetchedProduct.silkType || "",
+        nSize: fetchedProduct.nSize || ""
       });
     }
   }, [fetchedProduct]);
@@ -288,8 +290,8 @@ export default function EditProduct({ params }) {
   };
 
   const addVariant = () => {
-    if (!newVariant.color && !newVariant.size && !newVariant.length && !newVariant.age) {
-      return toast.error("Please provide at least one variant option (Color, Size, Length, or Age)");
+    if (!newVariant.color && !newVariant.size && !newVariant.length && !newVariant.age && !newVariant.nSize) {
+      return toast.error("Please provide at least one variant option (Color, Size, N-Size, Length, or Age)");
     }
     if (!newVariant.price) {
       return toast.error("Please provide variant price");
@@ -306,7 +308,7 @@ export default function EditProduct({ params }) {
         videos: newVariant.videos || []
       }] 
     });
-    setNewVariant({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+    setNewVariant({ color: "", size: "", length: "", age: "", nSize: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
   };
 
   const removeVariant = (index) => {
@@ -596,6 +598,17 @@ export default function EditProduct({ params }) {
                       className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                     />
                     <ColorPreview color={product.color} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">N-Size (Numerical)</label>
+                    <input 
+                      type="text" 
+                      name="nSize"
+                      value={product.nSize}
+                      onChange={handleInputChange}
+                      placeholder="e.g. 38, 40, 42"
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Size</label>
@@ -909,6 +922,16 @@ export default function EditProduct({ params }) {
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">N-Size</label>
+                <input 
+                  type="text" 
+                  value={newVariant.nSize}
+                  onChange={(e) => setNewVariant({...newVariant, nSize: e.target.value})}
+                  placeholder="e.g. 38"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                />
               </div>
               {isSaree && (
                 <>

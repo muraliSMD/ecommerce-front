@@ -72,14 +72,15 @@ export default function AddProduct() {
     age: "",
     withBlouse: "",
     blouseMeter: "",
-    silkType: ""
+    silkType: "",
+    nSize: ""
   });
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
 
   const isSaree = categories?.find(c => c._id === product.category)?.name?.toLowerCase().includes("saree");
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", nSize: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
 
   const addProductMutation = useMutation({
     mutationFn: async (data) => {
@@ -249,8 +250,8 @@ export default function AddProduct() {
   };
 
   const addVariant = () => {
-    if (!newVariant.color && !newVariant.size && !newVariant.length && !newVariant.age) {
-      return toast.error("Please provide at least one variant option (Color, Size, Length, or Age)");
+    if (!newVariant.color && !newVariant.size && !newVariant.length && !newVariant.age && !newVariant.nSize) {
+      return toast.error("Please provide at least one variant option (Color, Size, N-Size, Length, or Age)");
     }
     if (!newVariant.price) {
       return toast.error("Please provide variant price");
@@ -267,7 +268,7 @@ export default function AddProduct() {
         videos: newVariant.videos || []
       }] 
     });
-    setNewVariant({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+    setNewVariant({ color: "", size: "", length: "", age: "", nSize: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
   };
 
   const removeVariant = (index) => {
@@ -561,6 +562,17 @@ export default function AddProduct() {
                       className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                     />
                     <ColorPreview color={product.color} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">N-Size (Numerical)</label>
+                    <input 
+                      type="text" 
+                      name="nSize"
+                      value={product.nSize}
+                      onChange={handleInputChange}
+                      placeholder="e.g. 38, 40, 42"
+                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Size</label>
@@ -874,6 +886,16 @@ export default function AddProduct() {
                   ))}
                 </select>
               </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">N-Size</label>
+                <input 
+                  type="text" 
+                  value={newVariant.nSize}
+                  onChange={(e) => setNewVariant({...newVariant, nSize: e.target.value})}
+                  placeholder="e.g. 38"
+                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                />
+              </div>
               {isSaree && (
                 <>
                   <div className="space-y-2">
@@ -1021,6 +1043,15 @@ export default function AddProduct() {
                       <option value="">-</option>
                       {SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                     </select>
+                  </div>
+                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
+                    <span className="text-xs text-gray-500 font-medium">N-Size:</span>
+                    <input 
+                      type="text" 
+                      value={v.nSize || ""} 
+                      onChange={(e) => handleVariantChange(i, 'nSize', e.target.value)} 
+                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16"
+                    />
                   </div>
                   <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
                     <span className="text-xs text-gray-500 font-medium">Length:</span>
