@@ -75,6 +75,8 @@ export default function AddProduct() {
     silkType: ""
   });
 
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+
   const isSaree = categories?.find(c => c._id === product.category)?.name?.toLowerCase().includes("saree");
 
   const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
@@ -97,7 +99,6 @@ export default function AddProduct() {
   const handleInputChange = (e) => {
     let { name, value } = e.target;
     
-    
     let updatedProduct = { ...product, [name]: value };
 
     // Auto-calculate logic for single product
@@ -112,6 +113,12 @@ export default function AddProduct() {
       const mrp = Number(product.mrp);
       if (mrp > 0 && discount >= 0) {
         updatedProduct.price = Math.round(mrp * (1 - discount / 100));
+      }
+    } else if (name === "slug") {
+      setIsSlugManuallyEdited(true);
+    } else if (name === "name") {
+      if (!isSlugManuallyEdited) {
+        updatedProduct.slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
       }
     }
 

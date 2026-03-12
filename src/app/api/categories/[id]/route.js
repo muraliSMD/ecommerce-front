@@ -14,15 +14,49 @@ export async function PUT(request, { params }) {
     const { id } = await params;
     const body = await request.json();
     
-    // Allow updating name and image
+    const updateData = {};
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.image !== undefined) updateData.image = body.image;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.isActive !== undefined) updateData.isActive = body.isActive;
+    
+    if (body.sku !== undefined && body.sku.trim() !== "") {
+        const collision = await Category.findOne({ sku: body.sku, _id: { $ne: id } });
+        if (collision) {
+            return NextResponse.json({ message: "SKU already exists" }, { status: 400 });
+        }
+        updateData.sku = body.sku;
+    }
+    
+    if (body.slug !== undefined && body.slug.trim() !== "") {
+        let slug = body.slug.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+        // Check if slug is different and unique
+        const existingCategory = await Category.findById(id);
+        if (existingCategory && existingCategory.slug !== slug) {
+            const collision = await Category.findOne({ slug });
+            if (collision) {
+                slug = `${slug}-${Date.now()}`;
+            }
+            updateData.slug = slug;
+        }
+    }
+
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
-      { name: body.name, image: body.image },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
 
     if (!updatedCategory) {
       return NextResponse.json({ message: "Category not found" }, { status: 404 });
+    }
+
+    // Cascade activation/inactivation if status is changed
+    if (updateData.isActive !== undefined) {
+        await Category.updateMany(
+            { ancestors: id },
+            { $set: { isActive: updateData.isActive } }
+        );
     }
 
     return NextResponse.json(updatedCategory);

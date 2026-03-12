@@ -34,7 +34,7 @@ export default function FAQPage() {
   );
 
   return (
-    <main className="bg-white min-h-screen pt-32 lg:pt-40">
+    <div className="bg-white min-h-screen">
         {/* Hero Section */}
         <section className="container mx-auto px-4 md:px-8 max-w-4xl text-center mb-20">
             <motion.div
@@ -153,6 +153,6 @@ export default function FAQPage() {
                 </div>
             </div>
         </section>
-    </main>
+    </div>
   );
 }

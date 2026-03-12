@@ -56,16 +56,35 @@ export async function POST(request) {
     }
 
     // Generate slug safely
-    const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    let slug = validation.data.slug;
+    if (!slug || slug.trim() === "") {
+        slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    } else {
+        slug = slug.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    }
+
+    // Ensure slug uniqueness
+    let existingSlug = await Category.findOne({ slug });
+    if (existingSlug) {
+        slug = `${slug}-${Date.now()}`;
+    }
+
+    // Auto-generate SKU if not provided
+    let sku = validation.data.sku;
+    if (!sku || sku.trim() === "") {
+        sku = `CAT-${name.substring(0, 3).toUpperCase()}-${Date.now().toString().slice(-4)}`;
+    }
 
     const category = await Category.create({ 
         name, 
-        slug,
+        slug, 
+        sku,
         image, 
         parent: parent || null,
         level,
         ancestors,
-        description
+        description,
+        isActive: validation.data.isActive ?? true
     });
 
     return NextResponse.json(category, { status: 201 });

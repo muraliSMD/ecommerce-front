@@ -60,7 +60,11 @@ export default function Header() {
     queryKey: ["categories-menu"],
     queryFn: async () => {
       const { data } = await api.get("/categories");
-      return data;
+      // Filter only active categories. 
+      // Note: If a parent is inactive, we should ideally exclude all its descendants.
+      // Since we fetch a flat list, we can filter by isActive first.
+      const activeCategories = data.filter(cat => cat.isActive !== false);
+      return activeCategories;
     },
   });
 
@@ -126,8 +130,6 @@ export default function Header() {
     }
   };
 
-  const textColor = "text-gray-600";
-  const hoverColor = "hover:text-primary";
   const logoColor = "text-gray-900";
   const iconColor = "text-gray-600";
 
@@ -135,206 +137,175 @@ export default function Header() {
     <>
     <header 
       onMouseLeave={() => setActiveCategory(null)}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm py-1.5 lg:py-3" : "bg-white py-2 lg:py-4"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-sm border-b border-gray-100 ${
+        isScrolled ? "py-1" : "py-2"
       }`}
     >
       <div className="container mx-auto px-4 md:px-8">
-        <div className="flex items-center justify-between">
+        {/* Top Section */}
+        <div className="flex items-center gap-4 lg:gap-12 py-2">
           
           {/* Logo */}
-          <Link href="/" className="relative z-50 group">
+          <Link href="/" className="relative z-50 flex-shrink-0">
             {settings?.logo ? (
-                <div className="relative h-12 w-28 lg:h-20 lg:w-40">
+                <div className="relative h-16 w-44 lg:h-24 lg:w-64">
                     <Image 
                         src={settings.logo} 
                         alt={settings.siteName || "Logo"} 
                         fill 
-                        sizes="(max-width: 1024px) 112px, 160px"
+                        sizes="(max-width: 1024px) 176px, 256px"
                         priority
-                        className="object-contain object-left"
+                        className="object-cover object-left w-[75%] !w-[75%]" 
                     />
                 </div>
             ) : (
-             <span className={`font-display font-bold text-2xl tracking-tighter ${logoColor}`}>
+             <span className={`font-display font-bold text-3xl lg:text-5xl tracking-tighter ${logoColor}`}>
                 {settings?.siteName || "GRABSZY"}
                 <span className="text-primary">.</span>
              </span>
             )}
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8">
-            <Link 
-                href="/" 
-                className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}
-                onMouseEnter={() => setActiveCategory(null)}
-            >
-                Home
-            </Link>
-            <div className="relative group">
-                <Link 
-                    href="/shop" 
-                    className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors flex items-center gap-1`}
-                    onMouseEnter={() => setActiveCategory('shop')}
-                >
-                    Shop <FiChevronDown />
-                </Link>
-            </div>
-
-            <Link href="/about" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>About</Link>
-            <Link href="/gallery" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Gallery</Link>
-            <Link href="/blog" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Blog</Link>
-            <Link href="/contact" className={`text-sm font-medium ${textColor} ${hoverColor} transition-colors`}>Contact</Link>
-          </nav>
-
-          {/* Actions */}
-          <div className="hidden lg:flex items-center gap-6">
-            <div className="relative group">
-              <form onSubmit={handleSearch} className="relative">
+          {/* Desktop Search Bar (Large) */}
+          <div className="hidden lg:flex flex-1 max-w-2xl relative group">
+            <form onSubmit={handleSearch} className="relative w-full">
+              <div className="relative flex items-center w-full">
+                <FiSearch size={20} className="absolute left-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Try Saree, Kurti or Search by Product Code"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setTimeout(() => setIsInputFocused(false), 200)} // Delay to allow clicking items
-                  className="pl-4 pr-10 py-2 rounded-full bg-gray-100 border-transparent focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 w-40 focus:w-64 transition-all duration-300 outline-none text-sm"
+                  onBlur={() => setTimeout(() => setIsInputFocused(false), 200)}
+                  className="w-full pl-12 pr-4 py-2.5 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-sm"
                 />
-                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary">
-                  <FiSearch size={18} />
-                </button>
-              </form>
+              </div>
+            </form>
 
-              {/* Live Search Dropdown */}
-                <AnimatePresence>
-                    {isInputFocused && searchQuery.length > 2 && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            className="absolute top-full right-0 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 mt-2 overflow-hidden z-[60]"
-                        >
-                            {isLoadingSearch ? (
-                                <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
-                            ) : searchResults?.length > 0 ? (
-                                <ul>
-                                    {searchResults.map((product) => (
-                                        <li key={product._id}>
-                                            <Link 
-                                                href={`/product/${product._id}`}
-                                                className="flex items-center gap-4 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
-                                            >
-                                                <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden relative flex-shrink-0">
-                                                    <Image 
-                                                        src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
-                                                        alt={product.name} 
-                                                        fill 
-                                                        className="object-cover"
-                                                    />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="text-sm font-bold text-gray-900 truncate">{product.name}</h4>
-                                                    <p className="text-xs text-primary font-bold">{settings?.currency} {product.price}</p>
-                                                </div>
-                                            </Link>
-                                        </li>
-                                    ))}
-                                    <li>
+            <AnimatePresence>
+                {isInputFocused && searchQuery.length > 2 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute top-full left-0 w-full bg-white rounded-b-md shadow-xl border border-gray-100 mt-0 overflow-hidden z-[60]"
+                    >
+                        {isLoadingSearch ? (
+                            <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
+                        ) : searchResults?.length > 0 ? (
+                            <ul>
+                                {searchResults.map((product) => product && (
+                                    <li key={product._id}>
                                         <Link 
-                                            href={`/shop?search=${encodeURIComponent(searchQuery)}`}
-                                            className="block text-center py-3 text-xs font-bold text-primary hover:bg-gray-50 transition-colors uppercase tracking-wider"
+                                            href={`/product/${product._id}`}
+                                            className="flex items-center gap-4 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
                                         >
-                                            View All Results
+                                            <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden relative flex-shrink-0">
+                                                <Image 
+                                                    src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
+                                                    alt={product.name} 
+                                                    fill 
+                                                    className="object-cover"
+                                                />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-xs font-bold text-gray-900 truncate">{product.name}</h4>
+                                                <p className="text-xs text-primary font-bold">{settings?.currency} {product.price}</p>
+                                            </div>
                                         </Link>
                                     </li>
-                                </ul>
-                            ) : (
-                                <div className="p-4 text-center text-gray-400 text-sm">
-                                    No products found.
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-
-
-            {/* User Actions */}
-            
-             {/* Notification Bell (Only if user is logged in) */}
-             {user && <NotificationBell className={iconColor} />}
-
-             <Link href="/wishlist" className="relative group">
-               <FiHeart size={22} className={`${iconColor} ${hoverColor} transition-colors`} />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-sm">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
-
-            <Link href="/cart" className="relative group">
-              <FiShoppingBag size={22} className="text-gray-600 group-hover:text-primary transition-colors" />
-              {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold shadow-sm">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-            
-            {user ? (
-              <div className="relative group">
-                <Link href={user.role === 'admin' ? '/admin' : '/account'} className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border border-gray-200">
-                    <FiUser size={16} className="text-gray-600" />
-                  </div>
-                </Link>
-                <div className="absolute top-full right-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right">
-                    <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-2 w-48 overflow-hidden">
-                        <div className="px-4 py-3 border-b border-gray-100 mb-2">
-                            <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
-                            <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                        </div>
-                        <Link href="/account" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-colors">
-                            <FiGrid size={14} /> Dashboard
-                        </Link>
-                        <Link href="/account/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-colors">
-                            <FiUser size={14} /> Profile
-                        </Link>
-                        <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-primary rounded-lg transition-colors">
-                            <FiHeart size={14} /> Wishlist
-                        </Link>
-                        <button onClick={async () => { await logout(); router.refresh(); }} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition-colors text-left mt-1">
-                            <FiLogOut size={14} /> Logout
-                        </button>
-                    </div>
-                </div>
-              </div>
-            ) : (
-              <button 
-                onClick={() => setAuthModalOpen(true, "login")}
-                className="px-6 py-2.5 rounded-full bg-gray-900 text-white text-sm font-bold hover:bg-primary transition-colors shadow-lg shadow-gray-900/10 active:scale-95"
-              >
-                Login
-              </button>
-            )}
+                                ))}
+                                <li>
+                                    <Link 
+                                        href={`/shop?search=${encodeURIComponent(searchQuery)}`}
+                                        className="block text-center py-2 text-xs font-bold text-primary hover:bg-gray-50 transition-colors"
+                                    >
+                                        View All Results
+                                    </Link>
+                                </li>
+                            </ul>
+                        ) : (
+                            <div className="p-4 text-center text-gray-400 text-sm">
+                                No products found.
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Desktop Actions (Labeled) */}
+          <div className="hidden lg:flex items-center gap-10 ml-auto">
+            {/* Download App Placeholder or Join as Supplier could go here if user wanted, but they said NO */}
+            
+            {/* User Profile */}
+            <div className="relative group flex flex-col items-center">
+              {user ? (
+                <>
+                  <Link href={user.role === 'admin' ? '/admin' : '/account'} className="flex flex-col items-center group">
+                    <FiUser size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
+                    <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Profile</span>
+                  </Link>
+                  <div className="absolute top-full right-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50">
+                      <div className="bg-white rounded shadow-xl border border-gray-100 p-2 w-48 overflow-hidden">
+                          <div className="px-4 py-3 border-b border-gray-100 mb-2 text-center">
+                              <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
+                              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                          </div>
+                          <Link href="/account" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors">
+                              <FiGrid size={12} /> Dashboard
+                          </Link>
+                          <Link href="/account/profile" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors">
+                              <FiUser size={12} /> My Profile
+                          </Link>
+                          <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors">
+                              <FiHeart size={12} /> Wishlist ({wishlistCount})
+                          </Link>
+                          <button onClick={async () => { await logout(); router.refresh(); }} className="w-full flex items-center gap-2 px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors text-left mt-1 border-t border-gray-50">
+                              <FiLogOut size={12} /> Logout
+                          </button>
+                      </div>
+                  </div>
+                </>
+              ) : (
+                <button 
+                  onClick={() => setAuthModalOpen(true, "login")}
+                  className="flex flex-col items-center group"
+                >
+                  <FiUser size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
+                  <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Profile</span>
+                </button>
+              )}
+            </div>
+
+            {/* Cart */}
+            <Link href="/cart" className="flex flex-col items-center group relative">
+              <div className="relative">
+                <FiShoppingBag size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Cart</span>
+            </Link>
+          </div>
+
           {/* Mobile Actions */}
-          <div className="flex lg:hidden items-center gap-5">
+          <div className="flex lg:hidden items-center gap-4 ml-auto">
             <button
                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="w-10 h-10 flex items-center justify-center text-gray-900"
+                className="p-1 text-gray-700"
             >
-                <FiSearch size={22} className={iconColor} />
+                <FiSearch size={22} />
             </button>
 
-            <Link href="/cart" className="relative">
-              <FiShoppingBag size={24} className={iconColor} />
+            <Link href="/cart" className="relative p-1">
+              <FiShoppingBag size={22} className="text-gray-700" />
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full font-bold shadow-sm">
+                <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                   {cartCount}
                 </span>
               )}
@@ -342,14 +313,44 @@ export default function Header() {
 
             <button 
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="w-10 h-10 flex items-center justify-center text-gray-900"
+                className="p-1 text-gray-700"
             >
-                <FiMenu size={28} className={iconColor} />
+                <FiMenu size={24} />
             </button>
           </div>
         </div>
 
-        {/* Mobile Search Bar Overlay */}
+        {/* Bottom Section - Category Navigation */}
+        <nav className="hidden lg:flex items-center justify-between border-t border-gray-50">
+          <ul className="flex items-center gap-6 overflow-x-auto no-scrollbar py-2">
+            <li className="flex-shrink-0">
+               <Link href="/" className={`text-sm font-medium whitespace-nowrap text-gray-700 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary pb-1`}>
+                 All
+               </Link>
+            </li>
+            {categories?.map((cat) => (
+              <li 
+                key={cat._id} 
+                className="flex-shrink-0 relative group"
+                onMouseEnter={() => setActiveCategory(cat._id)}
+              >
+                <Link 
+                  href={`/shop?category=${cat.slug || cat.name}`}
+                  className={`text-sm font-medium whitespace-nowrap text-gray-700 hover:text-primary transition-colors border-b-2 ${activeCategory === cat._id ? 'border-primary' : 'border-transparent'} hover:border-primary pb-1`}
+                >
+                  {cat.name}
+                </Link>
+              </li>
+            ))}
+            <li className="flex-shrink-0">
+               <Link href="/shop" className="text-sm font-medium whitespace-nowrap text-gray-700 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary pb-1">
+                 New Arrivals
+               </Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Mobile Search Overlay */}
         <AnimatePresence>
             {isMobileSearchOpen && (
                 <motion.div
@@ -366,7 +367,7 @@ export default function Header() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 autoFocus
-                                className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-gray-900"
+                                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 rounded-md outline-none focus:ring-1 focus:ring-primary/20 text-gray-900 text-sm"
                             />
                             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                             <button 
@@ -377,51 +378,6 @@ export default function Header() {
                                 <FiX size={18} />
                             </button>
                         </form>
-
-                        {/* Mobile Live Results */}
-                        {searchQuery.length > 2 && (
-                             <div className="mt-4 max-h-[60vh] overflow-y-auto">
-                                {isLoadingSearch ? (
-                                    <div className="text-center text-gray-500 py-4">Searching...</div>
-                                ) : searchResults?.length > 0 ? (
-                                    <ul className="space-y-2">
-                                        {searchResults.map((product) => (
-                                            <li key={product._id}>
-                                                <Link 
-                                                    href={`/product/${product._id}`}
-                                                    onClick={() => setIsMobileSearchOpen(false)}
-                                                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors"
-                                                >
-                                                    <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 relative">
-                                                        <Image 
-                                                            src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
-                                                            alt={product.name} 
-                                                            fill 
-                                                            className="object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
-                                                        <p className="text-xs text-primary font-bold">{settings?.currency} {product.price}</p>
-                                                    </div>
-                                                </Link>
-                                            </li>
-                                        ))}
-                                        <li>
-                                            <Link 
-                                                href={`/shop?search=${encodeURIComponent(searchQuery)}`}
-                                                onClick={() => setIsMobileSearchOpen(false)}
-                                                className="block text-center py-3 text-xs font-bold text-primary hover:bg-gray-50 transition-colors uppercase tracking-wider border-t border-gray-100 mt-2"
-                                            >
-                                                View All Results
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                ) : (
-                                    <div className="text-center text-gray-500 py-4">No products found.</div>
-                                )}
-                             </div>
-                        )}
                     </div>
                 </motion.div>
             )}
@@ -429,74 +385,62 @@ export default function Header() {
 
         {/* Mega Menu Dropdown */}
         <AnimatePresence>
-            {activeCategory && (
+            {activeCategory && activeCategory !== 'shop' && (
                 <motion.div
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl py-10 z-40"
+                    exit={{ opacity: 0, y: 5 }}
+                    className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-2xl py-8 z-40"
                     onMouseEnter={() => setActiveCategory(activeCategory)}
                     onMouseLeave={() => setActiveCategory(null)}
                 >
                     <div className="container mx-auto px-8">
-                        {activeCategory === 'shop' ? (
-                             <div className="grid grid-cols-4 gap-8">
-                                <div>
-                                    <h3 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">Shop All</h3>
-                                    <ul className="space-y-3">
-                                        <li><Link href="/shop" className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> New Arrivals</Link></li>
-                                        <li><Link href="/shop?sort=best_selling" className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> Best Sellers</Link></li>
-                                        <li><Link href="/shop?sort=price_asc" className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> Sale</Link></li>
-                                    </ul>
-                                </div>
-                                {categories?.slice(0, 3).map(cat => (
-                                    <div key={cat._id}>
-                                         <h3 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">{cat.name}</h3>
-                                         <ul className="space-y-3">
-                                            {cat.children?.length > 0 ? (
-                                                cat.children.map(sub => (
-                                                    <li key={sub._id}>
-                                                        <Link href={`/shop?category=${sub.slug || sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
-                                                            <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> {sub.name}
+                        <div className="grid grid-cols-5 gap-8">
+                            {(() => {
+                                const cat = categories?.find(c => c._id === activeCategory);
+                                if (!cat) return null;
+                                return (
+                                    <>
+                                        <div className="col-span-1">
+                                            <h3 className="font-bold text-gray-900 mb-2 text-base">{cat.name}</h3>
+                                            <p className="text-xs text-gray-500 mb-4">Discover our premium collection of {cat.name.toLowerCase()}</p>
+                                            <Link href={`/shop?category=${cat.slug || cat.name}`} className="text-primary font-bold text-xs hover:underline flex items-center gap-1">
+                                              View All <FiChevronRight />
+                                            </Link>
+                                        </div>
+                                        {cat.children?.length > 0 ? (
+                                            <div className="col-span-4 grid grid-cols-4 gap-6 border-l border-gray-50 pl-8">
+                                                {cat.children.map(sub => (
+                                                    <div key={sub._id}>
+                                                        <Link 
+                                                            href={`/shop?category=${sub.slug || sub.name}`} 
+                                                            className="text-gray-800 font-bold text-xs uppercase tracking-wider hover:text-primary transition-colors mb-4 block"
+                                                        >
+                                                            {sub.name}
                                                         </Link>
-                                                    </li>
-                                                ))
-                                            ) : (
-                                                <li><Link href={`/shop?category=${cat.slug || cat.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group"><span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> View All</Link></li>
-                                            )}
-                                         </ul>
-                                    </div>
-                                ))}
-                             </div>
-                        ) : (
-                            <div className="grid grid-cols-4 gap-8">
-                                {(() => {
-                                    const cat = categories?.find(c => c._id === activeCategory);
-                                    if (!cat) return null;
-                                    return (
-                                        <>
-                                            <div className="col-span-1">
-                                                <h3 className="font-bold text-gray-900 mb-4 text-lg">{cat.name} collection</h3>
-                                                <Link href={`/shop?category=${cat.slug || cat.name}`} className="text-primary font-bold text-sm hover:underline">View All Products</Link>
+                                                        {sub.children?.length > 0 && (
+                                                            <ul className="space-y-2">
+                                                                {sub.children.map(grandChild => (
+                                                                    <li key={grandChild._id}>
+                                                                        <Link href={`/shop?category=${grandChild.slug || grandChild.name}`} className="text-gray-500 hover:text-primary text-xs flex items-center gap-1 group">
+                                                                            <span className="w-0 group-hover:w-1 h-0.5 bg-primary transition-all"></span> {grandChild.name}
+                                                                        </Link>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <div className="col-span-1">
-                                                <h3 className="font-bold text-gray-900 mb-4 uppercase tracking-wider text-xs">Subcategories</h3>
-                                                <ul className="space-y-3">
-                                                    {cat.children?.map(sub => (
-                                                        <li key={sub._id}>
-                                                            <Link href={`/shop?category=${sub.slug || sub.name}`} className="text-gray-500 hover:text-primary text-sm flex items-center gap-2 group">
-                                                                <span className="w-0 group-hover:w-2 h-0.5 bg-primary transition-all"></span> {sub.name}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                        ) : (
+                                            <div className="col-span-4 py-4 text-center text-gray-400 text-sm">
+                                              No subcategories found for this category.
                                             </div>
-                                            {/* Could add featured images for category here if available */}
-                                        </>
-                                    )
-                                })()}
-                            </div>
-                        )}
+                                        )}
+                                    </>
+                                )
+                            })()}
+                        </div>
                     </div>
                 </motion.div>
             )}

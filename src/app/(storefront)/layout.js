@@ -13,7 +13,7 @@ export default function StorefrontLayout({ children }) {
     <>
       <TransitionBar />
       {!isAuthRoute && <Header />}
-      <main className="flex-1">{children}</main>
+      <main className={`flex-1 ${!isAuthRoute ? "pt-14 lg:pt-32" : ""}`}>{children}</main>
       {!isAuthRoute && <Footer />}
     </>
   );
