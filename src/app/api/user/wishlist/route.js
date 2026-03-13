@@ -49,16 +49,30 @@ export async function POST(request) {
             return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
         }
 
-        const { productId } = await request.json();
+        const body = await request.json();
         
-        if (!productId) {
-            return NextResponse.json({ message: "Product ID required" }, { status: 400 });
+        let productIdsToAdd = [];
+        if (body.productIds && Array.isArray(body.productIds)) {
+            productIdsToAdd = body.productIds;
+        } else if (body.productId) {
+            productIdsToAdd = [body.productId];
+        }
+
+        if (productIdsToAdd.length === 0) {
+            return NextResponse.json({ message: "Product ID(s) required" }, { status: 400 });
         }
 
         const user = await User.findById(userId);
-        
-        if (!user.wishlist.includes(productId)) {
-            user.wishlist.push(productId);
+        let updated = false;
+
+        for (const pid of productIdsToAdd) {
+             if (!user.wishlist.includes(pid)) {
+                 user.wishlist.push(pid);
+                 updated = true;
+             }
+        }
+
+        if (updated) {
             await user.save();
         }
 

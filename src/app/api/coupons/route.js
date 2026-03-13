@@ -14,7 +14,7 @@ export async function GET(request) {
 
     // 1. Admin Request: Return all coupons
     if (user && isAdmin(user) && !availableOnly) {
-      const coupons = await Coupon.find({}).sort({ createdAt: -1 });
+      const coupons = await Coupon.find({}).sort({ createdAt: -1 }).lean();
       return NextResponse.json(coupons);
     }
 
@@ -29,7 +29,7 @@ export async function GET(request) {
         ]
     };
 
-    let coupons = await Coupon.find(query).sort({ createdAt: -1 });
+    let coupons = await Coupon.find(query).sort({ createdAt: -1 }).lean();
 
     // Filter by global usage limit
     coupons = coupons.filter(c => c.usageLimit === null || c.usedCount < c.usageLimit);

@@ -14,7 +14,8 @@ export async function GET(request) {
 
     const users = await User.find({})
       .select("-password") // Exclude passwords
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     return NextResponse.json(users);
   } catch (error) {

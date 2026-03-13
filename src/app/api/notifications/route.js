@@ -25,7 +25,8 @@ export async function GET(request) {
 
     const notifications = await Notification.find(query)
       .sort({ createdAt: -1 })
-      .limit(20);
+      .limit(20)
+      .lean();
 
     const unreadCount = await Notification.countDocuments({
         ...query,

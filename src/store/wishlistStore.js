@@ -14,12 +14,12 @@ export const useWishlistStore = create(
         if (!userId) return;
 
         try {
-            // 1. Sync local items to server (if any)
-            for (const item of items) {
+            // 1. Sync local items to server in a single batch
+            if (items.length > 0) {
                  await fetch('/api/user/wishlist', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId: item._id }),
+                    body: JSON.stringify({ productIds: items.map(item => item._id) }),
                 });
             }
 

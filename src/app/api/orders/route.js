@@ -47,7 +47,8 @@ export async function GET(request) {
     const orders = await Order.find(query)
       .populate("items.product")
       .populate("user", "name email")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     return NextResponse.json(orders);
   } catch (error) {
@@ -198,9 +199,12 @@ export async function POST(request) {
       taxAmount: taxAmount,
       discountAmount: discountAmount,
       couponCode: usedCoupon ? usedCoupon.code : null,
+      transactionId: body.paymentInfo?.transactionId,
+      razorpayOrderId: body.paymentInfo?.razorpayOrderId,
       paymentMethod: body.paymentMethod || "COD",
       shippingAddress: body.shippingAddress,
-      paymentStatus: body.paymentStatus || (body.paymentMethod === 'COD' ? 'pending' : 'Paid')
+      paymentStatus: 'pending', // SANITIZED: Always start as pending. Online orders updated via verification.
+      orderStatus: 'Processing' // Force initial status
     }).save();
 
     // --- Post-Order Extensions ---

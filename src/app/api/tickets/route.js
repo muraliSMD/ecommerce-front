@@ -19,7 +19,8 @@ export async function GET(request) {
 
     const tickets = await Ticket.find(query)
       .populate('user', 'name email')
-      .sort({ updatedAt: -1 });
+      .sort({ updatedAt: -1 })
+      .lean();
 
     return NextResponse.json(tickets);
   } catch (error) {

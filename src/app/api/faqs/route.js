@@ -14,7 +14,7 @@ export async function GET(request) {
       query = {};
     }
 
-    const faqs = await FAQ.find(query).sort({ order: 1, createdAt: -1 });
+    const faqs = await FAQ.find(query).sort({ order: 1, createdAt: -1 }).lean();
     return NextResponse.json(faqs);
   } catch (error) {
     return NextResponse.json({ message: "Server Error", error: error.message }, { status: 500 });

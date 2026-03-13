@@ -20,7 +20,8 @@ export async function GET(request) {
 
     const items = await Gallery.find(query)
       .populate("category", "name slug")
-      .sort({ order: 1, createdAt: -1 });
+      .sort({ order: 1, createdAt: -1 })
+      .lean();
     return NextResponse.json(items);
   } catch (error) {
     return NextResponse.json(

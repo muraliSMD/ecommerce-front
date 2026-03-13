@@ -16,7 +16,8 @@ export async function GET(request) {
 
     const blogs = await Blog.find(query)
       .populate('author', 'name')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     return NextResponse.json(blogs);
   } catch (error) {

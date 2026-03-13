@@ -7,7 +7,7 @@ import { heroSlideSchema } from "@/lib/validations/hero-slide";
 export async function GET() {
   await dbConnect();
   try {
-    const slides = await HeroSlide.find().sort({ order: 1 });
+    const slides = await HeroSlide.find().sort({ order: 1 }).lean();
     return NextResponse.json(slides);
   } catch (error) {
     return NextResponse.json(

@@ -180,24 +180,9 @@ export default function ProductDetails({ initialProduct }) {
       return matchColor && matchSize && matchLength && matchAge && matchBlouse && matchBlouseMeter && matchSilk && matchNSize;
     });
 
-    // If no exact match but we have a color, find ANY variant with that color as fallback
+    // If no exact match but we have a color, find ANY variant with that color as initial fallback for media/price
     if (!variant && selectedColor) {
         variant = variants.find(v => v.color === selectedColor);
-    }
-        if (variant) {
-            if (variant.size && selectedSize !== variant.size) {
-                setSelectedSize(variant.size);
-                setSelectedLength("");
-            } else if (variant.length && selectedLength !== variant.length) {
-                setSelectedLength(variant.length);
-                setSelectedSize("");
-                setSelectedAge("");
-            } else if (variant.age && selectedAge !== variant.age) {
-                setSelectedAge(variant.age);
-                setSelectedSize("");
-            } else if (variant.nSize && selectedNSize !== variant.nSize) {
-                setSelectedNSize(variant.nSize);
-        }
     }
 
     setSelectedVariant(variant || null);
@@ -691,7 +676,7 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={size}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedSize(size); setSelectedLength(""); }}
+                          onClick={() => { setSelectedSize(size); }}
                           className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
@@ -720,7 +705,7 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={length}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedLength(length); setSelectedSize(""); setSelectedAge(""); }}
+                          onClick={() => { setSelectedLength(length); }}
                           className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
@@ -749,7 +734,7 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={age}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedAge(age); setSelectedSize(""); setSelectedLength(""); }}
+                          onClick={() => { setSelectedAge(age); }}
                           className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
@@ -778,7 +763,7 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={nSize}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedNSize(nSize); setSelectedSize(""); setSelectedLength(""); setSelectedAge(""); }}
+                          onClick={() => { setSelectedNSize(nSize); }}
                           className={`min-w-[60px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :

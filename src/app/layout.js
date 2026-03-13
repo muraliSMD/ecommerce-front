@@ -2,11 +2,8 @@ import "../styles/globals.css";
 import { Toaster } from "react-hot-toast";
 import QueryProvider from "./QueryProvider";
 import { Montserrat, Open_Sans } from "next/font/google";
-import AuthModal from "@/components/AuthModal";
 import SettingsInitializer from "@/components/SettingsInitializer";
-import PopupManager from "@/components/popups/PopupManager";
-import ChatWidget from "@/components/ChatWidget";
-import PushNotificationManager from "@/components/PushNotificationManager";
+import GlobalOverlays from "@/components/GlobalOverlays";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -88,11 +85,8 @@ export default async function RootLayout({ children }) {
       <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-bg-main min-h-screen antialiased`} suppressHydrationWarning={true}>
         <QueryProvider>
           <SettingsInitializer />
-          <AuthModal />
           <PwaManager />
-          <PopupManager />
-          <ChatWidget />
-          <PushNotificationManager />
+          <GlobalOverlays />
           <ScriptManager scripts={settings.scripts} />
           <OrganizationJsonLd 
             siteName={settings.siteName || "GRABSZY"}

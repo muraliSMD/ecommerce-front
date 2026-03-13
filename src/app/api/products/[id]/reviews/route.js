@@ -57,14 +57,32 @@ export async function POST(request, { params }) {
     };
 
     product.reviews.push(review);
-
-    product.numReviews = product.reviews.length;
-
-    product.averageRating =
-      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-      product.reviews.length;
-
     await product.save();
+
+    // Recalculate average rating robustly to prevent race conditions
+    const aggregateResult = await Product.aggregate([
+      { $match: { _id: product._id } },
+      { $unwind: "$reviews" },
+      { 
+        $group: { 
+          _id: "$_id", 
+          averageRating: { $avg: "$reviews.rating" }, 
+          numReviews: { $sum: 1 } 
+        } 
+      }
+    ]);
+
+    if (aggregateResult.length > 0) {
+      await Product.updateOne(
+        { _id: product._id },
+        { 
+          $set: { 
+            averageRating: Number(aggregateResult[0].averageRating.toFixed(1)),
+            numReviews: aggregateResult[0].numReviews 
+          } 
+        }
+      );
+    }
     
     return NextResponse.json({ message: "Review added", isVerified: !!deliveredOrder });
   } catch (error) {
