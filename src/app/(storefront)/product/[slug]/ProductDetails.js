@@ -684,14 +684,17 @@ export default function ProductDetails({ initialProduct }) {
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Size</span>} compact={true}>
                     {allSizes.map((size) => {
-                      const disabled = !availableSizesForColor.includes(size);
+                      const variantInfo = variants.find(v => v.color === selectedColor && v.size === size);
+                      const disabled = !variantInfo;
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
                       return (
                         <button
                           key={size}
-                          disabled={disabled}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { setSelectedSize(size); setSelectedLength(""); }}
                           className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
-                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            disabled ? "hidden" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
                             selectedSize === size
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -710,14 +713,17 @@ export default function ProductDetails({ initialProduct }) {
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Length</span>} compact={true}>
                     {allLengths.map((length) => {
-                      const disabled = !availableLengthsForColor.includes(length);
+                      const variantInfo = variants.find(v => v.color === selectedColor && v.length === length);
+                      const disabled = !variantInfo;
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
                       return (
                         <button
                           key={length}
-                          disabled={disabled}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { setSelectedLength(length); setSelectedSize(""); setSelectedAge(""); }}
                           className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
-                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            disabled ? "hidden" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedLength === length
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -736,14 +742,17 @@ export default function ProductDetails({ initialProduct }) {
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Age Group</span>} compact={true}>
                     {allAges.map((age) => {
-                      const disabled = !availableAgesForColor.includes(age);
+                      const variantInfo = variants.find(v => v.color === selectedColor && v.age === age);
+                      const disabled = !variantInfo;
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
                       return (
                         <button
                           key={age}
-                          disabled={disabled}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { setSelectedAge(age); setSelectedSize(""); setSelectedLength(""); }}
                           className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
-                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            disabled ? "hidden" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedAge === age
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -762,14 +771,17 @@ export default function ProductDetails({ initialProduct }) {
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">N-Size</span>} compact={true}>
                     {allNSizes.map((nSize) => {
-                      const disabled = !availableNSizesForColor.includes(nSize);
+                      const variantInfo = variants.find(v => v.color === selectedColor && v.nSize === nSize);
+                      const disabled = !variantInfo;
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
                       return (
                         <button
                           key={nSize}
-                          disabled={disabled}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { setSelectedNSize(nSize); setSelectedSize(""); setSelectedLength(""); setSelectedAge(""); }}
                           className={`min-w-[60px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
-                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            disabled ? "hidden" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedNSize === nSize
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -788,14 +800,17 @@ export default function ProductDetails({ initialProduct }) {
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Silk Type</span>} compact={true}>
                     {allSilkTypes.map((type) => {
-                      const disabled = !availableSilkTypesForColor.includes(type);
+                      const variantInfo = variants.find(v => v.color === selectedColor && v.silkType === type);
+                      const disabled = !variantInfo;
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
                       return (
                         <button
                           key={type}
-                          disabled={disabled}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedSilkType(type)}
                           className={`min-w-[120px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
-                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            disabled ? "hidden" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedSilkType === type
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -814,14 +829,17 @@ export default function ProductDetails({ initialProduct }) {
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Blouse</span>} compact={true}>
                     {allBlouseOptions.map((opt) => {
-                      const disabled = !availableBlouseOptionsForColor.includes(opt);
+                      const variantInfo = variants.find(v => v.color === selectedColor && v.withBlouse === opt);
+                      const disabled = !variantInfo;
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
                       return (
                         <button
                           key={opt}
-                          disabled={disabled}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedWithBlouse(opt)}
                           className={`min-w-[120px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
-                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            disabled ? "hidden" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedWithBlouse === opt
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -840,14 +858,17 @@ export default function ProductDetails({ initialProduct }) {
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Blouse Length</span>} compact={true}>
                     {allBlouseMeters.map((meter) => {
-                      const disabled = !availableBlouseMetersForColor.includes(meter);
+                      const variantInfo = variants.find(v => v.color === selectedColor && v.blouseMeter === meter);
+                      const disabled = !variantInfo;
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
                       return (
                         <button
                           key={meter}
-                          disabled={disabled}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedBlouseMeter(meter)}
                           className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start ${
-                            disabled ? "opacity-20 cursor-not-allowed border-gray-100" :
+                            disabled ? "hidden" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedBlouseMeter === meter
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -919,15 +940,15 @@ export default function ProductDetails({ initialProduct }) {
               {/* Purchase Section: Add to Cart & Buy Now */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                  disabled={!canAdd}
+                  disabled={!canAdd || isOutOfStock}
                   onClick={() => {
                     addToCart(product, quantity, selectedVariant);
                     toast.success("Added to GRABSZY Cart!");
                     setQuantity(1);
                   }}
                   className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
-                    !canAdd 
-                      ? "bg-gray-200 cursor-not-allowed" 
+                    (!canAdd || isOutOfStock)
+                      ? "bg-gray-200 cursor-not-allowed text-gray-400" 
                       : "bg-primary hover:bg-secondary shadow-primary/20"
                   }`}
                 >
@@ -936,14 +957,14 @@ export default function ProductDetails({ initialProduct }) {
                 </button>
 
                 <button
-                  disabled={!canAdd}
+                  disabled={!canAdd || isOutOfStock}
                   onClick={() => {
                     addToCart(product, quantity, selectedVariant);
                     router.push('/checkout');
                   }}
                   className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
-                    !canAdd 
-                      ? "bg-gray-200 cursor-not-allowed" 
+                    (!canAdd || isOutOfStock)
+                      ? "bg-gray-200 cursor-not-allowed text-gray-400" 
                       : "bg-btn-dark hover:bg-black shadow-gray-900/20"
                   }`}
                 >

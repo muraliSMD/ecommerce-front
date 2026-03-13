@@ -227,6 +227,7 @@ export default function OrderDetailsPage() {
                     <FiMapPin /> <span className="text-xs font-bold uppercase tracking-widest">Shipping To</span>
                 </div>
                 <p className="font-bold text-gray-900">{order.shippingAddress?.name}</p>
+                <p className="text-sm text-gray-500">{order.shippingAddress?.email}</p>
                 <p className="text-sm text-gray-500">{order.shippingAddress?.phone}</p>
                 <p className="text-sm text-gray-500 mt-2">{order.shippingAddress?.address}</p>
             </div>

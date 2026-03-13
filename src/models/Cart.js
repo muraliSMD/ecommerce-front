@@ -8,6 +8,12 @@ const cartItemSchema = new mongoose.Schema({
   variant: {
     color: String,
     size: String,
+    length: String,
+    age: String,
+    nSize: String,
+    withBlouse: String,
+    blouseMeter: String,
+    silkType: String,
     price: Number, // variant-specific price
   },
 });

@@ -228,24 +228,35 @@ export async function POST(request) {
             let targetVariant = null;
 
             if (product.hasVariants && item.variant) {
-                // Find and update specific variant stock
+                // Determine which variant fields were actually provided
+                const queryConditions = { _id: item.product };
+                const validKeys = ['color', 'size', 'length', 'age', 'nSize', 'withBlouse', 'blouseMeter', 'silkType'];
+                
+                for (const key of validKeys) {
+                    if (item.variant[key] !== undefined && item.variant[key] !== null && item.variant[key] !== "") {
+                        queryConditions[`variants.${key}`] = item.variant[key];
+                    }
+                }
+
+                // Find and update specific variant stock AND parent stock
                 updatedProduct = await Product.findOneAndUpdate(
+                    queryConditions,
                     { 
-                        _id: item.product, 
-                        "variants.color": item.variant.color,
-                        "variants.size": item.variant.size,
-                        "variants.length": item.variant.length
+                        $inc: { 
+                            "variants.$.stock": -item.quantity,
+                            "stock": -item.quantity 
+                        } 
                     },
-                    { $inc: { "variants.$.stock": -item.quantity } },
                     { new: true }
                 );
 
                 if (updatedProduct) {
-                    targetVariant = updatedProduct.variants.find(v => 
-                        v.color === item.variant.color && 
-                        v.size === item.variant.size && 
-                        v.length === item.variant.length
-                    );
+                    targetVariant = updatedProduct.variants.find(v => {
+                        return validKeys.every(k => {
+                            if (item.variant[k]) return v[k] === item.variant[k];
+                            return true; // Ignore keys not in the order
+                        });
+                    });
                     currentStock = targetVariant ? targetVariant.stock : 0;
                 }
             } else {

@@ -5,11 +5,15 @@ import { useParams } from "next/navigation";
 import { FiCheckCircle, FiShoppingBag, FiArrowRight } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
+import { useUserStore } from "@/store/userStore";
 
 export default function CheckoutSuccessPage() {
   const { id } = useParams();
+  const { setAuthModalOpen, userInfo } = useUserStore();
   const [mounted, setMounted] = useState(false);
   const [orderFriendlyId, setOrderFriendlyId] = useState("");
+  const [orderEmail, setOrderEmail] = useState("");
+  const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -21,6 +25,8 @@ export default function CheckoutSuccessPage() {
         if (response.ok) {
           const data = await response.json();
           setOrderFriendlyId(data.orderId);
+          setOrderEmail(data.shippingAddress?.email || "");
+          setIsGuest(!data.user);
         }
       } catch (err) {
         console.error("Failed to fetch order details", err);
@@ -69,13 +75,33 @@ export default function CheckoutSuccessPage() {
           <p className="text-xl font-mono font-bold text-gray-900">#{orderFriendlyId || id.slice(-6).toUpperCase()}</p>
         </div>
 
-        <div className="space-y-3">
-          <Link 
-            href={`/account/orders/${id}`}
-            className="block w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/20"
-          >
-            View Order Details
-          </Link>
+        <div className="space-y-4">
+          {!userInfo && isGuest ? (
+            <div className="space-y-4">
+               <button 
+                onClick={() => setAuthModalOpen(true, "signup", orderEmail)}
+                className="block w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/20"
+              >
+                Create Account to Track Order
+              </button>
+              <p className="text-xs text-gray-400">
+                Already have an account? {" "}
+                <button 
+                  onClick={() => setAuthModalOpen(true, "login", orderEmail)}
+                  className="text-primary font-bold hover:underline"
+                >
+                  Sign In
+                </button>
+              </p>
+            </div>
+          ) : (
+            <Link 
+              href={`/account/orders/${id}`}
+              className="block w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/20"
+            >
+              View Order Details
+            </Link>
+          )}
           
           <Link 
             href="/"

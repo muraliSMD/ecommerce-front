@@ -75,7 +75,7 @@ export default async function RootLayout({ children }) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://grabszy.com";
 
     return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-bg-main min-h-screen antialiased`} suppressHydrationWarning={true}>
         <QueryProvider>
           <SettingsInitializer />

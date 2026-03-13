@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "@/store/userStore";
@@ -19,6 +19,13 @@ export default function AuthModal() {
   });
 
   const [mode, setMode] = useState(authMode); // Local state to handle "forgot_password"
+  const initialEmail = useUserStore((state) => state.initialEmail);
+
+  useEffect(() => {
+    if (initialEmail) {
+      setFormData((prev) => ({ ...prev, email: initialEmail }));
+    }
+  }, [initialEmail]);
 
   if (!isAuthModalOpen) return null;
 

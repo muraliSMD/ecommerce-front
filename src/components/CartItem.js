@@ -7,8 +7,8 @@ import { getClosestColorName } from "@/lib/colors";
 
 export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
-  const price = Number(item.variant?.price ?? item.product.price ?? 0);
-  const image = item.variant?.images?.[0] || item.product.images?.[0] || "/placeholder.png";
+  const price = Number(item.variant?.price ?? item.product?.price ?? 0);
+  const image = item.variant?.images?.[0] || item.product?.images?.[0] || "/placeholder.png";
 
   const resolveColorName = (color) => {
     if (!color) return "";
@@ -24,7 +24,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
       <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-surface flex-shrink-0 relative">
         <Image 
             src={image} 
-            alt={item.product.name} 
+            alt={item.product?.name || "Product"} 
             fill 
             className="object-cover group-hover:scale-110 transition-transform duration-500" 
         />
@@ -33,7 +33,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
       <div className="flex-grow space-y-2">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-lg font-display font-bold text-gray-900 line-clamp-1">{item.product.name}</h3>
+            <h3 className="text-lg font-display font-bold text-gray-900 line-clamp-1">{item.product?.name || "Unknown Product"}</h3>
             {item.variant && (
               <p className="text-xs font-bold uppercase tracking-wider text-primary/60 mt-1">
                 {resolveColorName(item.variant.color)} • {item.variant.size}

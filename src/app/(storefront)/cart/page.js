@@ -35,7 +35,7 @@ export default function CartPage() {
   };
 
   const total = items.reduce(
-    (sum, i) => sum + (Number(i.variant?.price ?? i.product.price ?? 0) * i.quantity),
+    (sum, i) => sum + (i.product ? Number(i.variant?.price ?? i.product.price ?? 0) * i.quantity : 0),
     0
   );
 
@@ -76,9 +76,9 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="lg:col-span-8 space-y-6">
             <AnimatePresence>
-              {items.map((item, index) => (
+              {items.filter(item => item.product).map((item, index) => (
                 <motion.div
-                  key={`${item.product._id}-${item.variant?.color}-${item.variant?.size}-${index}`}
+                  key={`${item.product?._id || index}-${item.variant?.color}-${item.variant?.size}-${index}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
