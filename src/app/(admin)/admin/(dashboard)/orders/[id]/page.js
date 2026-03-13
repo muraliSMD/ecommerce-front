@@ -110,6 +110,7 @@ export default function AdminOrderDetails() {
       let details = `Order #${order._id.slice(-6).toUpperCase()}\n`;
       details += `Date: ${new Date(order.createdAt).toLocaleString()}\n`;
       details += `Customer: ${order.shippingAddress?.fullName || order.shippingAddress?.name || "Guest"}\n`;
+      details += `Email: ${order.user?.email || order.shippingAddress?.email || "N/A"}\n`;
       details += `Phone: ${order.shippingAddress?.phone || "N/A"}\n`;
       details += `Address: ${order.shippingAddress?.address || ""}, ${order.shippingAddress?.city || ""}\n\n`;
       
@@ -431,8 +432,8 @@ export default function AdminOrderDetails() {
                         <FiUser />
                      </div>
                      <div>
-                        <p className="font-bold text-gray-900">{order.shippingAddress?.fullName || "Guest"}</p>
-                        <p className="text-xs text-gray-500">{order.user?.email || "No account email"}</p>
+                        <p className="font-bold text-gray-900">{order.shippingAddress?.fullName || order.shippingAddress?.name || "Guest"}</p>
+                        <p className="text-xs text-gray-500">{order.user?.email || order.shippingAddress?.email || "Guest Order"}</p>
                      </div>
                   </div>
                   
@@ -441,7 +442,7 @@ export default function AdminOrderDetails() {
                          <FiMail className="text-gray-400 mt-1" />
                          <div>
                              <p className="text-xs text-gray-500 font-bold uppercase">Email</p>
-                             <p className="text-sm font-medium text-gray-900 break-all">{order.user?.email || "N/A"}</p>
+                             <p className="text-sm font-medium text-gray-900 break-all">{order.user?.email || order.shippingAddress?.email || "N/A"}</p>
                          </div>
                      </div>
                      {order.shippingAddress?.phone && (

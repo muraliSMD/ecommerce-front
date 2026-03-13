@@ -34,6 +34,9 @@ export async function generateMetadata() {
     title: settings.seo?.metaTitle || "GRABSZY | Premium Clothing & Lifestyle",
     description: settings.seo?.metaDescription || "Experience the next generation of online shopping with Grabszy.",
     keywords: settings.seo?.metaKeywords || "fashion, clothing, premium, ecommerce",
+    alternates: {
+      canonical: siteUrl,
+    },
     manifest: '/manifest.json',
     icons: {
       icon: settings.favicon || '/favicon.ico',
@@ -75,7 +78,13 @@ export default async function RootLayout({ children }) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://grabszy.com";
 
     return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
+      <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://api.razorpay.com" />
+        <link rel="dns-prefetch" href="https://api.razorpay.com" />
+      </head>
       <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-bg-main min-h-screen antialiased`} suppressHydrationWarning={true}>
         <QueryProvider>
           <SettingsInitializer />

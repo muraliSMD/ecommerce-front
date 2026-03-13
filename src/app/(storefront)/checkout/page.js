@@ -63,7 +63,7 @@ export default function CheckoutPage() {
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
 
   const subtotal = items.reduce(
-    (sum, i) => sum + (i.variant?.price ?? i.product.price) * i.quantity,
+    (sum, i) => sum + (i.product ? (i.variant?.price ?? i.product.price) * i.quantity : 0),
     0
   );
 
@@ -138,8 +138,23 @@ export default function CheckoutPage() {
 
   const handleSaveAddress = async () => {
       // Basic validation
-      if(!formData.name || !formData.phone || !formData.address1 || !formData.city || !formData.pincode) {
-          toast.error("Please fill required fields");
+      if(!formData.name || !formData.phone || !formData.address1 || !formData.city || !formData.pincode || (!userInfo && !formData.email)) {
+          toast.error("Please fill required fields (Name, Phone, Email, Address, City, Pincode)");
+          return;
+      }
+
+      // Email validation for guests
+      if (!userInfo && formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+          toast.error("Please enter a valid email address");
+          return;
+      }
+
+      // If user is not logged in (guest), don't try to save to DB
+      if (!userInfo) {
+          // Just set the current form data as the billing detail (already handled by billingDetail = selectedAddress || formData)
+          // We can just close the form and pretend it's "saved" for the current session
+          setShowAddressForm(false);
+          toast.success("Shipping details set");
           return;
       }
 
@@ -154,6 +169,7 @@ export default function CheckoutPage() {
           setSelectedAddressId(newAddr._id);
           toast.success("Address saved!");
       } catch (err) {
+          console.error("Failed to save address:", err);
           toast.error("Failed to save address");
       } finally {
           setIsSubmitting(false);
@@ -210,6 +226,12 @@ export default function CheckoutPage() {
         const res = await loadRazorpay();
         if (!res) {
             toast.error("Razorpay SDK failed to load. Are you online?");
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!window.Razorpay) {
+            toast.error("Razorpay SDK not found. Please refresh and try again.");
             setIsSubmitting(false);
             return;
         }
@@ -303,8 +325,11 @@ export default function CheckoutPage() {
   const logAbandonedCheckout = useCallback(async () => {
     if (hasLoggedAbandoned.current || isOrderPlaced) return;
     
-    // Only log if they have entered some data or have items
-    if (!billingDetail.name || items.length === 0) return;
+    // Only log if they have entered certain details (e.g. name and phone) and have items
+    if (!billingDetail.name || !billingDetail.phone || items.length === 0) return;
+
+    // Set flag immediately to prevent concurrent calls
+    hasLoggedAbandoned.current = true;
 
     try {
         await fetch('/api/orders/abandoned', {
@@ -331,24 +356,29 @@ export default function CheckoutPage() {
                 discountAmount: appliedCoupon?.discountAmount || 0,
                 couponCode: appliedCoupon?.code || null,
                 totalAmount: total - (appliedCoupon?.discountAmount || 0),
-                items: items.map(i => ({
-                    product: i.product._id,
-                    quantity: i.quantity,
-                    variant: i.variant,
-                    price: i.variant?.price ?? i.product.price
-                }))
+                items: items
+                    .filter(i => i.product) // Defensive: filter items with missing product
+                    .map(i => ({
+                        product: i.product._id,
+                        quantity: i.quantity,
+                        variant: i.variant,
+                        price: i.variant?.price ?? i.product.price
+                    }))
             })
         });
-        hasLoggedAbandoned.current = true;
     } catch (err) {
         console.error("Failed to log abandoned checkout", err);
+        // Reset if it failed so we can try again on next trigger if appropriate
+        hasLoggedAbandoned.current = false;
     }
   }, [billingDetail, items, isOrderPlaced, userInfo, paymentMethod, shippingCost, taxAmount, appliedCoupon, total]);
 
   useEffect(() => {
-    // Log when user leaves page if they have entered data
+    // Only set up listeners if we haven't logged yet
+    if (hasLoggedAbandoned.current || isOrderPlaced) return;
+
     const handleBeforeUnload = () => {
-        if (!isOrderPlaced && billingDetail.name && items.length > 0) {
+        if (!isOrderPlaced && !hasLoggedAbandoned.current && billingDetail.name && billingDetail.phone && items.length > 0) {
             logAbandonedCheckout();
         }
     };
@@ -356,20 +386,21 @@ export default function CheckoutPage() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
-        // Also log on unmount if they haven't placed an order
-        if (!isOrderPlaced && billingDetail.name && items.length > 0) {
-            logAbandonedCheckout();
-        }
     };
-  }, [billingDetail.name, items.length, isOrderPlaced, logAbandonedCheckout]);
+  }, [billingDetail.name, billingDetail.phone, items.length, isOrderPlaced, logAbandonedCheckout]);
 
   const handlePlaceOrder = async () => {
     const hasLegacyAddress = !!billingDetail.address;
     const hasNewAddress = billingDetail.address1 && billingDetail.city && billingDetail.pincode;
 
-    if (!billingDetail.name || (!hasLegacyAddress && !hasNewAddress)) {
-      toast.error("Please fill in all shipping details or select an address.");
+    if (!billingDetail.name || (!hasLegacyAddress && !hasNewAddress) || (!userInfo && !billingDetail.email)) {
+      toast.error("Please fill in all shipping details including your email address.");
       return;
+    }
+
+    if (!userInfo && billingDetail.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingDetail.email)) {
+        toast.error("Please enter a valid email address");
+        return;
     }
 
     setIsSubmitting(true);
@@ -411,12 +442,14 @@ export default function CheckoutPage() {
             paymentMethod,
             shippingCharge: shippingCost,
             taxAmount: taxAmount,
-            items: items.map(i => ({
-                product: i.product._id,
-                quantity: i.quantity,
-                variant: i.variant,
-                price: i.variant?.price ?? i.product.price
-            })),
+            items: items
+                .filter(i => i.product) // Defensive: filter items with missing product
+                .map(i => ({
+                    product: i.product._id,
+                    quantity: i.quantity,
+                    variant: i.variant,
+                    price: i.variant?.price ?? i.product.price
+                })),
             paymentInfo: {
                 couponCode: appliedCoupon?.code,
                 discountAmount: appliedCoupon?.discountAmount,
@@ -559,13 +592,18 @@ export default function CheckoutPage() {
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
+                                    onBlur={() => {
+                                        if (formData.name && formData.phone) {
+                                            logAbandonedCheckout();
+                                        }
+                                    }}
                                     disabled={isSubmitting}
                                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="Full Name"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Email</label>
+                              <div>
+                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address *</label>
                                 <input
                                     type="email"
                                     name="email"
@@ -574,6 +612,7 @@ export default function CheckoutPage() {
                                     disabled={isSubmitting}
                                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="john@example.com"
+                                    required
                                 />
                             </div>
                              <div>
@@ -583,6 +622,11 @@ export default function CheckoutPage() {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
+                                    onBlur={() => {
+                                        if (formData.name && formData.phone) {
+                                            logAbandonedCheckout();
+                                        }
+                                    }}
                                     disabled={isSubmitting}
                                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="+1 (555) 000-0000"
@@ -761,7 +805,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="text-left">
                         <p className="font-bold text-gray-900">Online Payment</p>
-                        <p className="text-sm text-gray-400">Secure Stripe payment</p>
+                        <p className="text-sm text-gray-400">Secure Razorpay payment</p>
                     </div>
                     </button>
                 )}
@@ -786,21 +830,21 @@ export default function CheckoutPage() {
               <h2 className="text-2xl font-display font-bold mb-8">Your Order</h2>
               
               <div className="space-y-6 mb-8 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
-                {items.map((item, i) => (
+                {items.filter(item => item.product).map((item, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 flex-shrink-0 relative">
                       <Image 
-                        src={item.variant?.images?.[0] || item.product.images?.[0]} 
-                        alt={item.product.name} 
+                        src={item.variant?.images?.[0] || item.product?.images?.[0] || "/placeholder.png"} 
+                        alt={item.product?.name || "Product"} 
                         fill
                         className="object-cover" 
                       />
                     </div>
                     <div className="flex-grow">
-                      <h4 className="font-bold text-sm line-clamp-1">{item.product.name}</h4>
-                      <p className="text-xs text-gray-400">{item.quantity} × {getCurrencySymbol()}{item.variant?.price ?? item.product.price}</p>
+                      <h4 className="font-bold text-sm line-clamp-1">{item.product?.name || "Unknown Product"}</h4>
+                      <p className="text-xs text-gray-400">{item.quantity} × {getCurrencySymbol()}{item.variant?.price ?? item.product?.price ?? 0}</p>
                     </div>
-                    <p className="font-bold text-sm">{formatPrice((item.variant?.price ?? item.product.price) * item.quantity)}</p>
+                    <p className="font-bold text-sm">{formatPrice((item.variant?.price ?? item.product?.price ?? 0) * item.quantity)}</p>
                   </div>
                 ))}
               </div>

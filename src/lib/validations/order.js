@@ -21,7 +21,12 @@ export const orderItemSchema = z.object({
   variant: z.object({
     color: z.string().optional(),
     size: z.string().optional(),
-    length: z.string().optional()
+    length: z.string().optional(),
+    age: z.string().optional(),
+    nSize: z.string().optional(),
+    withBlouse: z.string().optional(),
+    blouseMeter: z.string().optional(),
+    silkType: z.string().optional()
   }).nullable().optional(),
   price: z.number().positive()
 });

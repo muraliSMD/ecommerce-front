@@ -39,6 +39,7 @@ const CollectionSlider = ({ collection }) => {
             <button 
               onClick={() => scroll('left')}
               className="w-10 h-10 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm active:scale-95"
+              aria-label="Scroll collections left"
               title="Scroll Left"
             >
               <FiChevronLeft className="text-lg" />
@@ -46,6 +47,7 @@ const CollectionSlider = ({ collection }) => {
             <button 
               onClick={() => scroll('right')}
               className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
+              aria-label="Scroll collections right"
               title="Scroll Right"
             >
               <FiChevronRight className="text-lg" />
@@ -133,6 +135,7 @@ export default function Home() {
 
   return (
     <main className="bg-surface min-h-screen pt-28 md:pt-32">
+      <h1 className="sr-only">GRABSZY | Premium Clothing & Lifestyle - Online Fashion Store</h1>
       <HeroSlider />
 
       {/* Categories Section */}
@@ -146,6 +149,7 @@ export default function Home() {
               <button 
                 onClick={() => scrollCategories('left')}
                 className="w-10 h-10 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm active:scale-95"
+                aria-label="Scroll categories left"
                 title="Scroll Left"
               >
                 <FiChevronLeft className="text-lg" />
@@ -153,6 +157,7 @@ export default function Home() {
               <button 
                 onClick={() => scrollCategories('right')}
                 className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
+                aria-label="Scroll categories right"
                 title="Scroll Right"
               >
                 <FiChevronRight className="text-lg" />

@@ -17,3 +17,11 @@
 2026-03-12 19:03:44 [[31merror[39m]: Failed to send low stock alert email {
   "error": "Email could not be sent"
 } 
+2026-03-13 01:21:34 [[31merror[39m]: Error sending email {
+  "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <alerts@grabszy.com>: Sender address rejected: not owned by user support@grabszy.com",
+  "to": "support@grabszy.com",
+  "subject": "[STOCK ALERT] Pack of 3 Combo Mens Lungi checked with pure cotton with 2.25 mtrs (Blue-C11 / 2.2 mtrs) is low!"
+} 
+2026-03-13 01:21:34 [[31merror[39m]: Failed to send low stock alert email {
+  "error": "Email could not be sent"
+} 

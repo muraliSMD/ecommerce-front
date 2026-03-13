@@ -40,6 +40,9 @@ export async function generateMetadata({ params, searchParams }) {
   return {
     title,
     description: plainDescription,
+    alternates: {
+      canonical: `${siteUrl}/product/${slug}`,
+    },
     openGraph: {
       title,
       description: plainDescription,

@@ -128,3 +128,31 @@
   "to": "muralis.1995@gmail.com",
   "subject": "Order Confirmation #GRY-ORD-00006 - GRABSZY"
 } 
+2026-03-13 01:21:34 [[31merror[39m]: Error sending email {
+  "error": "Can't send mail - all recipients were rejected: 553 5.7.1 <alerts@grabszy.com>: Sender address rejected: not owned by user support@grabszy.com",
+  "to": "support@grabszy.com",
+  "subject": "[STOCK ALERT] Pack of 3 Combo Mens Lungi checked with pure cotton with 2.25 mtrs (Blue-C11 / 2.2 mtrs) is low!"
+} 
+2026-03-13 01:21:34 [[31merror[39m]: Failed to send low stock alert email {
+  "error": "Email could not be sent"
+} 
+2026-03-13 01:21:46 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<c78ad5a1-b2c2-9856-24b9-db7013f95549@grabszy.com>",
+  "to": "grabszy2025@gmail.com",
+  "subject": "Order Confirmation #GRY-ORD-00012 - GRABSZY"
+} 
+2026-03-13 12:11:45 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<bb704a94-80f3-7321-640b-398347b9e079@grabszy.com>",
+  "to": "test@example.com",
+  "subject": "Order Confirmation #GRY-ORD-00016 - GRABSZY"
+} 
+2026-03-13 12:21:25 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<1aa9f5d9-8ed5-8cbe-acb0-915161b9ab3f@grabszy.com>",
+  "to": "test@example.com",
+  "subject": "Order Confirmation #GRY-ORD-00018 - GRABSZY"
+} 
+2026-03-13 13:09:27 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<e381d4cc-5b7c-f148-23a7-d5aaff938992@grabszy.com>",
+  "to": "muralis.1995@gmail.com",
+  "subject": "Order Confirmation #GRY-ORD-00022 - GRABSZY"
+} 

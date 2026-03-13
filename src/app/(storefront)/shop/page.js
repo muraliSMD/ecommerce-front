@@ -510,6 +510,7 @@ export default function ShopPage() {
                                 <ProductCard 
                                     product={product} 
                                     onAddToCart={handleAddToCart}
+                                    priority={index < 4}
                                 />
                             </motion.div>
                         ) : (

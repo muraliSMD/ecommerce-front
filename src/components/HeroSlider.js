@@ -66,6 +66,7 @@ export default function HeroSlider() {
                   sizes="(max-width: 1024px) 100vw, 1200px"
                   className="block object-cover"
                   priority
+                  fetchPriority="high"
                 />
               </Link>
             </motion.div>
@@ -76,6 +77,7 @@ export default function HeroSlider() {
             <button 
               onClick={(e) => { e.preventDefault(); setIndex((prev) => (prev - 1 + slides.length) % slides.length); }}
               className="w-10 h-10 md:w-12 md:h-12 bg-white/80 hover:bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm transition-all"
+              aria-label="Previous Slide"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -86,6 +88,7 @@ export default function HeroSlider() {
             <button 
               onClick={(e) => { e.preventDefault(); setIndex((prev) => (prev + 1) % slides.length); }}
               className="w-10 h-10 md:w-12 md:h-12 bg-white/80 hover:bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm transition-all"
+              aria-label="Next Slide"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -103,6 +106,7 @@ export default function HeroSlider() {
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === index ? "w-8 bg-primary" : "w-3 bg-gray-300 hover:bg-gray-400"
               }`}
+              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>

@@ -11,12 +11,13 @@ export const useUserStore = create(
       userInfo: null,
       isAuthModalOpen: false,
       authMode: "login", // "login" | "signup"
+      initialEmail: "",
 
       isHydrated: false,
       setHydrated: () => set({ isHydrated: true }),
 
-      setAuthModalOpen: (isOpen, mode = "login") => 
-        set({ isAuthModalOpen: isOpen, authMode: mode }),
+      setAuthModalOpen: (isOpen, mode = "login", initialEmail = "") => 
+        set({ isAuthModalOpen: isOpen, authMode: mode, initialEmail }),
       
       login: (userInfo, token) => {
         // Persist token for axios interceptors

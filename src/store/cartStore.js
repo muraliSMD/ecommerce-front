@@ -31,11 +31,13 @@ export const useCartStore = create(
             if (res.ok) {
                 const serverCart = await res.json();
                 // Map server cart to local structure
-                const mappedItems = serverCart.map(item => ({
-                    product: item.product,
-                    quantity: item.quantity,
-                    variant: item.variant
-                }));
+                const mappedItems = serverCart
+                    .filter(item => item.product) // Defensive: filter items with missing product
+                    .map(item => ({
+                        product: item.product,
+                        quantity: item.quantity,
+                        variant: item.variant
+                    }));
                 set({ items: mappedItems });
             }
         } catch (error) {
@@ -56,6 +58,7 @@ export const useCartStore = create(
           
           const index = items.findIndex(
             (i) =>
+              i.product && product && 
               i.product._id === product._id &&
               (
                 // Both have variants and they match
@@ -121,6 +124,7 @@ export const useCartStore = create(
         set((state) => {
           const items = state.items.filter(
             (i) =>
+              !i.product || !product ||
               i.product._id !== product._id ||
               (i.variant && variant && (
                   i.variant.color !== variant.color || 
@@ -149,7 +153,14 @@ export const useCartStore = create(
     {
       name: "cart-storage",
       onRehydrateStorage: () => (state) => {
-        state.setHydrated();
+        if (state) {
+            // Cleanup check: remove any items where product is null/undefined
+            const validItems = state.items?.filter(item => item && item.product) || [];
+            if (validItems.length !== state.items?.length) {
+                state.items = validItems;
+            }
+            state.setHydrated();
+        }
       },
       partialize: (state) => ({ items: state.items }), // Only persist items
     }
