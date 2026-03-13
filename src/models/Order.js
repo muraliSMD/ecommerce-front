@@ -25,6 +25,8 @@ const orderSchema = new mongoose.Schema({
     taxAmount: { type: Number, default: 0 },
     discountAmount: { type: Number, default: 0 },
     couponCode: { type: String },
+    transactionId: { type: String },
+    razorpayOrderId: { type: String },
     paymentMethod: {type: String, enum:["COD","Stripe", "Razorpay", "Online"], default: "COD"},
     paymentStatus: {type: String, enum:["pending", "Paid", "Failed"], required: true},
     orderStatus:{

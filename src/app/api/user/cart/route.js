@@ -68,18 +68,18 @@ export async function POST(request) {
 
             const existingItemIndex = user.cart.findIndex(cartItem => {
                 // Determine if products match
-                const existingProductId = cartItem.product.toString();
                 const productsMatch = existingProductId === incomingProductId.toString();
                 
                 // Determine if variants match (treating null/undefined/empty string as same)
                 const existingVariant = cartItem.variant || {};
-                
                 const normalize = (val) => (!val ? null : val);
                 
-                const colorMatch = normalize(existingVariant.color) === normalize(incomingVariant.color);
-                const sizeMatch = normalize(existingVariant.size) === normalize(incomingVariant.size);
+                const variantKeys = ['color', 'size', 'length', 'age', 'nSize', 'withBlouse', 'blouseMeter', 'silkType'];
+                const variantsMatch = variantKeys.every(key => 
+                    normalize(existingVariant[key]) === normalize(incomingVariant[key])
+                );
                 
-                return productsMatch && colorMatch && sizeMatch;
+                return productsMatch && variantsMatch;
             });
 
             if (existingItemIndex > -1) {
@@ -114,11 +114,17 @@ export async function PUT(request) {
         const { product, quantity, variant } = await request.json();
         
         const user = await User.findById(userId);
-        const itemIndex = user.cart.findIndex(item => 
-            item.product.toString() === product._id && 
-            item.variant?.color === variant?.color && 
-            item.variant?.size === variant?.size
-        );
+        const itemIndex = user.cart.findIndex(item => {
+            const productsMatch = item.product.toString() === product._id;
+            const existingVariant = item.variant || {};
+            const incomingVariant = variant || {};
+            const normalize = (val) => (!val ? null : val);
+            const variantKeys = ['color', 'size', 'length', 'age', 'nSize', 'withBlouse', 'blouseMeter', 'silkType'];
+            const variantsMatch = variantKeys.every(key => 
+                normalize(existingVariant[key]) === normalize(incomingVariant[key])
+            );
+            return productsMatch && variantsMatch;
+        });
 
         if (itemIndex > -1) {
             if (quantity <= 0) {
