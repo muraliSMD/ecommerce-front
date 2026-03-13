@@ -496,7 +496,7 @@ export default function ShopPage() {
                     : "space-y-4"
                 }>
                     <AnimatePresence mode="popLayout">
-                        {products?.map((product) => (
+                        {products?.map((product, index) => (
                         viewMode === "grid" ? (
                             <motion.div
                                 layout
