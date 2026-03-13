@@ -285,87 +285,88 @@ export async function POST(request) {
         }
     }
 
-    // 3. Trigger Admin Notification
-    try {
-        await Notification.create({
-            recipient: "admin",
-            type: "order_new",
-            title: "New Order Received",
-            message: `Order #${order.orderId} placed by ${body.shippingAddress?.name || "Guest"}`,
-            link: `/admin/orders/${order._id}`,
-            isRead: false
-        });
-        
-        // Push to Admins
-        if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-            const admins = await User.find({ role: 'admin' });
-            const payload = JSON.stringify({
+    // 3. Trigger Admin Notification & Push in Background
+    (async () => {
+        try {
+            await Notification.create({
+                recipient: "admin",
+                type: "order_new",
                 title: "New Order Received",
-                body: `Order #${order.orderId} placed by ${body.shippingAddress?.name || "Guest"}`,
-                url: `/admin/orders/${order._id}`
+                message: `Order #${order.orderId} placed by ${body.shippingAddress?.name || "Guest"}`,
+                link: `/admin/orders/${order._id}`,
+                isRead: false
             });
+            
+            // Push to Admins
+            if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+                const admins = await User.find({ role: 'admin' });
+                const payload = JSON.stringify({
+                    title: "New Order Received",
+                    body: `Order #${order.orderId} placed by ${body.shippingAddress?.name || "Guest"}`,
+                    url: `/admin/orders/${order._id}`
+                });
 
-            for (const admin of admins) {
-                if (admin.pushSubscriptions && admin.pushSubscriptions.length > 0) {
-                    let updatedSubscriptions = [...admin.pushSubscriptions];
-                    let needsUpdate = false;
+                for (const admin of admins) {
+                    if (admin.pushSubscriptions && admin.pushSubscriptions.length > 0) {
+                        let updatedSubscriptions = [...admin.pushSubscriptions];
+                        let needsUpdate = false;
 
-                    for (const sub of admin.pushSubscriptions) {
-                        try {
-                            await webpush.sendNotification(sub, payload);
-                        } catch (error) {
-                            if (error.statusCode === 410 || error.statusCode === 404) {
-                                // Subscription has expired or is no longer valid
-                                updatedSubscriptions = updatedSubscriptions.filter(s => s.endpoint !== sub.endpoint);
-                                needsUpdate = true;
-                                logger.info(`Pruning expired push subscription for admin ${admin._id}`);
-                            } else {
-                                logger.error("Error sending push to admin", { error: error.message, adminId: admin._id });
+                        for (const sub of admin.pushSubscriptions) {
+                            try {
+                                await webpush.sendNotification(sub, payload);
+                            } catch (error) {
+                                if (error.statusCode === 410 || error.statusCode === 404) {
+                                    updatedSubscriptions = updatedSubscriptions.filter(s => s.endpoint !== sub.endpoint);
+                                    needsUpdate = true;
+                                    logger.info(`Pruning expired push subscription for admin ${admin._id}`);
+                                } else {
+                                    logger.error("Error sending push to admin", { error: error.message, adminId: admin._id });
+                                }
                             }
                         }
-                    }
 
-                    if (needsUpdate) {
-                        await User.findByIdAndUpdate(admin._id, { pushSubscriptions: updatedSubscriptions });
+                        if (needsUpdate) {
+                            await User.findByIdAndUpdate(admin._id, { pushSubscriptions: updatedSubscriptions });
+                        }
                     }
                 }
             }
+        } catch (err) {
+            logger.error("Failed to execute background push notifications", { error: err.message });
         }
+    })();
 
-    } catch (err) {
-        console.error("Failed to create notification", err);
-    }
+    // 4. Send Order Confirmation Email in Background
+    (async () => {
+        try {
+            // Fetch the full order with populated products for the email
+            const populatedOrder = await Order.findById(order._id).populate('items.product').lean();
+            
+            let recipientEmail = body.shippingAddress?.email;
+            let recipientName = body.shippingAddress?.name;
 
-    // 4. Send Order Confirmation Email
-    try {
-        // Fetch the full order with populated products for the email
-        const populatedOrder = await Order.findById(order._id).populate('items.product').lean();
-        
-        let recipientEmail = body.shippingAddress?.email;
-        let recipientName = body.shippingAddress?.name;
-
-        // If no email in shipping address, try to get from user object
-        if (!recipientEmail && userId) {
-            const user = await User.findById(userId).lean();
-            if (user) {
-                recipientEmail = user.email;
-                recipientName = recipientName || user.name;
+            // If no email in shipping address, try to get from user object
+            if (!recipientEmail && userId) {
+                const user = await User.findById(userId).lean();
+                if (user) {
+                    recipientEmail = user.email;
+                    recipientName = recipientName || user.name;
+                }
             }
-        }
 
-        if (recipientEmail) {
-            await sendOrderConfirmationEmail(populatedOrder, { 
-                email: recipientEmail, 
-                name: recipientName 
+            if (recipientEmail) {
+                await sendOrderConfirmationEmail(populatedOrder, { 
+                    email: recipientEmail, 
+                    name: recipientName 
+                });
+            }
+        } catch (emailError) {
+            logger.error("Failed to send background order confirmation email", { 
+                orderId: order._id, 
+                error: emailError.message 
             });
         }
-    } catch (emailError) {
-        logger.error("Failed to send order confirmation email", { 
-            orderId: order._id, 
-            error: emailError.message 
-        });
-        // We don't fail the request if email fails, just log it
-    }
+    })();
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
