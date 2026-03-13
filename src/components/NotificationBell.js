@@ -22,8 +22,8 @@ export default function NotificationBell({ className = "", align = "right" }) {
       const { data } = await api.get("/notifications");
       return data;
     },
-    refetchInterval: 30000, 
-    staleTime: 10000,
+    refetchInterval: 300000, 
+    staleTime: 300000,
   });
 
   const notifications = data?.notifications || [];

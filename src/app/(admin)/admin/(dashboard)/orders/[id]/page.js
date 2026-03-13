@@ -117,8 +117,14 @@ export default function AdminOrderDetails() {
       details += `Items:\n`;
       order.items.forEach(item => {
           details += `- ${item.quantity}x ${item.product?.name || "Product"}`;
-          if (item.variant?.color || item.variant?.size) {
-              details += ` (${item.variant?.color || ''} ${item.variant?.size || ''})`.trim();
+          if (item.variant) {
+              const variantDetails = Object.entries(item.variant)
+                  .filter(([k, v]) => v && k !== '_id' && k !== 'stock' && k !== 'price' && k !== 'images')
+                  .map(([k, v]) => v)
+                  .join(' | ');
+              if (variantDetails) {
+                  details += ` (${variantDetails})`;
+              }
           }
           details += `\n`;
       });
@@ -253,16 +259,14 @@ export default function AdminOrderDetails() {
                                                     SKU: {item.product.sku}
                                                 </span>
                                             )}
-                                             {item.variant?.color && (
-                                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                                                    {resolveColorName(item.variant.color)}
-                                                </span>
-                                            )}
-                                            {item.variant?.size && (
-                                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                                                    {item.variant.size}
-                                                </span>
-                                            )}
+                                            {item.variant && Object.entries(item.variant)
+                                                .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images'].includes(k))
+                                                .map(([k, v]) => (
+                                                    <span key={k} className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                                        {k === 'color' ? resolveColorName(v) : v}
+                                                    </span>
+                                                ))
+                                            }
                                         </div>
                                     </div>
                                     <p className="font-bold text-gray-900 text-sm whitespace-nowrap">

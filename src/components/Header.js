@@ -66,6 +66,7 @@ export default function Header() {
       const activeCategories = data.filter(cat => cat.isActive !== false);
       return activeCategories;
     },
+    staleTime: 60 * 60 * 1000, // Cache categories for 1 hour
   });
 
   const categories = buildCategoryTree(categoriesRaw);
@@ -237,7 +238,13 @@ export default function Header() {
 
           {/* Desktop Actions (Labeled) */}
           <div className="hidden lg:flex items-center gap-10 ml-auto">
-            {/* Download App Placeholder or Join as Supplier could go here if user wanted, but they said NO */}
+            {/* Notifications */}
+            {user && (
+              <div className="flex flex-col items-center group relative">
+                <NotificationBell align="right" />
+                <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Alerts</span>
+              </div>
+            )}
             
             {/* User Profile */}
             <div className="relative group flex flex-col items-center">
@@ -279,6 +286,19 @@ export default function Header() {
               )}
             </div>
 
+            {/* Wishlist */}
+            <Link href="/wishlist" className="flex flex-col items-center group relative">
+              <div className="relative">
+                <FiHeart size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                    {wishlistCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Wishlist</span>
+            </Link>
+
             {/* Cart */}
             <Link href="/cart" className="flex flex-col items-center group relative">
               <div className="relative">
@@ -302,6 +322,21 @@ export default function Header() {
             >
                 <FiSearch size={22} />
             </button>
+            
+            {user && (
+                <div className="flex items-center justify-center -mx-1">
+                    <NotificationBell align="right" />
+                </div>
+            )}
+
+            <Link href="/wishlist" className="relative p-1" aria-label={`Wishlist with ${wishlistCount} items`}>
+              <FiHeart size={22} className="text-gray-700" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
 
             <Link href="/cart" className="relative p-1" aria-label={`Cart with ${cartCount} items`}>
               <FiShoppingBag size={22} className="text-gray-700" />

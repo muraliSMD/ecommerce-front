@@ -35,8 +35,11 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
           <div>
             <h3 className="text-lg font-display font-bold text-gray-900 line-clamp-1">{item.product?.name || "Unknown Product"}</h3>
             {item.variant && (
-              <p className="text-xs font-bold uppercase tracking-wider text-primary/60 mt-1">
-                {resolveColorName(item.variant.color)} • {item.variant.size}
+              <p className="text-xs font-bold uppercase tracking-wider text-primary/60 mt-1 line-clamp-1">
+                {Object.entries(item.variant)
+                    .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images'].includes(k))
+                    .map(([k, v]) => k === 'color' ? resolveColorName(v) : v)
+                    .join(' • ')}
               </p>
             )}
           </div>

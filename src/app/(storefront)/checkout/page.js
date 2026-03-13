@@ -16,12 +16,22 @@ import { useWindowSize } from "react-use";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { format } from "date-fns";
+import { getClosestColorName } from "@/lib/colors";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const isHydrated = useCartStore((state) => state.isHydrated);
+
+  const resolveColorName = (color) => {
+    if (!color) return "";
+    if (color.startsWith("#")) {
+      const name = getClosestColorName(color);
+      return name || color;
+    }
+    return color;
+  };
 
   // Address State
   const [addresses, setAddresses] = useState([]);
@@ -852,7 +862,15 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-grow">
                       <h4 className="font-bold text-sm line-clamp-1">{item.product?.name || "Unknown Product"}</h4>
-                      <p className="text-xs text-gray-400">{item.quantity} × {getCurrencySymbol()}{item.variant?.price ?? item.product?.price ?? 0}</p>
+                      {item.variant && (
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-1 line-clamp-1">
+                            {Object.entries(item.variant)
+                                .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images'].includes(k))
+                                .map(([k, v]) => k === 'color' ? resolveColorName(v) : v)
+                                .join(' • ')}
+                          </p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">{item.quantity} × {getCurrencySymbol()}{item.variant?.price ?? item.product?.price ?? 0}</p>
                     </div>
                     <p className="font-bold text-sm">{formatPrice((item.variant?.price ?? item.product?.price ?? 0) * item.quantity)}</p>
                   </div>
