@@ -43,12 +43,12 @@ export default function Footer() {
                 </>
               )}
             </Link>
-            <p className="text-gray-500 leading-relaxed text-sm md:text-base">
+            <p className="text-gray-600 leading-relaxed text-sm md:text-base">
               Curating the finest contemporary fashion since 2024. Your destination for style, quality, and conscious living.
             </p>
             <div className="flex gap-3">
               {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-all shadow-sm hover:shadow-lg hover:shadow-primary/30">
+                <a key={i} href="#" className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-all shadow-sm hover:shadow-lg hover:shadow-primary/30" aria-label={Icon.name}>
                   <Icon size={18} />
                 </a>
               ))}
@@ -58,7 +58,7 @@ export default function Footer() {
           {/* Links Column 1 */}
           <div>
             <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">Collections</h4>
-            <ul className="space-y-4 text-gray-500 text-sm md:text-base">
+            <ul className="space-y-4 text-gray-600 text-sm md:text-base">
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">New Arrivals</Link></li>
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Best Sellers</Link></li>
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Summer &apos;26</Link></li>
@@ -70,7 +70,7 @@ export default function Footer() {
           {/* Links Column 2 */}
           <div>
             <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">Customer Care</h4>
-            <ul className="space-y-4 text-gray-500 text-sm md:text-base">
+            <ul className="space-y-4 text-gray-600 text-sm md:text-base">
               <li><Link href="/account/orders" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Track Order</Link></li>
               <li><Link href="/shipping-policy" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Shipping Policy</Link></li>
               <li><Link href="/returns-and-exchange" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Returns & Exchanges</Link></li>
@@ -81,7 +81,7 @@ export default function Footer() {
           {/* Contact Column */}
           <div>
             <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">{settings?.siteName || "GRABSZY"} HQ</h4>
-            <p className="text-gray-500 leading-relaxed mb-4 text-sm md:text-base whitespace-pre-line">
+            <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base whitespace-pre-line">
               {settings?.address || "54/1 Ottar Street\nOmalur, Salem 636455"}
             </p>
             <a href={`mailto:${settings?.supportEmail || "support@grabszy.com"}`} className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">

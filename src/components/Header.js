@@ -298,11 +298,12 @@ export default function Header() {
             <button
                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
                 className="p-1 text-gray-700"
+                aria-label="Search"
             >
                 <FiSearch size={22} />
             </button>
 
-            <Link href="/cart" className="relative p-1">
+            <Link href="/cart" className="relative p-1" aria-label={`Cart with ${cartCount} items`}>
               <FiShoppingBag size={22} className="text-gray-700" />
               {cartCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
@@ -314,6 +315,7 @@ export default function Header() {
             <button 
                 onClick={() => setIsMobileMenuOpen(true)}
                 className="p-1 text-gray-700"
+                aria-label="Open Menu"
             >
                 <FiMenu size={24} />
             </button>
@@ -374,6 +376,7 @@ export default function Header() {
                                 type="button" 
                                 onClick={() => setIsMobileSearchOpen(false)}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1"
+                                aria-label="Close search"
                             >
                                 <FiX size={18} />
                             </button>
@@ -472,7 +475,7 @@ export default function Header() {
             >
                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                   <span className="font-display font-bold text-xl">GRABSZY.</span>
-                  <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-gray-100">
+                  <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-gray-100" aria-label="Close menu">
                      <FiX size={24} />
                   </button>
                </div>
