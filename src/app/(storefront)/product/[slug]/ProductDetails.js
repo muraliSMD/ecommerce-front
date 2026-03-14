@@ -686,7 +686,7 @@ export default function ProductDetails({ initialProduct }) {
             {/* Attributes Slider for Mobile & Web */}
             <VariantSlider orderClass="order-6 mt-2 md:mt-0 gap-4 lg:gap-2">
               {/* Sizes */}
-              {allSizes.length > 0 && (
+              {availableSizesForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Size</span>} compact={true}>
                     {allSizes.map((size) => {
@@ -720,7 +720,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Lengths */}
-              {allLengths.length > 0 && (
+              {availableLengthsForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Length</span>} compact={true}>
                     {allLengths.map((length) => {
@@ -754,7 +754,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Ages */}
-              {allAges.length > 0 && (
+              {availableAgesForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Age Group</span>} compact={true}>
                     {allAges.map((age) => {
@@ -788,7 +788,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Numerical Sizes */}
-              {allNSizes.length > 0 && (
+              {availableNSizesForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">N-Size</span>} compact={true}>
                     {allNSizes.map((nSize) => {
@@ -822,7 +822,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Silk Types */}
-              {isSaree && allSilkTypes.length > 0 && (
+              {isSaree && availableSilkTypesForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Silk Type</span>} compact={true}>
                     {allSilkTypes.map((type) => {
@@ -851,7 +851,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Blouse Options */}
-              {isSaree && allBlouseOptions.length > 0 && (
+              {isSaree && availableBlouseOptionsForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Blouse</span>} compact={true}>
                     {allBlouseOptions.map((opt) => {
@@ -880,7 +880,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Blouse Meters */}
-              {isSaree && allBlouseMeters.length > 0 && (
+              {isSaree && availableBlouseMetersForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
                   <VariantSlider title={<span className="ml-2">Blouse Length</span>} compact={true}>
                     {allBlouseMeters.map((meter) => {
