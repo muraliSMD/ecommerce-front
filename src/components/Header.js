@@ -242,7 +242,7 @@ export default function Header() {
             {user && (
               <div className="flex flex-col items-center group relative">
                 <NotificationBell align="right" />
-                <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Alerts</span>
+                {/* <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Alerts</span> */}
               </div>
             )}
             
