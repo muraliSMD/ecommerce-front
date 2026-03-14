@@ -25,3 +25,6 @@
 2026-03-13 01:21:34 [[31merror[39m]: Failed to send low stock alert email {
   "error": "Email could not be sent"
 } 
+2026-03-14 12:31:26 [[31merror[39m]: Order not found during payment verification {
+  "razorpay_order_id": "order_SR11tcljHTFyua"
+} 

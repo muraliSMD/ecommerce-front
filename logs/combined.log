@@ -156,3 +156,16 @@
   "to": "muralis.1995@gmail.com",
   "subject": "Order Confirmation #GRY-ORD-00022 - GRABSZY"
 } 
+2026-03-14 12:31:01 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<fb6a4a6a-0c26-2fc9-b85d-65c2474c079c@grabszy.com>",
+  "to": "muralis.1995@gmail.com",
+  "subject": "Order Confirmation #GRY-ORD-00004 - GRABSZY"
+} 
+2026-03-14 12:31:26 [[31merror[39m]: Order not found during payment verification {
+  "razorpay_order_id": "order_SR11tcljHTFyua"
+} 
+2026-03-14 13:20:36 [[32minfo[39m]: User logged in successfully {
+  "email": "muralis.1995@gmail.com",
+  "userId": "69b456b756bb4e75ed8fd8bc",
+  "role": "customer"
+} 

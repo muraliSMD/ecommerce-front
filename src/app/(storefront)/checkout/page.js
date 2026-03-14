@@ -315,7 +315,7 @@ export default function CheckoutPage() {
                 ondismiss: function() {
                     setIsSubmitting(false);
                     toast("Payment cancelled");
-                    logAbandonedCheckout();
+                    logAbandonedCheckout('abandoned');
                 }
             }
         };
@@ -324,7 +324,7 @@ export default function CheckoutPage() {
         paymentObject.on('payment.failed', function (response){
                 toast.error(response.error.description || "Payment Failed");
                 setIsSubmitting(false);
-                logAbandonedCheckout();
+                logAbandonedCheckout('failed');
         });
         paymentObject.open();
 
@@ -337,7 +337,7 @@ export default function CheckoutPage() {
 
   const hasLoggedAbandoned = useRef(false);
 
-  const logAbandonedCheckout = useCallback(async () => {
+  const logAbandonedCheckout = useCallback(async (reason = "abandoned") => {
     if (hasLoggedAbandoned.current || isOrderPlaced) return;
     
     // Only log if they have entered certain details (e.g. name and phone) and have items
@@ -351,6 +351,7 @@ export default function CheckoutPage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                reason: reason,
                 shippingAddress: {
                     name: billingDetail.name,
                     email: billingDetail.email || userInfo?.email || "",
@@ -394,7 +395,7 @@ export default function CheckoutPage() {
 
     const handleBeforeUnload = () => {
         if (!isOrderPlaced && !hasLoggedAbandoned.current && billingDetail.name && billingDetail.phone && items.length > 0) {
-            logAbandonedCheckout();
+            logAbandonedCheckout('abandoned');
         }
     };
 
@@ -865,7 +866,7 @@ export default function CheckoutPage() {
                       {item.variant && (
                           <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-1 line-clamp-1">
                             {Object.entries(item.variant)
-                                .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images'].includes(k))
+                                .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
                                 .map(([k, v]) => k === 'color' ? resolveColorName(v) : v)
                                 .join(' • ')}
                           </p>

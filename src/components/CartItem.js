@@ -37,7 +37,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
             {item.variant && (
               <p className="text-xs font-bold uppercase tracking-wider text-primary/60 mt-1 line-clamp-1">
                 {Object.entries(item.variant)
-                    .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images'].includes(k))
+                    .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
                     .map(([k, v]) => k === 'color' ? resolveColorName(v) : v)
                     .join(' • ')}
               </p>

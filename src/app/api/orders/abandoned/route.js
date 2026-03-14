@@ -40,7 +40,7 @@ export async function POST(request) {
       paymentMethod: body.paymentMethod || "Online",
       shippingAddress: body.shippingAddress,
       paymentStatus: "Failed",
-      orderStatus: "Abandoned",
+      orderStatus: body.reason === "failed" ? "Payment Failed" : "Abandoned",
     }).save();
 
     return NextResponse.json(order, { status: 201 });

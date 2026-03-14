@@ -178,15 +178,16 @@ export default function OrderDetailsPage() {
                              <div className="flex gap-4 items-center">
                                 <div className="w-20 h-20 bg-gray-100 rounded-2xl overflow-hidden relative flex-shrink-0">
                                     {(() => {
-                                        let imgUrl = item.product?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070";
+                                        let imgUrl = item.product?.images?.find(img => img?.trim()) || "/placeholder.png";
                                         if (item.variant?.color && item.product?.variants) {
                                             const matchedV = item.product.variants.find(v => v.color === item.variant.color);
-                                            if (matchedV?.images?.[0]) imgUrl = matchedV.images[0];
+                                            const vImg = matchedV?.images?.find(img => img?.trim());
+                                            if (vImg) imgUrl = vImg;
                                         }
                                         return (
                                             <Image 
                                                 src={imgUrl} 
-                                                alt="Product" 
+                                                alt={item.product?.name || "Product"} 
                                                 fill 
                                                 className="object-cover" 
                                             />

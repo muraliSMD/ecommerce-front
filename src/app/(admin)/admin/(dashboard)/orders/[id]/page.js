@@ -119,7 +119,7 @@ export default function AdminOrderDetails() {
           details += `- ${item.quantity}x ${item.product?.name || "Product"}`;
           if (item.variant) {
               const variantDetails = Object.entries(item.variant)
-                  .filter(([k, v]) => v && k !== '_id' && k !== 'stock' && k !== 'price' && k !== 'images')
+                  .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
                   .map(([k, v]) => v)
                   .join(' | ');
               if (variantDetails) {
@@ -260,7 +260,7 @@ export default function AdminOrderDetails() {
                                                 </span>
                                             )}
                                             {item.variant && Object.entries(item.variant)
-                                                .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images'].includes(k))
+                                                .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
                                                 .map(([k, v]) => (
                                                     <span key={k} className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full whitespace-nowrap">
                                                         {k === 'color' ? resolveColorName(v) : v}
