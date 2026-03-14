@@ -150,6 +150,26 @@ export default function AdminOrderDetails() {
     }
   });
 
+  const refundMutation = useMutation({
+    mutationFn: async () => {
+        const response = await fetch(`/api/admin/orders/${id}/refund`, {
+            method: 'PUT',
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to process refund');
+        }
+        return response.json();
+    },
+    onSuccess: () => {
+        toast.success('Payment successfully refunded via Razorpay');
+        queryClient.invalidateQueries(['admin-order', id]);
+    },
+    onError: (error) => {
+        toast.error(error.message || 'Refund failed');
+    }
+  });
+
   if (isLoading) return <PageLoader />;
 
   if (!order) return (
@@ -327,10 +347,13 @@ export default function AdminOrderDetails() {
                   <div>
                      <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Status</p>
                      <div className="flex items-center gap-2">
-                         <p className={`font-bold ${order.paymentStatus === 'Paid' ? 'text-green-600' : 'text-orange-500'}`}>
+                     <p className={`font-bold ${
+                            order.paymentStatus === 'Paid' ? 'text-green-600' : 
+                            order.paymentStatus === 'Refunded' ? 'text-blue-500' : 'text-orange-500'
+                         }`}>
                             {order.paymentStatus || 'Pending'}
                          </p>
-                         {order.paymentMethod === 'COD' && order.paymentStatus !== 'Paid' && (
+                         {order.paymentMethod === 'COD' && order.paymentStatus !== 'Paid' && order.paymentStatus !== 'Refunded' && (
                              <button
                                 onClick={() => updateStatusMutation.mutate({ paymentStatus: 'Paid' })}
                                 className="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold uppercase rounded-lg border border-green-100 hover:bg-green-100 transition-colors"
@@ -338,14 +361,35 @@ export default function AdminOrderDetails() {
                                 Mark as Paid
                              </button>
                          )}
+                         {(order.paymentMethod === 'Online' || order.paymentMethod === 'Razorpay') && order.paymentStatus === 'Paid' && (
+                             <button
+                                onClick={() => {
+                                    if(confirm('Are you sure you want to refund this payment? The funds will be returned to the customer via Razorpay.')) {
+                                        refundMutation.mutate();
+                                    }
+                                }}
+                                disabled={refundMutation.isPending}
+                                className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase rounded-lg border border-blue-100 hover:bg-blue-100 transition-colors disabled:opacity-50"
+                             >
+                                {refundMutation.isPending ? 'Processing...' : 'Process Refund'}
+                             </button>
+                         )}
                      </div>
                   </div>
                   <div className="col-span-2">
                      <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Transaction ID</p>
                      <p className="font-mono text-sm text-gray-600 bg-gray-50 p-2 rounded-lg break-all">
-                        {order.paymentResult?.id || 'N/A'}
+                        {order.transactionId || order.paymentResult?.id || 'N/A'}
                      </p>
                   </div>
+                  {order.razorpayRefundId && (
+                      <div className="col-span-2">
+                         <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Refund ID</p>
+                         <p className="font-mono text-sm text-blue-600 bg-blue-50 p-2 rounded-lg break-all">
+                            {order.razorpayRefundId}
+                         </p>
+                      </div>
+                  )}
                </div>
             </div>
          </div>

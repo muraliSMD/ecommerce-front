@@ -82,7 +82,7 @@ export default function ShippingPolicyPage() {
               <div>
                 <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">2. Shipping Rates & Delivery Estimates</h2>
                 <p>
-                  Shipping charges for your order will be calculated and displayed at checkout. Standard shipping is <strong>FREE</strong> for orders above ₹999 across India.
+                  Shipping charges for your order will be calculated and displayed at checkout. Standard shipping is <strong>FREE</strong> for orders above ₹1499 across India.
                 </p>
                 <div className="bg-gray-50 rounded-2xl overflow-hidden mt-4">
                   <table className="w-full text-left">
@@ -96,13 +96,13 @@ export default function ShippingPolicyPage() {
                     <tbody className="divide-y divide-gray-200">
                       <tr>
                         <td className="px-6 py-4">Tamil Nadu</td>
-                        <td className="px-6 py-4">1-3 Business Days</td>
-                        <td className="px-6 py-4">₹50 (Free over ₹999)</td>
+                        <td className="px-6 py-4">1-5 Business Days</td>
+                        <td className="px-6 py-4"> minimum ₹60 (Free over ₹1499)</td>
                       </tr>
                       <tr>
                         <td className="px-6 py-4">Rest of India</td>
-                        <td className="px-6 py-4">3-7 Business Days</td>
-                        <td className="px-6 py-4">₹80 (Free over ₹999)</td>
+                        <td className="px-6 py-4">3-9 Business Days</td>
+                        <td className="px-6 py-4"> minimum ₹90 (Free over ₹1499)</td>
                       </tr>
                     </tbody>
                   </table>

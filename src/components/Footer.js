@@ -94,8 +94,8 @@ export default function Footer() {
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-gray-400">
           <p>© {new Date().getFullYear()} {settings?.siteName || "GRABSZY"}. All rights reserved.</p>
           <div className="flex gap-8">
-            <Link href="#" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-gray-900 transition-colors">Terms of Service</Link>
+            <Link href="/privacy-policy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-gray-900 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

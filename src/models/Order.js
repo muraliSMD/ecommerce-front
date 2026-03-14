@@ -27,8 +27,9 @@ const orderSchema = new mongoose.Schema({
     couponCode: { type: String },
     transactionId: { type: String },
     razorpayOrderId: { type: String },
+    razorpayRefundId: { type: String },
     paymentMethod: {type: String, enum:["COD","Stripe", "Razorpay", "Online"], default: "COD"},
-    paymentStatus: {type: String, enum:["pending", "Paid", "Failed"], required: true},
+    paymentStatus: {type: String, enum:["pending", "Paid", "Failed", "Refunded"], required: true},
     orderStatus:{
         type: String,
         enum: ["Pending", "Processing", "Paid", "Shipped", "Delivered", "Cancelled", "Return Requested", "Returned", "Cancellation Requested", "Abandoned", "Payment Failed"],

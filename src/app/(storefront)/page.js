@@ -12,6 +12,7 @@ import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
+import InstagramSection from "@/components/InstagramSection";
 
 const CollectionSlider = ({ collection }) => {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -256,6 +257,9 @@ export default function Home() {
           <CollectionSlider key={collection._id} collection={collection} />
         ))
       )}
+
+      {/* Instagram Feed */}
+      <InstagramSection />
 
       {/* Newsletter Section */}
       <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
