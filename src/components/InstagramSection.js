@@ -31,7 +31,7 @@ const InstagramSection = () => {
   const placeholders = [
     "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070",
     "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070",
-    "https://images.unsplash.com/photo-1539109132314-34a9c6a559d6?q=80&w=2070",
+    "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=2070",
     "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2070",
     "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=2070",
     "https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=2070"

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Gallery from "@/models/Gallery";
+import GalleryCategory from "@/models/GalleryCategory";
 import { getFullUserFromRequest, isAdmin } from "@/lib/auth";
 
 export async function GET(request) {
