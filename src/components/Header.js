@@ -251,8 +251,7 @@ export default function Header() {
               {user ? (
                 <>
                   <Link href={user.role === 'admin' ? '/admin' : '/account'} className="flex flex-col items-center group">
-                    <FiUser size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
-                    <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Profile</span>
+                    <FiUser size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
                   </Link>
                   <div className="absolute top-full right-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50">
                       <div className="bg-white rounded shadow-xl border border-gray-100 p-2 w-48 overflow-hidden">
@@ -280,8 +279,7 @@ export default function Header() {
                   onClick={() => setAuthModalOpen(true, "login")}
                   className="flex flex-col items-center group"
                 >
-                  <FiUser size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
-                  <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Profile</span>
+                  <FiUser size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
                 </button>
               )}
             </div>
@@ -289,27 +287,25 @@ export default function Header() {
             {/* Wishlist */}
             <Link href="/wishlist" className="flex flex-col items-center group relative">
               <div className="relative">
-                <FiHeart size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
+                <FiHeart size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
                 {wishlistCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                     {wishlistCount}
                   </span>
                 )}
               </div>
-              <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Wishlist</span>
             </Link>
 
             {/* Cart */}
             <Link href="/cart" className="flex flex-col items-center group relative">
               <div className="relative">
-                <FiShoppingBag size={20} className="text-gray-700 group-hover:text-primary transition-colors" />
+                <FiShoppingBag size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                     {cartCount}
                   </span>
                 )}
               </div>
-              <span className="text-[11px] font-medium text-gray-600 mt-1 uppercase tracking-wider group-hover:text-primary">Cart</span>
             </Link>
           </div>
 
