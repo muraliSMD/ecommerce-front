@@ -26,7 +26,6 @@ export async function PUT(request, { params }) {
     const { id } = await params;
     const json = await request.json();
     const reason = json.reason;
-    console.log("Processing cancellation for Order ID:", id, "Reason:", reason);
 
     const order = await Order.findById(id).populate("items.product");
     console.log("Order found:", order ? order._id : "null");
@@ -46,15 +45,12 @@ export async function PUT(request, { params }) {
     // Update Order
     order.orderStatus = 'Cancellation Requested';
     order.cancellationReason = reason;
-    console.log("Saving order with status 'Cancellation Requested'");
     await order.save();
-    console.log("Order saved.");
 
 
 
     // Notify Admin
     try {
-        console.log("Creating notification for admin...");
         await Notification.create({
             recipient: "admin",
             type: "order_status",
@@ -63,7 +59,6 @@ export async function PUT(request, { params }) {
             link: `/admin/orders/${order._id}`,
             isRead: false
         });
-        console.log("Notification created.");
 
         // Push to Admin
         if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {

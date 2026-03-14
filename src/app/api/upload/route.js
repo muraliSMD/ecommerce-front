@@ -44,9 +44,6 @@ export async function POST(request) {
       uploadStream.end(buffer);
     });
 
-    console.log('Cloudinary Upload Success:', result.secure_url);
-    console.log('Public ID:', result.public_id);
-
     return NextResponse.json({ url: result.secure_url }, { status: 201 });
   } catch (error) {
     console.error('Upload error details:', error);

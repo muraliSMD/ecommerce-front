@@ -118,11 +118,6 @@ export async function GET(request) {
     // Use .lean() for performance since we don't need mongoose document checks here
     const products = await query.populate({ path: 'category', select: 'name slug', strictPopulate: false }).lean();
     
-    // Debugging: Check if population worked for the first few items
-    if (products.length > 0) {
-        console.log("Debug: First product category:", products[0].category);
-    }
-
     return NextResponse.json(products);
   } catch (error) {
     logger.error("Failed to fetch products", { error: error.message, stack: error.stack });

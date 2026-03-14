@@ -46,13 +46,6 @@ const addToCart = (product, quantity = 1, variant = null, isSet = false) => {
         ((variantObj && i.variant?._id === variantObj._id) || (!variantObj && !i.variant))
     );
 
-    console.log("=== addToCart called ===");
-    console.log("Product:", product.name);
-    console.log("Variant:", variantObj ? `${variantObj.color} ${variantObj.size}` : "No variant");
-    console.log("Quantity requested:", quantity);
-    console.log("Is set directly:", isSet);
-    console.log("Previous cart items:", prev.items);
-
     if (index > -1) {
       let newQty;
       if (isSet) {
@@ -61,22 +54,15 @@ const addToCart = (product, quantity = 1, variant = null, isSet = false) => {
         newQty = Math.min(Math.max(items[index].quantity + quantity, 0), maxStock); // add to existing
       }
 
-      console.log("Previous quantity:", items[index].quantity);
-      console.log("New quantity after update:", newQty);
-
       if (newQty === 0) items.splice(index, 1);
       else items[index].quantity = newQty;
     } else if (quantity > 0) {
-      console.log("Adding new item to cart");
       items.push({
         product,
         quantity: Math.min(Number(quantity), maxStock),
         variant: variantObj ? { ...variantObj, price: itemPrice } : null,
       });
     }
-
-    console.log("Updated cart items:", items);
-    console.log("=======================");
 
     return { items };
   });
