@@ -34,6 +34,7 @@ export default function AdminGallery() {
     imageUrl: "",
     category: "",
     caption: "",
+    externalLink: "",
     isActive: true,
     order: 0
   });
@@ -134,6 +135,7 @@ export default function AdminGallery() {
       imageUrl: "",
       category: categories?.[0]?._id || "",
       caption: "",
+      externalLink: "",
       isActive: true,
       order: 0
     });
@@ -145,6 +147,7 @@ export default function AdminGallery() {
       imageUrl: item.imageUrl,
       category: item.category?._id || item.category,
       caption: item.caption || "",
+      externalLink: item.externalLink || "",
       isActive: item.isActive,
       order: item.order
     });
@@ -371,6 +374,17 @@ export default function AdminGallery() {
                   value={formData.caption}
                   onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
                   placeholder="A short description for the image"
+                  className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Instagram Post Link (Optional)</label>
+                <input 
+                  type="url" 
+                  value={formData.externalLink}
+                  onChange={(e) => setFormData({ ...formData, externalLink: e.target.value })}
+                  placeholder="https://www.instagram.com/p/..."
                   className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
                 />
               </div>

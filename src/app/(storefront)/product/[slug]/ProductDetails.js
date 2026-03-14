@@ -317,26 +317,47 @@ export default function ProductDetails({ initialProduct }) {
       params.set('size', selectedSize);
       params.delete('length');
       params.delete('nSize');
+      params.delete('age');
     } else if (selectedLength) {
       params.set('length', selectedLength);
       params.delete('size');
+      params.delete('nSize');
+      params.delete('age');
+    } else if (selectedAge) {
+      params.set('age', selectedAge);
+      params.delete('size');
+      params.delete('length');
       params.delete('nSize');
     } else if (selectedNSize) {
       params.set('nSize', selectedNSize);
       params.delete('size');
       params.delete('length');
+      params.delete('age');
     } else {
       params.delete('size');
       params.delete('length');
       params.delete('nSize');
+      params.delete('age');
     }
+
+    if (selectedWithBlouse) params.set('blouse', selectedWithBlouse);
+    else params.delete('blouse');
+
+    if (selectedBlouseMeter) params.set('blouseMeter', selectedBlouseMeter);
+    else params.delete('blouseMeter');
+
+    if (selectedSilkType) params.set('silk', selectedSilkType);
+    else params.delete('silk');
 
     const queryString = params.toString();
     const newPath = queryString ? `${pathname}?${queryString}` : pathname;
     
-    // Use replace to avoid polluting history on every click, or push if you want it trackable
-    router.replace(newPath, { scroll: false });
-  }, [selectedColor, selectedSize, selectedLength, selectedNSize, pathname, router, mounted, searchParams]);
+    // Use replace to avoid polluting history on every click
+    // Only replace if url actually changed
+    if (queryString !== searchParams.toString()) {
+        router.replace(newPath, { scroll: false });
+    }
+  }, [selectedColor, selectedSize, selectedLength, selectedAge, selectedNSize, selectedWithBlouse, selectedBlouseMeter, selectedSilkType, pathname, router, mounted, searchParams]);
 
   const handleShare = async () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
@@ -676,7 +697,12 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={size}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedSize(size); }}
+                          onClick={() => { 
+                            setSelectedSize(size); 
+                            setSelectedLength("");
+                            setSelectedAge("");
+                            setSelectedNSize("");
+                          }}
                           className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
@@ -705,7 +731,12 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={length}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedLength(length); }}
+                          onClick={() => { 
+                            setSelectedLength(length); 
+                            setSelectedSize("");
+                            setSelectedAge("");
+                            setSelectedNSize("");
+                          }}
                           className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
@@ -734,7 +765,12 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={age}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedAge(age); }}
+                          onClick={() => { 
+                            setSelectedAge(age); 
+                            setSelectedSize("");
+                            setSelectedLength("");
+                            setSelectedNSize("");
+                          }}
                           className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
@@ -763,7 +799,12 @@ export default function ProductDetails({ initialProduct }) {
                         <button
                           key={nSize}
                           disabled={disabled || isOutOfStock}
-                          onClick={() => { setSelectedNSize(nSize); }}
+                          onClick={() => { 
+                            setSelectedNSize(nSize); 
+                            setSelectedSize("");
+                            setSelectedLength("");
+                            setSelectedAge("");
+                          }}
                           className={`min-w-[60px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :

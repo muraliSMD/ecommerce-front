@@ -18,6 +18,10 @@ const gallerySchema = new mongoose.Schema(
       type: String, 
       trim: true 
     },
+    externalLink: {
+      type: String,
+      trim: true
+    },
     order: { 
       type: Number, 
       default: 0 
