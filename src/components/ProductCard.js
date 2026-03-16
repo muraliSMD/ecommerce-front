@@ -42,6 +42,14 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
             -{product.discount}%
           </span>
         )}
+
+        {(hasVariants ? product.variants.every(v => v.stock <= 0) : product.stock <= 0) && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center">
+            <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+              <span className="text-white text-[10px] font-bold uppercase tracking-widest">Out of Stock</span>
+            </div>
+          </div>
+        )}
       </Link>
 
       <div className="p-2.5 flex flex-col justify-between flex-grow gap-2">
@@ -63,8 +71,15 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
         </div>
 
         {hasVariants ? (
-          <Link href={`/product/${product.slug || product._id}`} className="mt-2 flex items-center justify-center gap-1.5 w-full bg-btn-dark text-btn-text py-1.5 rounded-lg text-[10px] font-bold hover:bg-btn-dark-hover transition-all active:scale-95">
-            Details <FiArrowRight size={10} />
+          <Link 
+            href={`/product/${product.slug || product._id}`} 
+            className={`mt-2 flex items-center justify-center gap-1.5 w-full py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 ${
+              product.variants.every(v => v.stock <= 0)
+                ? "bg-gray-100 text-text-muted border border-gray-100 cursor-not-allowed"
+                : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
+            }`}
+          >
+            {product.variants.every(v => v.stock <= 0) ? "Out of Stock" : "Details"} <FiArrowRight size={10} />
           </Link>
         ) : (() => {
           const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);

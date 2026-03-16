@@ -703,7 +703,7 @@ export default function ProductDetails({ initialProduct }) {
                             setSelectedAge("");
                             setSelectedNSize("");
                           }}
-                          className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                          className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
                             selectedSize === size
@@ -711,7 +711,7 @@ export default function ProductDetails({ initialProduct }) {
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
                           }`}
                         >
-                          {size}
+                          {size} {isOutOfStock && "(Out of Stock)"}
                         </button>
                       );
                     })}
@@ -737,7 +737,7 @@ export default function ProductDetails({ initialProduct }) {
                             setSelectedAge("");
                             setSelectedNSize("");
                           }}
-                          className={`min-w-[50px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                          className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedLength === length
@@ -745,7 +745,7 @@ export default function ProductDetails({ initialProduct }) {
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
                           }`}
                         >
-                          {length}
+                          {length} {isOutOfStock && "(Out of Stock)"}
                         </button>
                       );
                     })}
@@ -771,7 +771,7 @@ export default function ProductDetails({ initialProduct }) {
                             setSelectedLength("");
                             setSelectedNSize("");
                           }}
-                          className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                          className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedAge === age
@@ -779,7 +779,7 @@ export default function ProductDetails({ initialProduct }) {
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
                           }`}
                         >
-                          {age}
+                          {age} {isOutOfStock && "(Out of Stock)"}
                         </button>
                       );
                     })}
@@ -805,7 +805,7 @@ export default function ProductDetails({ initialProduct }) {
                             setSelectedLength("");
                             setSelectedAge("");
                           }}
-                          className={`min-w-[60px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                          className={`min-w-[60px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedNSize === nSize
@@ -813,7 +813,7 @@ export default function ProductDetails({ initialProduct }) {
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
                           }`}
                         >
-                          {nSize}
+                          {nSize} {isOutOfStock && "(Out of Stock)"}
                         </button>
                       );
                     })}
@@ -834,7 +834,7 @@ export default function ProductDetails({ initialProduct }) {
                           key={type}
                           disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedSilkType(type)}
-                          className={`min-w-[120px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                          className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedSilkType === type
@@ -842,7 +842,7 @@ export default function ProductDetails({ initialProduct }) {
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
                           }`}
                         >
-                          {type}
+                          {type} {isOutOfStock && "(Out of Stock)"}
                         </button>
                       );
                     })}
@@ -863,7 +863,7 @@ export default function ProductDetails({ initialProduct }) {
                           key={opt}
                           disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedWithBlouse(opt)}
-                          className={`min-w-[120px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
+                          className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedWithBlouse === opt
@@ -871,7 +871,7 @@ export default function ProductDetails({ initialProduct }) {
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
                           }`}
                         >
-                          {opt}
+                          {opt} {isOutOfStock && "(Out of Stock)"}
                         </button>
                       );
                     })}
@@ -892,7 +892,7 @@ export default function ProductDetails({ initialProduct }) {
                           key={meter}
                           disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedBlouseMeter(meter)}
-                          className={`min-w-[100px] h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start ${
+                          className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start ${
                             disabled ? "hidden" :
                             isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedBlouseMeter === meter
@@ -900,7 +900,7 @@ export default function ProductDetails({ initialProduct }) {
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
                           }`}
                         >
-                          {meter}
+                          {meter} {isOutOfStock && "(Out of Stock)"}
                         </button>
                       );
                     })}
