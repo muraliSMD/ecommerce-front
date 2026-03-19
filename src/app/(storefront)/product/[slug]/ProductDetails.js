@@ -1012,7 +1012,7 @@ export default function ProductDetails({ initialProduct }) {
                   disabled={!canAdd}
                   onClick={() => {
                     addToCart(product, quantity, selectedVariant);
-                    router.push('/checkout');
+                    router.push(isPreBook ? '/cart' : '/checkout');
                   }}
                   className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
                     !canAdd

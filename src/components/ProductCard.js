@@ -115,7 +115,7 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
                   e.preventDefault();
                   const variant = product.variants?.length === 1 ? product.variants[0] : null;
                   onAddToCart(product, 1, variant);
-                  router.push('/checkout');
+                  router.push(product.isPreBook ? '/cart' : '/checkout');
                 }}
               >
                 {product.isPreBook ? "Pre-book" : "Buy Now"}
