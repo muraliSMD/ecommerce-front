@@ -123,12 +123,24 @@ export default function CartPage() {
               <AnimatePresence>
                 {items.some(i => i.quantity > 3) && (
                   <motion.div
+                    key="bulk-shipping-note"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     className="mb-6 p-4 bg-orange-50 border border-orange-100 rounded-2xl text-orange-800 text-xs leading-relaxed"
                   >
                     <strong>Note:</strong> Your order contains bulk items (3+ units). These require custom manufacturing before dispatch.
+                  </motion.div>
+                )}
+                {items.some(i => i.isPreBook) && (
+                  <motion.div
+                    key="pre-book-note"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="mb-6 p-4 bg-primary/5 border border-primary/10 rounded-2xl text-primary/80 text-xs leading-relaxed"
+                  >
+                    <strong>Note:</strong> Your order contains pre-book items. These will be delivered within 10 days from order confirmation.
                   </motion.div>
                 )}
               </AnimatePresence>

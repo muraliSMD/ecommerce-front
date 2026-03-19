@@ -4,7 +4,7 @@
 import { useSettingsStore } from "@/store/settingsStore";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
@@ -187,6 +187,7 @@ export default function Header() {
             <AnimatePresence>
                 {isInputFocused && searchQuery.length > 2 && (
                     <motion.div
+                        key="search-preview-results"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
@@ -207,6 +208,7 @@ export default function Header() {
                                                     src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                                                     alt={product.name} 
                                                     fill 
+                                                    sizes="40px"
                                                     className="object-cover"
                                                 />
                                             </div>
@@ -387,6 +389,7 @@ export default function Header() {
         <AnimatePresence>
             {isMobileSearchOpen && (
                 <motion.div
+                    key="mobile-search-overlay"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
@@ -421,6 +424,7 @@ export default function Header() {
         <AnimatePresence>
             {activeCategory && activeCategory !== 'shop' && (
                 <motion.div
+                    key="mega-menu-dropdown"
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 5 }}
@@ -486,9 +490,10 @@ export default function Header() {
     {/* Mobile Drawer Navigation moved outside header to avoid stacking context issues */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <>
+          <Fragment key="mobile-menu-fragment">
             {/* Backdrop */}
             <motion.div
+              key="mobile-menu-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -498,6 +503,7 @@ export default function Header() {
             
             {/* Drawer */}
             <motion.div
+              key="mobile-menu-drawer"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -591,7 +597,7 @@ export default function Header() {
                   )}
                </div>
             </motion.div>
-          </>
+          </Fragment>
         )}
       </AnimatePresence>
     </>
