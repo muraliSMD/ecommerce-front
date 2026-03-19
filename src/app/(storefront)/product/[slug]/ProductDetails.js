@@ -395,11 +395,12 @@ export default function ProductDetails({ initialProduct }) {
 
   const hasVariants = variants.length > 0;
   const isOutOfStock = hasVariants 
-    ? (!selectedVariant || selectedVariant.stock === 0)
-    : (product.stock === 0);
+    ? (!selectedVariant || (selectedVariant.stock === 0 && !selectedVariant.isPreBook && !product.isPreBook))
+    : (product.stock === 0 && !product.isPreBook);
   
+  const isPreBook = product.isPreBook || (hasVariants ? (selectedVariant?.isPreBook ?? false) : false);
   const stock = hasVariants ? (selectedVariant?.stock ?? 0) : (product.stock ?? 0);
-  const canAdd = !isOutOfStock && quantity > 0 && quantity <= stock;
+  const canAdd = (!isOutOfStock || isPreBook) && quantity > 0 && (isPreBook || quantity <= stock);
 
   const validVariantVideos = selectedVariant && selectedVariant.videos?.filter(v => typeof v === 'string' && v.trim() !== '');
   const variantHasVideos = validVariantVideos && validVariantVideos.length > 0;
@@ -558,12 +559,32 @@ export default function ProductDetails({ initialProduct }) {
                   );
                 })()}
                 
-                {stock < 10 && stock > 0 && (
+                {isPreBook && (
+                    <span className="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border border-primary/20">
+                      Pre-book
+                    </span>
+                )}
+                
+                {stock < 10 && stock > 0 && !isPreBook && (
                   <span className="bg-orange-100 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-full animate-pulse">
                     Only {stock} left!
                   </span>
                 )}
               </div>
+              
+              {isPreBook && (
+                  <div className="order-4 bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                          <FiShoppingBag />
+                      </div>
+                      <div>
+                          <p className="text-xs font-bold text-gray-500 uppercase">Estimated Shipping</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            {selectedVariant?.preBookDeliveryDate || product.preBookDeliveryDate || "10 Days from order placement"}
+                          </p>
+                      </div>
+                  </div>
+              )}
 
               {/* Star Rating Summary */}
               <div className="flex items-center gap-2 order-4">
@@ -693,10 +714,11 @@ export default function ProductDetails({ initialProduct }) {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.size === size);
                       const disabled = !variantInfo;
                       const isOutOfStock = variantInfo && variantInfo.stock <= 0;
+                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
                       return (
                         <button
                           key={size}
-                          disabled={disabled || isOutOfStock}
+                          disabled={disabled || (isOutOfStock && !isPreBookable)}
                           onClick={() => { 
                             setSelectedSize(size); 
                             setSelectedLength("");
@@ -705,7 +727,7 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
+                            (isOutOfStock && !isPreBookable) ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
                             selectedSize === size
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -727,10 +749,11 @@ export default function ProductDetails({ initialProduct }) {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.length === length);
                       const disabled = !variantInfo;
                       const isOutOfStock = variantInfo && variantInfo.stock <= 0;
+                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
                       return (
                         <button
                           key={length}
-                          disabled={disabled || isOutOfStock}
+                          disabled={disabled || (isOutOfStock && !isPreBookable)}
                           onClick={() => { 
                             setSelectedLength(length); 
                             setSelectedSize("");
@@ -739,7 +762,7 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            (isOutOfStock && !isPreBookable) ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedLength === length
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -761,10 +784,11 @@ export default function ProductDetails({ initialProduct }) {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.age === age);
                       const disabled = !variantInfo;
                       const isOutOfStock = variantInfo && variantInfo.stock <= 0;
+                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
                       return (
                         <button
                           key={age}
-                          disabled={disabled || isOutOfStock}
+                          disabled={disabled || (isOutOfStock && !isPreBookable)}
                           onClick={() => { 
                             setSelectedAge(age); 
                             setSelectedSize("");
@@ -773,7 +797,7 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            (isOutOfStock && !isPreBookable) ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedAge === age
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -795,10 +819,11 @@ export default function ProductDetails({ initialProduct }) {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.nSize === nSize);
                       const disabled = !variantInfo;
                       const isOutOfStock = variantInfo && variantInfo.stock <= 0;
+                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
                       return (
                         <button
                           key={nSize}
-                          disabled={disabled || isOutOfStock}
+                          disabled={disabled || (isOutOfStock && !isPreBookable)}
                           onClick={() => { 
                             setSelectedNSize(nSize); 
                             setSelectedSize("");
@@ -829,10 +854,11 @@ export default function ProductDetails({ initialProduct }) {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.silkType === type);
                       const disabled = !variantInfo;
                       const isOutOfStock = variantInfo && variantInfo.stock <= 0;
+                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
                       return (
                         <button
                           key={type}
-                          disabled={disabled || isOutOfStock}
+                          disabled={disabled || (isOutOfStock && !isPreBookable)}
                           onClick={() => setSelectedSilkType(type)}
                           className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
@@ -858,10 +884,11 @@ export default function ProductDetails({ initialProduct }) {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.withBlouse === opt);
                       const disabled = !variantInfo;
                       const isOutOfStock = variantInfo && variantInfo.stock <= 0;
+                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
                       return (
                         <button
                           key={opt}
-                          disabled={disabled || isOutOfStock}
+                          disabled={disabled || (isOutOfStock && !isPreBookable)}
                           onClick={() => setSelectedWithBlouse(opt)}
                           className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
@@ -887,10 +914,11 @@ export default function ProductDetails({ initialProduct }) {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.blouseMeter === meter);
                       const disabled = !variantInfo;
                       const isOutOfStock = variantInfo && variantInfo.stock <= 0;
+                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
                       return (
                         <button
                           key={meter}
-                          disabled={disabled || isOutOfStock}
+                          disabled={disabled || (isOutOfStock && !isPreBookable)}
                           onClick={() => setSelectedBlouseMeter(meter)}
                           className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start ${
                             disabled ? "hidden" :
@@ -926,9 +954,9 @@ export default function ProductDetails({ initialProduct }) {
                   </button>
                   <span className="w-10 text-center font-bold text-lg">{quantity}</span>
                   <button 
-                    onClick={() => setQuantity(q => Math.min(stock, q + 1))}
+                    onClick={() => setQuantity(q => isPreBook ? q + 1 : Math.min(stock, q + 1))}
                     className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
-                    disabled={isOutOfStock || quantity >= stock}
+                    disabled={isOutOfStock && !isPreBook || (!isPreBook && quantity >= stock)}
                   >
                     <FiPlus />
                   </button>
@@ -965,37 +993,35 @@ export default function ProductDetails({ initialProduct }) {
 
               {/* Purchase Section: Add to Cart & Buy Now */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  disabled={!canAdd || isOutOfStock}
-                  onClick={() => {
-                    addToCart(product, quantity, selectedVariant);
-                    toast.success("Added to GRABSZY Cart!");
-                    setQuantity(1);
-                  }}
-                  className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
-                    (!canAdd || isOutOfStock)
-                      ? "bg-gray-200 cursor-not-allowed text-gray-400" 
-                      : "bg-primary hover:bg-secondary shadow-primary/20"
-                  }`}
-                >
-                  <FiShoppingBag size={20} />
-                  {isOutOfStock ? "Out of Stock" : "Add to Cart"}
-                </button>
+                {(!isPreBook && !isOutOfStock) && (
+                  <button
+                    disabled={!canAdd}
+                    onClick={() => {
+                      addToCart(product, quantity, selectedVariant);
+                      toast.success("Added to GRABSZY Cart!");
+                      setQuantity(1);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg bg-primary hover:bg-secondary shadow-primary/20"
+                  >
+                    <FiShoppingBag size={20} />
+                    Add to Cart
+                  </button>
+                )}
 
                 <button
-                  disabled={!canAdd || isOutOfStock}
+                  disabled={!canAdd}
                   onClick={() => {
                     addToCart(product, quantity, selectedVariant);
                     router.push('/checkout');
                   }}
                   className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
-                    (!canAdd || isOutOfStock)
+                    !canAdd
                       ? "bg-gray-200 cursor-not-allowed text-gray-400" 
                       : "bg-btn-dark hover:bg-black shadow-gray-900/20"
                   }`}
                 >
                   <FiArrowRight size={20} />
-                  {isOutOfStock ? "Out of Stock" : "Buy Now"}
+                  {isOutOfStock ? "Out of Stock" : isPreBook ? "Pre-book Now" : "Buy Now"}
                 </button>
               </div>
             </div>

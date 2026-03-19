@@ -48,7 +48,10 @@ export const useCartStore = create(
       addToCart: async (product, qty = 1, variant = null) => {
         const { userId } = get();
         
+        const isPreBook = variant ? !!variant.isPreBook : !!product.isPreBook;
         const currentStock = variant ? variant.stock : product.stock;
+        const price = isPreBook ? (variant?.preBookPrice || product.preBookPrice || (variant?.price ?? product.price)) : (variant?.price ?? product.price);
+        const preBookDeliveryDate = isPreBook ? (variant?.preBookDeliveryDate || product.preBookDeliveryDate) : null;
 
         set((state) => {
           const items = [...state.items];
@@ -74,7 +77,7 @@ export const useCartStore = create(
 
           if (index > -1) {
             const newQuantity = items[index].quantity + qty;
-            if (newQuantity > currentStock) {
+            if (newQuantity > currentStock && !isPreBook) {
                 // Determine how many can be added
                 const remaining = Math.max(0, currentStock - items[index].quantity);
                 if (remaining > 0) {
@@ -87,22 +90,33 @@ export const useCartStore = create(
                 items[index].quantity += qty;
             }
             
+            // Update price in case it changed (e.g. pre-book price set now)
+            items[index].price = price;
+            items[index].isPreBook = isPreBook;
+            items[index].preBookDeliveryDate = preBookDeliveryDate;
+            
             // Prevent negative quantity
             if (items[index].quantity <= 0) items.splice(index, 1);
           } else if (qty > 0) {
              // New item
-             if (qty > currentStock) {
+             if (qty > currentStock && !isPreBook) {
                  items.push({ 
                     product, 
                     variant: isEmptyVariant(variant) ? null : variant, 
-                    quantity: currentStock // Clamp to max stock
+                    quantity: currentStock, // Clamp to max stock
+                    price,
+                    isPreBook,
+                    preBookDeliveryDate
                 });
                 toast.error(`Only ${currentStock} available in stock`);
              } else {
                 items.push({ 
                     product, 
                     variant: isEmptyVariant(variant) ? null : variant, 
-                    quantity: qty 
+                    quantity: qty,
+                    price,
+                    isPreBook,
+                    preBookDeliveryDate
                 });
              }
           }

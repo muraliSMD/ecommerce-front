@@ -30,6 +30,7 @@ export default function AdminOrders() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
   const [orderToDelete, setOrderToDelete] = useState(null);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
 
@@ -75,7 +76,13 @@ export default function AdminOrders() {
     
     const matchesStatus = statusFilter === "All" || o.orderStatus === statusFilter;
     
-    return matchesSearch && matchesStatus;
+    // Check both top-level isPreBook (new orders) and items (legacy support)
+    const isPreBookOrder = o.isPreBook || o.items?.some(item => item.isPreBook);
+    const matchesType = typeFilter === "All" || 
+                        (typeFilter === "Pre-book" && isPreBookOrder) || 
+                        (typeFilter === "Standard" && !isPreBookOrder);
+    
+    return matchesSearch && matchesStatus && matchesType;
   }) || [];
 
   if (isLoading) return (
@@ -125,6 +132,21 @@ export default function AdminOrders() {
             <FiArrowRight className="rotate-90" size={12} />
           </div>
         </div>
+        <div className="relative">
+          <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <select 
+            className="pl-12 pr-10 py-3 bg-surface text-gray-600 rounded-2xl border border-gray-100 font-bold text-sm hover:bg-white transition-all outline-none appearance-none cursor-pointer"
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value="All">All Types</option>
+            <option value="Standard">Standard</option>
+            <option value="Pre-book">Pre-book</option>
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+            <FiArrowRight className="rotate-90" size={12} />
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6">
@@ -151,6 +173,11 @@ export default function AdminOrders() {
                       }`}>
                         {order.orderStatus || 'Pending'}
                       </span>
+                      {(order.isPreBook || order.items?.some(item => item.isPreBook)) && (
+                        <span className="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border border-primary/20">
+                          Pre-book
+                        </span>
+                      )}
                       <span className="text-xs text-gray-400 flex items-center gap-1">
                         <FiClock size={14} /> {new Date(order.createdAt).toLocaleString()}
                       </span>

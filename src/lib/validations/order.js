@@ -28,7 +28,9 @@ export const orderItemSchema = z.object({
     blouseMeter: z.string().optional(),
     silkType: z.string().optional()
   }).nullable().optional(),
-  price: z.number().positive()
+  price: z.number().positive(),
+  isPreBook: z.boolean().optional().default(false),
+  preBookDeliveryDate: z.string().optional().nullable(),
 });
 
 export const checkoutSchema = z.object({

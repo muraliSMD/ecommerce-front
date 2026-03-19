@@ -12,12 +12,12 @@ export async function GET(request, { params }) {
     
     // Check if id is a valid ObjectId
     if (id.match(/^[0-9a-fA-F]{24}$/)) {
-        product = await Product.findById(id).populate({ path: 'category', select: 'name slug', strictPopulate: false });
+        product = await Product.findById(id).populate({ path: 'category', select: 'name slug', strictPopulate: false }).lean();
     } 
     
     // If not found by ID or invalid ID, try slug
     if (!product) {
-        product = await Product.findOne({ slug: id }).populate({ path: 'category', select: 'name slug', strictPopulate: false });
+        product = await Product.findOne({ slug: id }).populate({ path: 'category', select: 'name slug', strictPopulate: false }).lean();
     }
     
     if (!product) {
@@ -69,26 +69,34 @@ export async function PUT(request, { params }) {
 
     const updateData = { ...validation.data };
 
+    let product;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+        product = await Product.findById(id);
+    }
+    if (!product) {
+        product = await Product.findOne({ slug: id });
+    }
+
+    if (!product) {
+      return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    }
+
     if (updateData.slug) {
         updateData.slug = updateData.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        const collision = await Product.findOne({ slug: updateData.slug, _id: { $ne: id } });
+        const collision = await Product.findOne({ slug: updateData.slug, _id: { $ne: product._id } });
         if (collision) {
             updateData.slug = `${updateData.slug}-${Date.now()}`;
         }
     }
 
     if (updateData.sku) {
-        const collision = await Product.findOne({ sku: updateData.sku, _id: { $ne: id } });
+        const collision = await Product.findOne({ sku: updateData.sku, _id: { $ne: product._id } });
         if (collision) {
             return NextResponse.json({ message: "SKU already exists" }, { status: 400 });
         }
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true });
-    
-    if (!updatedProduct) {
-      return NextResponse.json({ message: "Product not found" }, { status: 404 });
-    }
+    const updatedProduct = await Product.findByIdAndUpdate(product._id, updateData, { new: true }).lean();
     
     return NextResponse.json(updatedProduct);
   } catch (error) {

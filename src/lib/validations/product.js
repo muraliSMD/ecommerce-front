@@ -15,6 +15,9 @@ export const variantSchema = z.object({
   withBlouse: z.string().optional().nullable(),
   blouseMeter: z.string().optional().nullable(),
   silkType: z.string().optional().nullable(),
+  isPreBook: z.boolean().optional(),
+  preBookPrice: z.number().optional().nullable(),
+  preBookDeliveryDate: z.string().optional().nullable(),
 });
 
 export const productSchema = z.object({
@@ -34,15 +37,18 @@ export const productSchema = z.object({
   price: z.number().positive("Price must be positive"),
   mrp: z.number().optional().nullable(),
   discount: z.number().min(0).max(100).optional().nullable(),
-  hasVariants: z.boolean().default(false),
+  hasVariants: z.boolean().optional(),
   stock: z.number().int().min(0, "Stock cannot be negative"),
   variants: z.array(variantSchema).optional(),
-  isFeatured: z.boolean().default(false),
-  isActive: z.boolean().default(true),
+  isFeatured: z.boolean().optional(),
+  isActive: z.boolean().optional(),
   metaTitle: z.string().max(100).optional().nullable(),
   metaDescription: z.string().max(300).optional().nullable(),
   metaKeywords: z.string().max(200).optional().nullable(),
   withBlouse: z.string().optional().nullable(),
   blouseMeter: z.string().optional().nullable(),
   silkType: z.string().optional().nullable(),
+  isPreBook: z.boolean().optional(),
+  preBookPrice: z.number().optional().nullable(),
+  preBookDeliveryDate: z.string().optional().nullable(),
 });
