@@ -95,6 +95,8 @@ export async function POST(request) {
         quantity: i.quantity,
         variant: i.variant,
         price: i.price,
+        isPreBook: i.isPreBook || false,
+        preBookDeliveryDate: i.isPreBook ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) : null
       }));
     } 
     // Fallback: Check Server-side DB cart if body items missing (Legacy/Backup)
@@ -106,6 +108,8 @@ export async function POST(request) {
           quantity: i.quantity,
           variant: i.variant,
           price: i.product.price,
+          isPreBook: i.product.isPreBook || false,
+          preBookDeliveryDate: i.product.isPreBook ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) : null
         }));
         
         // Clear server cart
@@ -190,10 +194,15 @@ export async function POST(request) {
     const taxAmount = body.taxAmount || 0;
     const finalAmount = Math.max(0, totalAmount - discountAmount + shippingCharge + taxAmount);
 
+    const isPreBook = items.some(i => i.isPreBook);
+    const preBookDeliveryDate = isPreBook ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) : null;
+
     const order = await new Order({
       orderId,
       user: userId,
       items,
+      isPreBook,
+      preBookDeliveryDate,
       totalAmount: finalAmount, 
       shippingCharge: shippingCharge,
       taxAmount: taxAmount,

@@ -174,3 +174,22 @@
   "userId": "69b456b756bb4e75ed8fd8bc",
   "role": "customer"
 } 
+2026-03-18 12:10:30 [[33mwarn[39m]: Failed login attempt: Invalid password {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244"
+} 
+2026-03-18 12:10:41 [[32minfo[39m]: User logged in successfully {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244",
+  "role": "admin"
+} 
+2026-03-19 10:54:55 [[32minfo[39m]: User logged in successfully {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244",
+  "role": "admin"
+} 
+2026-03-19 11:07:15 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<3b3b38ce-ffc1-dffe-415c-f2b9df2b973e@grabszy.com>",
+  "to": "muralis.1995@gmail.com",
+  "subject": "Order Confirmation #GRY-ORD-00006 - GRABSZY"
+} 

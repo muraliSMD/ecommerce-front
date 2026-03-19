@@ -73,14 +73,22 @@ export default function AddProduct() {
     withBlouse: "",
     blouseMeter: "",
     silkType: "",
-    nSize: ""
+    nSize: "",
+    preBookDeliveryDate: "",
+    isPreBook: false
   });
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
 
   const isSaree = categories?.find(c => c._id === product.category)?.name?.toLowerCase().includes("saree");
 
-  const [newVariant, setNewVariant] = useState({ color: "", size: "", length: "", age: "", nSize: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+  const [newVariant, setNewVariant] = useState({ 
+    color: "", size: "", length: "", age: "", nSize: "", 
+    withBlouse: "", blouseMeter: "", silkType: "", 
+    price: "", mrp: "", discount: "", stock: "", 
+    isPreBook: false,
+    images: [], videos: [] 
+  });
 
   const addProductMutation = useMutation({
     mutationFn: async (data) => {
@@ -268,7 +276,13 @@ export default function AddProduct() {
         videos: newVariant.videos || []
       }] 
     });
-    setNewVariant({ color: "", size: "", length: "", age: "", nSize: "", withBlouse: "", blouseMeter: "", silkType: "", price: "", mrp: "", discount: "", stock: "", images: [], videos: [] });
+    setNewVariant({ 
+      color: "", size: "", length: "", age: "", nSize: "", 
+      withBlouse: "", blouseMeter: "", silkType: "", 
+      price: "", mrp: "", discount: "", stock: "", 
+      isPreBook: false,
+      images: [], videos: [] 
+    });
   };
 
   const removeVariant = (index) => {
@@ -325,12 +339,14 @@ export default function AddProduct() {
 
     const formattedProduct = {
       ...product,
+      isPreBook: !!product.isPreBook,
       price: Number(product.price) || 0,
       mrp: Number(product.mrp) || undefined,
       discount: Number(product.discount) || undefined,
       stock: totalStock,
-      variants: product.variants.map(v => ({
+      variants: (product.variants || []).map(v => ({
         ...v,
+        isPreBook: !!product.isPreBook || !!v.isPreBook,
         price: Number(v.price) || 0,
         mrp: Number(v.mrp) || undefined,
         discount: Number(v.discount) || undefined,
@@ -1007,6 +1023,20 @@ export default function AddProduct() {
                 />
               </div>
             </div>
+
+            {/* Pre-book for New Variant */}
+            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold text-gray-700">Pre-book for this variant</p>
+                <button 
+                  type="button" 
+                  onClick={() => setNewVariant({...newVariant, isPreBook: !newVariant.isPreBook})}
+                  className={`w-10 h-5 rounded-full transition-all relative ${newVariant.isPreBook ? 'bg-primary' : 'bg-gray-200'}`}
+                >
+                  <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${newVariant.isPreBook ? 'left-5.5' : 'left-0.5'}`} />
+                </button>
+              </div>
+            </div>
             
             <div className="flex justify-start md:mt-2">
               <button 
@@ -1168,6 +1198,19 @@ export default function AddProduct() {
                         className="w-20 bg-white border border-gray-100 px-3 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
                     />
                   </div>
+
+                  <div className="flex flex-col gap-1 min-w-[120px] bg-primary/5 p-2 rounded-xl border border-primary/10">
+                    <div className="flex items-center justify-between gap-2">
+                       <span className="text-[9px] font-bold text-primary uppercase">Pre-book</span>
+                       <button 
+                        type="button" 
+                        onClick={() => handleVariantChange(i, 'isPreBook', !v.isPreBook)}
+                        className={`w-8 h-4 rounded-full transition-all relative ${v.isPreBook ? 'bg-primary' : 'bg-gray-200'}`}
+                      >
+                        <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${v.isPreBook ? 'left-4.5' : 'left-0.5'}`} />
+                      </button>
+                    </div>
+                  </div>
                   
                   <div className="flex items-center gap-2 md:ml-auto mt-2 md:mt-0">
                     <button 
@@ -1261,8 +1304,32 @@ export default function AddProduct() {
                     )}
                   </div>
                 </div>
+
               </div>
             ))}
+            
+            <div className="p-6 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-bold text-gray-900">Enable Pre-book</p>
+                  <p className="text-xs text-gray-500 mt-1">Allow customers to order even if stock is 0</p>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    const newState = !product.isPreBook;
+                    setProduct({
+                      ...product, 
+                      isPreBook: newState,
+                      variants: (product.variants || []).map(v => ({...v, isPreBook: newState}))
+                    });
+                  }}
+                  className={`w-12 h-6 rounded-full transition-all relative ${product.isPreBook ? 'bg-primary' : 'bg-gray-200'}`}
+                >
+                  <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${product.isPreBook ? 'left-7' : 'left-1'}`} />
+                </button>
+              </div>
+            </div>
             {product.variants.length === 0 && (
               <p className="text-center py-10 text-gray-400 border-2 border-dashed border-gray-100 rounded-[2rem]">
                 No variants added yet. Define colour/size combinations.

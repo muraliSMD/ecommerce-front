@@ -30,6 +30,9 @@ const variantSchema = new mongoose.Schema({
   withBlouse: { type: String },
   blouseMeter: { type: String },
   silkType: { type: String },
+  isPreBook: { type: Boolean, default: false },
+  preBookPrice: { type: Number },
+  preBookDeliveryDate: { type: String },
 });
 
 
@@ -67,6 +70,9 @@ const productSchema = new mongoose.Schema(
     withBlouse: { type: String },
     blouseMeter: { type: String },
     silkType: { type: String },
+    isPreBook: { type: Boolean, default: false },
+    preBookPrice: { type: Number },
+    preBookDeliveryDate: { type: String },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
@@ -78,4 +84,9 @@ productSchema.index({ price: 1 });
 productSchema.index({ createdAt: -1 });
 productSchema.index({ isFeatured: 1 });
 
-export default mongoose.models.Product || mongoose.model("Product", productSchema);
+// Remove existing model to ensure schema updates are applied (important for HMR)
+if (mongoose.models && mongoose.models.Product) {
+  delete mongoose.models.Product;
+}
+
+export default mongoose.model("Product", productSchema);

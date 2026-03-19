@@ -213,6 +213,11 @@ export default function AdminOrderDetails() {
                 }`}>
                     {order.orderStatus || 'Pending'}
                 </span>
+                {(order.isPreBook || order.items?.some(item => item.isPreBook)) && (
+                    <span className="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest border border-primary/20">
+                        Pre-book
+                    </span>
+                )}
               </div>
 
               <p className="text-gray-500 text-sm mt-1 flex items-center gap-2">
@@ -289,9 +294,23 @@ export default function AdminOrderDetails() {
                                             }
                                         </div>
                                     </div>
-                                    <p className="font-bold text-gray-900 text-sm whitespace-nowrap">
-                                        {formatPrice(item.price)}
-                                    </p>
+                                    <div className="flex flex-col items-end gap-1">
+                                        <p className="font-bold text-gray-900 text-sm whitespace-nowrap">
+                                            {formatPrice(item.price)}
+                                        </p>
+                                        {item.isPreBook && (
+                                            <div className="flex flex-col items-end">
+                                                <span className="bg-primary/10 text-primary text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter border border-primary/20">
+                                                    Pre-book
+                                                </span>
+                                                {item.preBookDeliveryDate && (
+                                                    <span className="text-[10px] text-gray-500 font-medium mt-1">
+                                                        Est: {item.preBookDeliveryDate}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex justify-between items-center mt-4 text-xs text-gray-500">
                                     <span>Qty: {item.quantity}</span>

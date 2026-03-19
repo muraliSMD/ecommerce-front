@@ -71,6 +71,9 @@ export default function CheckoutPage() {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  
+  const hasBulk = items.some(i => i.quantity >= 3);
+  const hasPreBook = items.some(i => i.isPreBook);
 
   const subtotal = items.reduce(
     (sum, i) => sum + (i.product ? (i.variant?.price ?? i.product.price) * i.quantity : 0),
@@ -464,7 +467,9 @@ export default function CheckoutPage() {
                     product: i.product._id,
                     quantity: i.quantity,
                     variant: i.variant,
-                    price: i.variant?.price ?? i.product.price
+                    price: i.price,
+                    isPreBook: i.isPreBook || false,
+                    preBookDeliveryDate: i.preBookDeliveryDate || null
                 })),
             paymentInfo: {
                 couponCode: appliedCoupon?.code,
@@ -948,10 +953,23 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              <div className="mt-8 space-y-4">
+                {hasBulk && (
+                  <div className="bg-orange-50/10 border border-orange-500/20 rounded-2xl p-4 text-orange-200/90 text-sm leading-relaxed">
+                    <span className="font-bold text-orange-400">Note:</span> Your order contains bulk items (3+ units). These require custom manufacturing before dispatch.
+                  </div>
+                )}
+                {hasPreBook && (
+                  <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 text-primary-100/90 text-sm leading-relaxed">
+                    <span className="font-bold text-primary">Note:</span> Your order contains pre-book items. These will be delivered within 10 days from order confirmation.
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={handlePlaceOrder}
                 disabled={isSubmitting}
-                className="w-full bg-primary hover:bg-secondary text-white py-5 rounded-[1.5rem] font-bold mt-10 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+                className="w-full bg-primary hover:bg-secondary text-white py-5 rounded-[1.5rem] font-bold mt-6 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
               >
                 {isSubmitting ? "Processing..." : "Complete Purchase"}
                 <FiCheckCircle size={20} />

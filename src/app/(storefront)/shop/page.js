@@ -550,9 +550,13 @@ export default function ShopPage() {
                                         {product.variants && product.variants.length > 1 ? (
                                             <Link 
                                                 href={`/product/${product.slug || product._id}`} 
-                                                className="bg-btn-dark text-btn-text px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-btn-dark-hover transition-colors shadow-lg shadow-gray-900/10 active:scale-95 flex items-center gap-2"
+                                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 flex items-center gap-2 ${
+                                                    product.variants.every(v => v.stock <= 0)
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                                        : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
+                                                }`}
                                             >
-                                                Select Options
+                                                {product.variants.every(v => v.stock <= 0) ? "Out of Stock" : "Select Options"}
                                             </Link>
                                         ) : (() => {
                                             const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);
