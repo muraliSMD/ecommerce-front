@@ -110,6 +110,7 @@ export default function GalleryPage() {
                       src={image.imageUrl}
                       alt={image.caption || "Gallery image"}
                       fill
+                      sizes="(max-width: 768px) 33vw, (max-width: 1024px) 16vw, 12vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     
@@ -178,6 +179,7 @@ export default function GalleryPage() {
                   src={selectedImage.imageUrl}
                   alt={selectedImage.caption || "Gallery image"}
                   fill
+                  sizes="(max-width: 1280px) 100vw, 1024px"
                   className="object-contain"
                 />
               </div>

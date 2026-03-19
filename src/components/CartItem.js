@@ -26,6 +26,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
             src={image} 
             alt={item.product?.name || "Product"} 
             fill 
+            sizes="(max-width: 640px) 96px, 128px"
             className="object-cover group-hover:scale-110 transition-transform duration-500" 
         />
       </div>
@@ -41,6 +42,13 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
                     .map(([k, v]) => k === 'color' ? resolveColorName(v) : v)
                     .join(' • ')}
               </p>
+            )}
+            {item.isPreBook && (
+              <div className="mt-1">
+                <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-primary/20">
+                  Pre-book
+                </span>
+              </div>
             )}
           </div>
           <button 
@@ -75,6 +83,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
           <AnimatePresence>
             {item.quantity > 3 && (
               <motion.div
+                key="bulk-warning"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}

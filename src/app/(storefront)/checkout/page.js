@@ -877,6 +877,11 @@ export default function CheckoutPage() {
                           </p>
                       )}
                       <p className="text-xs text-gray-400 mt-1">{item.quantity} × {getCurrencySymbol()}{item.variant?.price ?? item.product?.price ?? 0}</p>
+                      {item.isPreBook && (
+                        <span className="bg-primary/20 text-primary text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter border border-primary/30 mt-1 inline-block">
+                          Pre-book
+                        </span>
+                      )}
                     </div>
                     <p className="font-bold text-sm">{formatPrice((item.variant?.price ?? item.product?.price ?? 0) * item.quantity)}</p>
                   </div>

@@ -102,6 +102,7 @@ const InstagramSection = () => {
                   src={item.imageUrl} 
                   alt={item.caption || "Instagram Post"} 
                   fill 
+                  sizes="(max-width: 768px) 280px, 320px"
                   className="object-cover transition-transform duration-1000 group-hover:scale-110"
                 />
                 
