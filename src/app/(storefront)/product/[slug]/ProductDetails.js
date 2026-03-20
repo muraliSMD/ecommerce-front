@@ -713,12 +713,11 @@ export default function ProductDetails({ initialProduct }) {
                     {allSizes.map((size) => {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.size === size);
                       const disabled = !variantInfo;
-                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
-                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0 && !product.isPreBook && !variantInfo.isPreBook;
                       return (
                         <button
                           key={size}
-                          disabled={disabled || (isOutOfStock && !isPreBookable)}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { 
                             setSelectedSize(size); 
                             setSelectedLength("");
@@ -727,7 +726,7 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            (isOutOfStock && !isPreBookable) ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
                             selectedSize === size
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -748,12 +747,11 @@ export default function ProductDetails({ initialProduct }) {
                     {allLengths.map((length) => {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.length === length);
                       const disabled = !variantInfo;
-                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
-                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0 && !product.isPreBook && !variantInfo.isPreBook;
                       return (
                         <button
                           key={length}
-                          disabled={disabled || (isOutOfStock && !isPreBookable)}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { 
                             setSelectedLength(length); 
                             setSelectedSize("");
@@ -762,7 +760,7 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            (isOutOfStock && !isPreBookable) ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedLength === length
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -783,12 +781,11 @@ export default function ProductDetails({ initialProduct }) {
                     {allAges.map((age) => {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.age === age);
                       const disabled = !variantInfo;
-                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
-                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0 && !product.isPreBook && !variantInfo.isPreBook;
                       return (
                         <button
                           key={age}
-                          disabled={disabled || (isOutOfStock && !isPreBookable)}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { 
                             setSelectedAge(age); 
                             setSelectedSize("");
@@ -797,7 +794,7 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            (isOutOfStock && !isPreBookable) ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
                             selectedAge === age
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
                               : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -818,12 +815,11 @@ export default function ProductDetails({ initialProduct }) {
                     {allNSizes.map((nSize) => {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.nSize === nSize);
                       const disabled = !variantInfo;
-                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
-                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0 && !product.isPreBook && !variantInfo.isPreBook;
                       return (
                         <button
                           key={nSize}
-                          disabled={disabled || (isOutOfStock && !isPreBookable)}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => { 
                             setSelectedNSize(nSize); 
                             setSelectedSize("");
@@ -853,12 +849,11 @@ export default function ProductDetails({ initialProduct }) {
                     {allSilkTypes.map((type) => {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.silkType === type);
                       const disabled = !variantInfo;
-                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
-                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0 && !product.isPreBook && !variantInfo.isPreBook;
                       return (
                         <button
                           key={type}
-                          disabled={disabled || (isOutOfStock && !isPreBookable)}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedSilkType(type)}
                           className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
@@ -883,12 +878,11 @@ export default function ProductDetails({ initialProduct }) {
                     {allBlouseOptions.map((opt) => {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.withBlouse === opt);
                       const disabled = !variantInfo;
-                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
-                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0 && !product.isPreBook && !variantInfo.isPreBook;
                       return (
                         <button
                           key={opt}
-                          disabled={disabled || (isOutOfStock && !isPreBookable)}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedWithBlouse(opt)}
                           className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
@@ -913,12 +907,11 @@ export default function ProductDetails({ initialProduct }) {
                     {allBlouseMeters.map((meter) => {
                       const variantInfo = variants.find(v => v.color === selectedColor && v.blouseMeter === meter);
                       const disabled = !variantInfo;
-                      const isOutOfStock = variantInfo && variantInfo.stock <= 0;
-                      const isPreBookable = product.isPreBook || (variantInfo && variantInfo.isPreBook);
+                      const isOutOfStock = variantInfo && variantInfo.stock <= 0 && !product.isPreBook && !variantInfo.isPreBook;
                       return (
                         <button
                           key={meter}
-                          disabled={disabled || (isOutOfStock && !isPreBookable)}
+                          disabled={disabled || isOutOfStock}
                           onClick={() => setSelectedBlouseMeter(meter)}
                           className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start ${
                             disabled ? "hidden" :

@@ -43,7 +43,7 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
           </span>
         )}
 
-        {((hasVariants ? product.variants.every(v => v.stock <= 0 && !v.isPreBook) : (product.stock <= 0 && !product.isPreBook)) && !product.isPreBook) && (
+        {((hasVariants ? product.variants.every(v => v.stock <= 0 && !v.isPreBook && !product.isPreBook) : (product.stock <= 0 && !product.isPreBook)) && !product.isPreBook) && (
           <div className="absolute inset-0 z-10 flex items-center justify-center">
             <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
               <span className="text-white text-[10px] font-bold uppercase tracking-widest">Out of Stock</span>
@@ -88,12 +88,12 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
                 : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
             }`}
           >
-            {product.variants.every(v => v.stock <= 0 && !v.isPreBook) && !product.isPreBook 
+            {product.variants.every(v => v.stock <= 0 && !v.isPreBook && !product.isPreBook) 
               ? "Out of Stock" 
               : (product.isPreBook || product.variants.some(v => v.isPreBook)) ? "Pre-book" : "Details"} <FiArrowRight size={10} />
           </Link>
         ) : (() => {
-          const isOutOfStock = product.stock <= 0 || (product.variants?.length === 1 && product.variants[0].stock <= 0);
+          const isOutOfStock = (product.stock <= 0 && !product.isPreBook) || (product.variants?.length === 1 && product.variants[0].stock <= 0 && !product.variants[0].isPreBook && !product.isPreBook);
           return (
           <div className="mt-2 flex gap-2">
             {(!product.isPreBook && !isOutOfStock) && (
