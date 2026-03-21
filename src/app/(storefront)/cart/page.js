@@ -8,7 +8,10 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiShoppingBag, FiArrowRight } from "react-icons/fi";
 import ConfirmationModal from "@/components/ConfirmationModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { useUserStore } from "@/store/userStore";
 
 export default function CartPage() {
   const items = useCartStore((state) => state.items);
@@ -19,8 +22,25 @@ export default function CartPage() {
   const settings = useSettingsStore((state) => state.settings);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
 
+  const { userInfo } = useUserStore();
+  const queryClient = useQueryClient();
+
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Pre-fetch addresses if logged in
+  useEffect(() => {
+    if (userInfo?._id) {
+      queryClient.prefetchQuery({
+        queryKey: ["user-addresses", userInfo._id],
+        queryFn: async () => {
+          const { data } = await api.get("/user/addresses?limit=100");
+          return data;
+        },
+        staleTime: 5 * 60 * 1000,
+      });
+    }
+  }, [userInfo, queryClient]);
 
   const handleDeleteClick = (product, variant) => {
     setItemToDelete({ product, variant });

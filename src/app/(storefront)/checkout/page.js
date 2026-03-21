@@ -71,6 +71,7 @@ export default function CheckoutPage() {
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
   const [isCouponsModalOpen, setIsCouponsModalOpen] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  const [hasAttemptedPurchase, setHasAttemptedPurchase] = useState(false);
   
   const hasBulk = items.some(i => i.quantity >= 3);
   const hasPreBook = items.some(i => i.isPreBook);
@@ -87,7 +88,7 @@ export default function CheckoutPage() {
 
 
   // Fetch Available Coupons
-  const { data: availableCoupons } = useQuery({
+  const { data: availableCoupons, isLoading: isLoadingCoupons } = useQuery({
     queryKey: ["available-coupons", userInfo?._id], // Refetch when user changes
     queryFn: async () => {
         // Only fetch if user is logged in, otherwise empty list (or could fetch public coupons)
@@ -99,13 +100,14 @@ export default function CheckoutPage() {
   });
 
   // Fetch User Addresses
-  const { data: userAddresses, refetch: refetchAddresses } = useQuery({
+  const { data: userAddresses, isLoading: isLoadingAddresses, refetch: refetchAddresses } = useQuery({
     queryKey: ["user-addresses", userInfo?._id],
     queryFn: async () => {
-        const { data } = await api.get("/user/addresses?limit=100"); // Ensure we get all
+        const { data } = await api.get("/user/addresses?limit=100"); 
         return data;
     },
     enabled: !!userInfo,
+    staleTime: 5 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -318,7 +320,7 @@ export default function CheckoutPage() {
                 ondismiss: function() {
                     setIsSubmitting(false);
                     toast("Payment cancelled");
-                    logAbandonedCheckout('abandoned');
+                    logAbandonedCheckout('cancelled');
                 }
             }
         };
@@ -327,7 +329,7 @@ export default function CheckoutPage() {
         paymentObject.on('payment.failed', function (response){
                 toast.error(response.error.description || "Payment Failed");
                 setIsSubmitting(false);
-                logAbandonedCheckout('failed');
+                logAbandonedCheckout('payment failed');
         });
         paymentObject.open();
 
@@ -343,6 +345,9 @@ export default function CheckoutPage() {
   const logAbandonedCheckout = useCallback(async (reason = "abandoned") => {
     if (hasLoggedAbandoned.current || isOrderPlaced) return;
     
+    // NEW REQUIREMENT: Only log abandonment if they have at least attempted to purchase
+    if (reason === "abandoned" && !hasAttemptedPurchase) return;
+
     // Only log if they have entered certain details (e.g. name and phone) and have items
     if (!billingDetail.name || !billingDetail.phone || items.length === 0) return;
 
@@ -423,6 +428,7 @@ export default function CheckoutPage() {
     }
 
     setIsSubmitting(true);
+    setHasAttemptedPurchase(true);
     
     try {
         if (paymentMethod === "Online") {
@@ -567,7 +573,18 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {!showAddressForm && userInfo && addresses.length > 0 ? (
+              {isLoadingAddresses ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
+                      {[1, 2].map((i) => (
+                          <div key={i} className="border-2 border-gray-100 rounded-2xl p-5 space-y-3">
+                              <div className="h-4 bg-gray-100 rounded w-1/3"></div>
+                              <div className="h-3 bg-gray-50 rounded w-full"></div>
+                              <div className="h-3 bg-gray-50 rounded w-2/3"></div>
+                              <div className="h-3 bg-gray-100 rounded w-1/4 mt-4"></div>
+                          </div>
+                      ))}
+                  </div>
+              ) : !showAddressForm && userInfo && addresses.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {addresses.map((addr) => (
                           <div 
@@ -618,11 +635,6 @@ export default function CheckoutPage() {
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
-                                    onBlur={() => {
-                                        if (formData.name && formData.phone) {
-                                            logAbandonedCheckout();
-                                        }
-                                    }}
                                     disabled={isSubmitting}
                                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="Full Name"
@@ -648,11 +660,6 @@ export default function CheckoutPage() {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
-                                    onBlur={() => {
-                                        if (formData.name && formData.phone) {
-                                            logAbandonedCheckout();
-                                        }
-                                    }}
                                     disabled={isSubmitting}
                                     className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
                                     placeholder="+1 (555) 000-0000"
@@ -925,12 +932,14 @@ export default function CheckoutPage() {
                     </div>
                     
                     {/* View Offers Button */}
-                     {userInfo && availableCoupons?.length > 0 && !appliedCoupon && (
+                     {userInfo && !appliedCoupon && (
                         <button
                           onClick={() => setIsCouponsModalOpen(true)}
-                          className="text-primary text-xs font-bold mt-2 hover:underline flex items-center gap-1"
+                          disabled={isLoadingCoupons}
+                          className="text-primary text-xs font-bold mt-2 hover:underline flex items-center gap-1 disabled:opacity-50"
                         >
-                          <FiTag /> View Available Offers ({availableCoupons.length})
+                          <FiTag className={isLoadingCoupons ? "animate-pulse" : ""} /> 
+                          {isLoadingCoupons ? "Checking for offers..." : `View Available Offers (${availableCoupons?.length || 0})`}
                         </button>
                      )}
                      
@@ -1016,14 +1025,25 @@ export default function CheckoutPage() {
                          <p className="text-gray-500 text-sm mb-6">Select a coupon to apply to your order.</p>
 
                          <div className="space-y-4 overflow-y-auto pr-2">
-                            {availableCoupons?.sort(a => a.minOrderAmount > subtotal ? 1 : -1).map(coupon => {
+                            {availableCoupons?.sort((a, b) => {
+                                // Used coupons go to bottom
+                                if (a.isUsed !== b.isUsed) return a.isUsed ? 1 : -1;
+                                // Ineligible coupons go after eligible ones
+                                const aEligible = subtotal >= a.minOrderAmount;
+                                const bEligible = subtotal >= b.minOrderAmount;
+                                if (aEligible !== bEligible) return aEligible ? -1 : 1;
+                                return 0;
+                            }).map(coupon => {
                                 const isEligible = subtotal >= coupon.minOrderAmount;
+                                const isUsed = coupon.isUsed;
                                 
                                 return (
                                 <div 
                                     key={coupon._id} 
                                     className={`border rounded-2xl p-4 flex flex-col gap-2 transition-all ${
-                                        isEligible 
+                                        isUsed
+                                        ? "border-gray-100 bg-gray-50 opacity-50 grayscale select-none"
+                                        : isEligible 
                                         ? "border-primary/20 bg-primary/5 hover:border-primary" 
                                         : "border-gray-100 bg-gray-50 opacity-60"
                                     }`}
@@ -1040,7 +1060,11 @@ export default function CheckoutPage() {
                                                 }
                                             </h4>
                                         </div>
-                                        {isEligible ? (
+                                        {isUsed ? (
+                                             <span className="text-xs font-bold text-gray-400 bg-gray-100 px-3 py-2 rounded-lg">
+                                                Already Used
+                                             </span>
+                                        ) : isEligible ? (
                                              <button
                                                 onClick={() => handleApplyCoupon(coupon.code)}
                                                 className="bg-primary text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-secondary transition-colors"
@@ -1054,8 +1078,12 @@ export default function CheckoutPage() {
                                         )}
                                     </div>
                                     <p className="text-xs text-gray-500">
-                                        expires {coupon.expiryDate ? format(new Date(coupon.expiryDate), "MMM dd") : "Never"} • 
-                                        Min order {formatPrice(coupon.minOrderAmount)}
+                                        {isUsed ? "You have already redeemed this offer" : (
+                                            <>
+                                                expires {coupon.expiryDate ? format(new Date(coupon.expiryDate), "MMM dd") : "Never"} • 
+                                                Min order {formatPrice(coupon.minOrderAmount)}
+                                            </>
+                                        )}
                                     </p>
                                 </div>
                             )})}
