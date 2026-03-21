@@ -31,15 +31,32 @@ export async function GET(request) {
 
     let coupons = await Coupon.find(query).sort({ createdAt: -1 }).lean();
 
-    // Filter by global usage limit
-    coupons = coupons.filter(c => c.usageLimit === null || c.usedCount < c.usageLimit);
-
-    // Filter by User Usage (if user is logged in)
+    // Get usage for the current user to handle both isUsed flag and visibility for exhausted coupons
+    let usedCodes = new Set();
     if (user) {
-        const usedCoupons = await CouponUsage.find({ userId: user._id }).select('couponCode');
-        const usedCodes = new Set(usedCoupons.map(u => u.couponCode));
-        coupons = coupons.filter(c => !usedCodes.has(c.code));
+        const userIdStr = user._id.toString();
+        const usedCoupons = await CouponUsage.find({ 
+            $or: [
+                { userId: user._id },
+                { userId: userIdStr }
+            ]
+        }).select('couponCode');
+        usedCodes = new Set(usedCoupons.map(u => u.couponCode.toUpperCase().trim()));
     }
+
+    // Filter by global usage limit OR if already used by current user
+    // (We show exhausted coupons as "Already Used" if the user has redeemed them)
+    coupons = coupons.filter(c => 
+        c.usageLimit === null || 
+        c.usedCount < c.usageLimit || 
+        usedCodes.has(c.code.toUpperCase().trim())
+    );
+
+    // Add isUsed flag
+    coupons = coupons.map(c => ({
+        ...c,
+        isUsed: usedCodes.has(c.code.toUpperCase().trim())
+    }));
 
     return NextResponse.json(coupons);
 

@@ -7,7 +7,9 @@ import {
   FiSearch, 
   FiTrash2, 
   FiEdit2,
-  FiTag
+  FiTag,
+  FiUsers,
+  FiX
 } from "react-icons/fi";
 import Link from "next/link";
 import { useState } from "react";
@@ -21,6 +23,7 @@ export default function AdminCoupons() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [couponToDelete, setCouponToDelete] = useState(null);
+  const [viewingUsage, setViewingUsage] = useState(null);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
 
   const { data: coupons, isLoading } = useQuery({
@@ -135,6 +138,13 @@ export default function AdminCoupons() {
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setViewingUsage(coupon)}
+                        className="p-3 bg-surface text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
+                        title="View Usage"
+                      >
+                         <FiUsers size={16} />
+                      </button>
                       <Link
                         href={`/admin/coupons/edit/${coupon._id}`}
                         className="p-3 bg-surface text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
@@ -175,6 +185,104 @@ export default function AdminCoupons() {
           confirmText={deleteMutation.isPending ? "Deleting..." : "Delete Coupon"}
         />
       )}
+
+      {viewingUsage && (
+        <UsageModal 
+          coupon={viewingUsage} 
+          onClose={() => setViewingUsage(null)} 
+          formatPrice={formatPrice}
+        />
+      )}
     </div>
   );
+}
+
+function UsageModal({ coupon, onClose, formatPrice }) {
+    const { data: usage, isLoading } = useQuery({
+        queryKey: ["coupon-usage", coupon.code],
+        queryFn: async () => {
+            const { data } = await api.get(`/admin/coupons/${coupon.code}/usage`);
+            return data;
+        },
+    });
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div 
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={onClose}
+            />
+            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl relative overflow-hidden flex flex-col max-h-[80vh]">
+                <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-surface/50">
+                    <div>
+                        <h2 className="text-2xl font-display font-bold text-gray-900">Coupon Usage</h2>
+                        <p className="text-gray-500 text-sm mt-1">Customers who used code: <span className="font-mono font-bold text-primary">{coupon.code}</span></p>
+                    </div>
+                    <button 
+                        onClick={onClose}
+                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                        <FiX size={24} />
+                    </button>
+                </div>
+
+                <div className="p-8 overflow-y-auto">
+                    {isLoading ? (
+                        <div className="py-20 flex justify-center">
+                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                        </div>
+                    ) : usage?.length > 0 ? (
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="text-[10px] font-bold uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                    <th className="pb-4">Customer</th>
+                                    <th className="pb-4">Order Details</th>
+                                    <th className="pb-4 text-right">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {usage.map((u) => (
+                                    <tr key={u._id} className="group">
+                                        <td className="py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                                    {u.user?.name?.charAt(0) || "U"}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-gray-900 text-sm">{u.user?.name || "Guest User"}</p>
+                                                    <p className="text-xs text-gray-400">{u.user?.email || "No email"}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4">
+                                            <p className="text-sm font-medium text-gray-700">{u.order?.orderId}</p>
+                                            <p className="text-xs text-gray-400">{formatPrice(u.order?.totalAmount)}</p>
+                                        </td>
+                                        <td className="py-4 text-right">
+                                            <p className="text-xs text-gray-500">
+                                                {format(new Date(u.usedAt), 'MMM dd, yyyy')}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <div className="py-20 text-center">
+                            <p className="text-gray-400">This coupon hasn&apos;t been used yet.</p>
+                        </div>
+                    )}
+                </div>
+                
+                <div className="p-8 border-t border-gray-100 bg-surface/30 flex justify-end">
+                    <button 
+                        onClick={onClose}
+                        className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 }

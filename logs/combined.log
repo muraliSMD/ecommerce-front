@@ -193,3 +193,13 @@
   "to": "muralis.1995@gmail.com",
   "subject": "Order Confirmation #GRY-ORD-00006 - GRABSZY"
 } 
+2026-03-21 12:01:53 [[32minfo[39m]: User logged in successfully {
+  "email": "muralis.1995@gmail.com",
+  "userId": "69b456b756bb4e75ed8fd8bc",
+  "role": "customer"
+} 
+2026-03-21 12:26:22 [[32minfo[39m]: User logged in successfully {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244",
+  "role": "admin"
+} 
