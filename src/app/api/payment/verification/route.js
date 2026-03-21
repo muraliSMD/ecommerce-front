@@ -32,11 +32,10 @@ export async function POST(req) {
 
       if (!order) {
         logger.error("Order not found during payment verification", { razorpay_order_id });
-        // We still return true for payment success, but flag the missing order
         return NextResponse.json({ 
-            success: true, 
-            message: "Payment verified but order record not found" 
-        });
+            success: false, 
+            message: "Order record not found" 
+        }, { status: 404 });
       }
 
       return NextResponse.json({ success: true, message: "Payment verified and order updated" });

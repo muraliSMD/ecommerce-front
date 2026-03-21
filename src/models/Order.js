@@ -67,6 +67,7 @@ orderSchema.index({ createdAt: -1 });
 orderSchema.index({ orderStatus: 1 });
 orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ paymentMethod: 1 });
+orderSchema.index({ razorpayOrderId: 1 });
 
 // Prevent model overwrite error in development
 if (process.env.NODE_ENV === "development") {

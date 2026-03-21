@@ -43,6 +43,7 @@ export const checkoutSchema = z.object({
     couponCode: z.string().optional(),
     discountAmount: z.number().optional(),
     transactionId: z.string().optional(),
+    razorpayOrderId: z.string().optional(),
     status: z.string().optional(),
     onlineProvider: z.string().optional()
   }).optional()
