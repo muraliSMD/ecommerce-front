@@ -169,8 +169,21 @@ export const useCartStore = create(
       onRehydrateStorage: () => (state) => {
         if (state) {
             // Cleanup check: remove any items where product is null/undefined
-            const validItems = state.items?.filter(item => item && item.product) || [];
-            if (validItems.length !== state.items?.length) {
+            // Also migrate items missing price or isPreBook flag
+            const validItems = (state.items?.filter(item => item && item.product) || []).map(item => {
+                const product = item.product;
+                const variant = item.variant;
+                const isPreBook = item.isPreBook !== undefined ? item.isPreBook : (variant ? !!variant.isPreBook : !!product.isPreBook);
+                const price = item.price !== undefined ? item.price : (isPreBook ? (variant?.preBookPrice || product.preBookPrice || (variant?.price ?? product.price)) : (variant?.price ?? product.price));
+                
+                return {
+                    ...item,
+                    isPreBook,
+                    price
+                };
+            });
+
+            if (validItems.length !== state.items?.length || validItems.some((item, idx) => item.price !== state.items[idx]?.price)) {
                 state.items = validItems;
             }
             state.setHydrated();

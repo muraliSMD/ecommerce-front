@@ -76,7 +76,7 @@ export default function CheckoutPage() {
   const hasPreBook = items.some(i => i.isPreBook);
 
   const subtotal = items.reduce(
-    (sum, i) => sum + (i.product ? (i.variant?.price ?? i.product.price) * i.quantity : 0),
+    (sum, i) => sum + (i.product ? (i.price ?? (i.variant?.price ?? i.product.price)) * i.quantity : 0),
     0
   );
 
@@ -381,7 +381,7 @@ export default function CheckoutPage() {
                         product: i.product._id,
                         quantity: i.quantity,
                         variant: i.variant,
-                        price: i.variant?.price ?? i.product.price
+                        price: i.price ?? (i.variant?.price ?? i.product.price)
                     }))
             })
         });
@@ -467,8 +467,8 @@ export default function CheckoutPage() {
                     product: i.product._id,
                     quantity: i.quantity,
                     variant: i.variant,
-                    price: i.price,
-                    isPreBook: i.isPreBook || false,
+                    price: i.price ?? (i.isPreBook ? (i.variant?.preBookPrice || i.product.preBookPrice || (i.variant?.price ?? i.product.price)) : (i.variant?.price ?? i.product.price)),
+                    isPreBook: i.isPreBook ?? (i.variant?.isPreBook || i.product.isPreBook || false),
                     preBookDeliveryDate: i.preBookDeliveryDate || null
                 })),
             paymentInfo: {
