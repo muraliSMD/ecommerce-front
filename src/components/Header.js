@@ -149,7 +149,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="relative z-50 flex-shrink-0">
             {settings?.logo ? (
-                <div className="relative h-16 w-44 lg:h-24 lg:w-64">
+                <div className="relative h-12 w-32 lg:h-24 lg:w-64">
                     <Image 
                         src={settings.logo} 
                         alt={settings.siteName || "Logo"} 
@@ -312,7 +312,7 @@ export default function Header() {
           </div>
 
           {/* Mobile Actions */}
-          <div className="flex lg:hidden items-center gap-4 ml-auto">
+          <div className="flex lg:hidden items-center gap-2 sm:gap-4 ml-auto">
             <button
                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
                 className="p-1 text-gray-700"
