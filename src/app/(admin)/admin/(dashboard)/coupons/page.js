@@ -269,7 +269,7 @@ function UsageModal({ coupon, onClose, formatPrice }) {
                         </table>
                     ) : (
                         <div className="py-20 text-center">
-                            <p className="text-gray-400">This coupon hasn't been used yet.</p>
+                            <p className="text-gray-400">This coupon hasn&apos;t been used yet.</p>
                         </div>
                     )}
                 </div>

@@ -395,7 +395,7 @@ export default function CheckoutPage() {
         // Reset if it failed so we can try again on next trigger if appropriate
         hasLoggedAbandoned.current = false;
     }
-  }, [billingDetail, items, isOrderPlaced, userInfo, paymentMethod, shippingCost, taxAmount, appliedCoupon, total]);
+  }, [billingDetail, items, isOrderPlaced, userInfo, paymentMethod, shippingCost, taxAmount, appliedCoupon, total, hasAttemptedPurchase]);
 
   useEffect(() => {
     // Only set up listeners if we haven't logged yet
