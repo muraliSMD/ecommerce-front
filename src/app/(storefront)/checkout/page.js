@@ -191,6 +191,13 @@ export default function CheckoutPage() {
       }
   };
 
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+    toast.success("Coupon removed");
+  };
+
   const handleApplyCoupon = async (codeOverride = null) => {
     const codeToUse = codeOverride || couponCode;
     if (!codeToUse) return;
@@ -923,11 +930,11 @@ export default function CheckoutPage() {
                             className="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white w-full outline-none placeholder:text-gray-500 focus:border-primary transition-all disabled:opacity-50 uppercase font-mono"
                         />
                         <button 
-                            onClick={() => handleApplyCoupon()}
-                            disabled={isValidatingCoupon || !couponCode || appliedCoupon || isSubmitting}
-                            className="bg-white text-gray-900 px-4 rounded-xl font-bold text-sm hover:bg-gray-100 disabled:opacity-50 transition-all"
+                            onClick={() => appliedCoupon ? handleRemoveCoupon() : handleApplyCoupon()}
+                            disabled={isValidatingCoupon || (!couponCode && !appliedCoupon) || isSubmitting}
+                            className={`${appliedCoupon ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" : "bg-white text-gray-900 hover:bg-gray-100"} px-4 rounded-xl font-bold text-sm disabled:opacity-50 transition-all flex items-center gap-1`}
                         >
-                            {isValidatingCoupon ? "..." : appliedCoupon ? "Applied" : "Apply"}
+                            {isValidatingCoupon ? "..." : appliedCoupon ? <><FiX /> Remove</> : "Apply"}
                         </button>
                     </div>
                     
@@ -954,8 +961,17 @@ export default function CheckoutPage() {
 
                     {couponError && <p className="text-red-400 text-xs mt-2">{couponError}</p>}
                     {appliedCoupon && (
-                        <div className="flex justify-between text-green-400 text-sm mt-3">
-                            <span>Discount ({appliedCoupon.code})</span>
+                        <div className="flex justify-between items-center text-green-400 text-sm mt-3">
+                            <span className="flex items-center gap-2">
+                                Discount ({appliedCoupon.code})
+                                <button 
+                                    onClick={handleRemoveCoupon}
+                                    className="p-1 hover:bg-green-400/10 rounded-full transition-colors"
+                                    title="Remove Coupon"
+                                >
+                                    <FiX size={14} />
+                                </button>
+                            </span>
                             <span>-{formatPrice(appliedCoupon.discountAmount)}</span>
                         </div>
                     )}
