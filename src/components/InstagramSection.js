@@ -73,7 +73,7 @@ const InstagramSection = () => {
                 </button>
               </div>
               <a 
-                href="https://instagram.com" 
+                href="https://www.instagram.com/grabszyclothingstore/" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 bg-btn-dark text-btn-text px-8 py-4 rounded-2xl font-bold hover:bg-btn-dark-hover transition-all shadow-xl shadow-black/10 active:scale-95 whitespace-nowrap"
