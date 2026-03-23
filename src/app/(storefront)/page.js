@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import toast from "react-hot-toast";
 import InstagramSection from "@/components/InstagramSection";
+import AppDownloadSection from "@/components/AppDownloadSection";
 
 const CollectionSlider = ({ collection }) => {
   const addToCart = useCartStore((state) => state.addToCart);
@@ -257,6 +258,9 @@ export default function Home() {
           <CollectionSlider key={collection._id} collection={collection} />
         ))
       )}
+
+      {/* App Download Section */}
+      <AppDownloadSection />
 
       {/* Instagram Feed */}
       <InstagramSection />

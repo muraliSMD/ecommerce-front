@@ -37,4 +37,9 @@ export const settingsSchema = z.object({
     showChatbot: z.boolean(),
     whatsappNumber: z.string().optional().nullable(),
   }),
+  appLinks: z.object({
+    android: z.string().optional().nullable(),
+    ios: z.string().optional().nullable(),
+    pwaEnabled: z.boolean().default(true),
+  }).optional(),
 });

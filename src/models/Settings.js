@@ -48,6 +48,13 @@ const settingsSchema = new mongoose.Schema({
     showSignupPopup: { type: Boolean, default: true },
     showChatbot: { type: Boolean, default: true },
     whatsappNumber: { type: String, default: "" },
+  },
+
+  // App Links & PWA
+  appLinks: {
+    android: { type: String, default: "" },
+    ios: { type: String, default: "" },
+    pwaEnabled: { type: Boolean, default: true }
   }
 }, { timestamps: true });
 
