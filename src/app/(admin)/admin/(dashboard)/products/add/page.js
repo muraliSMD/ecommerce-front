@@ -24,6 +24,7 @@ import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
 import { useQuery } from "@tanstack/react-query";
 import CategorySelector from "@/components/admin/CategorySelector";
+import { SectionLoader, Skeleton } from "@/components/Loader";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";
@@ -488,7 +489,7 @@ export default function AddProduct() {
                         onChange={(val) => setProduct({...product, category: val})}
                     />
                   ) : (
-                    <p>Loading categories...</p>
+                    <Skeleton className="h-14 w-full" />
                   )}
                 </div>
                 <div className="space-y-2">

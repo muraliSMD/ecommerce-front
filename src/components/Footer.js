@@ -4,10 +4,14 @@ import Link from "next/link";
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 import { useSettingsStore } from "@/store/settingsStore";
+import usePwaInstall from "@/hooks/usePwaInstall";
+import { FiDownload } from "react-icons/fi";
 import Image from "next/image";
 
 export default function Footer() {
   const settings = useSettingsStore((state) => state.settings);
+  const { isInstallable, install } = usePwaInstall();
+  const pwaEnabled = settings.appLinks?.pwaEnabled ?? true;
   return (
     <footer className="relative bg-bg-main mt-20 pt-20 pb-10 overflow-hidden">
       {/* Background Decor */}
@@ -93,7 +97,16 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border-main flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-text-muted">
           <p>© {new Date().getFullYear()} {settings?.siteName || "GRABSZY"}. All rights reserved.</p>
-          <div className="flex gap-8">
+          <div className="flex gap-8 items-center">
+            {isInstallable && pwaEnabled && (
+              <button 
+                onClick={install}
+                className="flex items-center gap-2 text-primary hover:text-secondary font-bold transition-all px-4 py-2 rounded-xl bg-primary/5 hover:bg-primary/10 border border-primary/20"
+              >
+                <FiDownload size={16} />
+                <span>Install App</span>
+              </button>
+            )}
             <Link href="/privacy-policy" className="hover:text-text-main transition-colors">Privacy Policy</Link>
             <Link href="/terms-of-service" className="hover:text-text-main transition-colors">Terms of Service</Link>
           </div>

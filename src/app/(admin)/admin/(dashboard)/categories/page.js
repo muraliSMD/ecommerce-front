@@ -9,6 +9,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import imageCompression from "browser-image-compression";
 import ConfirmationModal from "@/components/ConfirmationModal";
+import { SectionLoader } from "@/components/Loader";
 
 // Recursive Category Item Component
 const CategoryItem = ({ category, allCategories, level = 0, onDelete, onEdit, onAddChild }) => {
@@ -265,7 +266,7 @@ export default function CategoriesPage() {
 
       <div className="bg-white rounded-[2.5rem] p-4 md:p-8 shadow-xl shadow-black/5 border border-gray-100 min-h-[500px] overflow-x-auto">
         {isLoading ? (
-            <div className="text-center py-20 text-gray-400">Loading categories...</div>
+            <SectionLoader className="min-h-[60vh]" />
         ) : rootCategories.length > 0 ? (
             <div className="space-y-1 min-w-[600px]">
                 {rootCategories.map(cat => (

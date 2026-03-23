@@ -70,9 +70,15 @@ export function generateViewport() {
 }
 
 export default async function RootLayout({ children }) {  
-    await dbConnect();
-    const settingsDoc = await Settings.findOne().lean();
-    const settings = settingsDoc ? JSON.parse(JSON.stringify(settingsDoc)) : {};
+    let settings = {};
+    try {
+        await dbConnect();
+        const settingsDoc = await Settings.findOne().lean();
+        settings = settingsDoc ? JSON.parse(JSON.stringify(settingsDoc)) : {};
+    } catch (error) {
+        console.error("Database connection error in RootLayout:", error.message);
+        // Fallback settings are already empty object
+    }
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://grabszy.com";
 
     return (

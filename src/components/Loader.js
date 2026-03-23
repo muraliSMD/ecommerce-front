@@ -42,7 +42,7 @@ export const SectionLoader = ({ className = "" }) => {
         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         className="w-10 h-10 border-4 border-border-main border-t-primary"
       />
-      <p className="mt-4 text-xs font-bold text-text-muted uppercase tracking-widest">Fetching Data</p>
+      <p className="mt-4 text-xs font-bold text-gray-600 uppercase tracking-widest">Fetching Data</p>
     </div>
   );
 };

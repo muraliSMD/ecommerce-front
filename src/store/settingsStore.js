@@ -31,6 +31,11 @@ export const useSettingsStore = create(
         marketing: {
           showChatbot: true,
           whatsappNumber: ""
+        },
+        appLinks: {
+          android: "",
+          ios: "",
+          pwaEnabled: true
         }
       },
       isLoading: false,

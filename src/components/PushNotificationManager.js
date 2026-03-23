@@ -66,13 +66,24 @@ export default function PushNotificationManager() {
              });
              
              // Send to backend
-             await api.post("/notifications/subscribe", newSubscription);
-             console.log("Push Notification Subscribed!");
-         }
-     } catch (err) {
-         console.error("Subscription failed", err);
-     }
-  };
+            try {
+                await api.post("/notifications/subscribe", newSubscription);
+                console.log("Push Notification Subscribed!");
+            } catch (postErr) {
+                if (postErr.response?.status === 401) {
+                    console.warn("Push subscription failed: Unauthorized. User might be logged out or token expired.");
+                    // Don't throw or show toast, just log it as it's a background process
+                } else {
+                    throw postErr;
+                }
+            }
+        }
+    } catch (err) {
+        if (err.response?.status !== 401) {
+            console.error("Subscription failed", err);
+        }
+    }
+};
 
   // Auto-subscribe on load if logged in and permission granted? 
   // Or just render nothing and use this as a logic container.

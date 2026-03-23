@@ -17,7 +17,8 @@ import {
   FiTag,
   FiStar,
   FiMessageCircle,
-  FiGift
+  FiGift,
+  FiSmartphone
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { SectionLoader } from "@/components/Loader";
@@ -64,6 +65,11 @@ export default function AdminSettings() {
       showSignupPopup: true,
       showChatbot: true,
       whatsappNumber: ""
+    },
+    appLinks: {
+      android: "",
+      ios: "",
+      pwaEnabled: true
     }
   });
 
@@ -124,6 +130,11 @@ export default function AdminSettings() {
             showSignupPopup: fetchedSettings.marketing?.showSignupPopup ?? true,
             showChatbot: fetchedSettings.marketing?.showChatbot ?? true,
             whatsappNumber: fetchedSettings.marketing?.whatsappNumber || ""
+        },
+        appLinks: {
+            android: fetchedSettings.appLinks?.android || "",
+            ios: fetchedSettings.appLinks?.ios || "",
+            pwaEnabled: fetchedSettings.appLinks?.pwaEnabled ?? true
         }
       });
     }
@@ -163,6 +174,12 @@ export default function AdminSettings() {
         setSettings({
             ...settings,
             scripts: { ...settings.scripts, [field]: value }
+        });
+    } else if (name.startsWith("appLinks.")) {
+        const field = name.split(".")[1];
+        setSettings({
+            ...settings,
+            appLinks: { ...settings.appLinks, [field]: type === 'checkbox' ? checked : value }
         });
     } else {
         setSettings({ 
@@ -204,6 +221,7 @@ export default function AdminSettings() {
     { id: "seo", label: "SEO & Metadata", icon: FiSearch },
     { id: "scripts", label: "Scripts & Tracking", icon: FiTag },
     { id: "marketing", label: "Marketing", icon: FiStar },
+    { id: "app", label: "App & PWA", icon: FiSmartphone },
   ];
 
   return (
@@ -827,6 +845,67 @@ export default function AdminSettings() {
             </section>
         )}
 
+        {/* App & PWA Settings */}
+        {activeTab === "app" && (
+            <section className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-black/5 border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-2xl font-display font-bold mb-8 flex items-center gap-3">
+                <FiSmartphone className="text-primary" /> App & PWA Configuration
+            </h2>
+            <div className="grid grid-cols-1 gap-8">
+                <div className="flex items-center justify-between bg-surface p-6 rounded-2xl border border-gray-100">
+                    <div>
+                        <p className="font-bold text-gray-900 text-lg">PWA Install Button</p>
+                        <p className="text-sm text-gray-400">Show a sticky install button for the website (PWA)</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            name="appLinks.pwaEnabled"
+                            checked={settings.appLinks.pwaEnabled}
+                            onChange={handleInputChange}
+                            className="sr-only peer" 
+                        />
+                        <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+                    </label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            Android App URL (Play Store)
+                        </label>
+                        <input 
+                            type="text" 
+                            name="appLinks.android"
+                            value={settings.appLinks.android}
+                            onChange={handleInputChange}
+                            placeholder="https://play.google.com/store/apps/details?id=..."
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            iOS App URL (App Store)
+                        </label>
+                        <input 
+                            type="text" 
+                            name="appLinks.ios"
+                            value={settings.appLinks.ios}
+                            onChange={handleInputChange}
+                            placeholder="https://apps.apple.com/app/..."
+                            className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                        />
+                    </div>
+                </div>
+                
+                <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                    <p className="text-blue-800 text-sm font-medium">
+                        <strong>Note:</strong> These links will be used in the homepage &quot;Download our App&quot; section and footer. The PWA toggle controls the visibility of the &quot;Install Website&quot; prompt across the storefront.
+                    </p>
+                </div>
+            </div>
+            </section>
+        )}
       </div>
     </div>
   );
