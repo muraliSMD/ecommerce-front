@@ -51,9 +51,19 @@ export default function Footer() {
               Curating the finest contemporary fashion since 2024. Your destination for style, quality, and conscious living.
             </p>
             <div className="flex gap-3">
-              {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 rounded-full bg-bg-surface border border-border-main flex items-center justify-center text-text-muted hover:text-white hover:bg-primary hover:border-primary transition-all shadow-sm hover:shadow-lg hover:shadow-primary/30" aria-label={Icon.name}>
-                  <Icon size={18} />
+              {[
+                { Icon: Facebook, href: "https://www.facebook.com/profile.php?id=61585047283172", label: "Facebook" },
+                { Icon: Instagram, href: "https://www.instagram.com/grabszyclothingstore/", label: "Instagram" }
+              ].map((social, i) => (
+                <a 
+                  key={i} 
+                  href={social.href} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="w-10 h-10 rounded-full bg-bg-surface border border-border-main flex items-center justify-center text-text-muted hover:text-white hover:bg-primary hover:border-primary transition-all shadow-sm hover:shadow-lg hover:shadow-primary/30" 
+                  aria-label={social.label}
+                >
+                  <social.Icon size={18} />
                 </a>
               ))}
             </div>
