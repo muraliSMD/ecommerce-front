@@ -104,12 +104,12 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-8">
-      <h3 className="font-display font-bold text-2xl text-gray-900 mb-6">Write a Review</h3>
+    <div className="bg-bg-surface rounded-3xl p-8 shadow-sm border border-border-main mb-8">
+      <h3 className="font-display font-bold text-2xl text-text-main mb-6">Write a Review</h3>
       
       {!userInfo ? (
           <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">Please login to write a review.</p>
+              <p className="text-text-muted mb-4">Please login to write a review.</p>
               <button 
                 onClick={() => setAuthModalOpen(true, "login")}
                 className="px-6 py-2 bg-primary text-white rounded-full font-bold hover:bg-secondary transition-colors"
@@ -120,7 +120,7 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Rating</label>
+                <label className="block text-sm font-bold text-text-main mb-2">Rating</label>
                 <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -132,7 +132,7 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
                             className="text-2xl focus:outline-none transition-colors"
                         >
                             <FiStar 
-                                className={`${(hoverRating || rating) >= star ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} 
+                                className={`${(hoverRating || rating) >= star ? "fill-yellow-400 text-yellow-400" : "text-text-muted/30"}`} 
                             />
                         </button>
                     ))}
@@ -140,24 +140,24 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
             </div>
 
             <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Comment</label>
+                <label className="block text-sm font-bold text-text-main mb-2">Comment</label>
                 <textarea
                     rows="4"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="Share your thoughts about the product..."
-                    className="w-full bg-gray-50 border border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 px-4 py-3 rounded-xl outline-none transition-all"
+                    className="w-full bg-bg-section/50 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-4 py-3 rounded-xl outline-none transition-all placeholder:text-text-muted/50 text-text-main"
                     required
                 ></textarea>
             </div>
 
             {/* Media Upload Section */}
-            <div className="space-y-4">
-                <label className="block text-sm font-bold text-gray-700">Add Photos or Video</label>
+             <div className="space-y-4">
+                <label className="block text-sm font-bold text-text-main">Add Photos or Video</label>
                 <div className="flex flex-wrap gap-4">
                     {/* Image Previews */}
                     {images.map((img, idx) => (
-                        <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-100 group">
+                        <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-border-main group">
                             <Image src={img} alt="review" fill className="object-cover" />
                             <button 
                                 onClick={() => removeMedia(idx, 'image')}
@@ -170,7 +170,7 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
                     
                     {/* Video Preview */}
                     {videos.map((vid, idx) => (
-                        <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-100 bg-black flex items-center justify-center group">
+                        <div key={idx} className="relative w-20 h-20 rounded-xl overflow-hidden border border-border-main bg-black flex items-center justify-center group">
                             <FiPlay className="text-white" />
                             <button 
                                 onClick={() => removeMedia(idx, 'video')}
@@ -181,9 +181,9 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
                         </div>
                     ))}
 
-                    {/* Upload Buttons */}
+                     {/* Upload Buttons */}
                     {images.length < 4 && (
-                        <label className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all text-gray-400 hover:text-primary">
+                        <label className="w-20 h-20 rounded-xl border-2 border-dashed border-border-main flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all text-text-muted hover:text-primary">
                             <FiImage size={20} />
                             <span className="text-[10px] font-bold mt-1">Photo</span>
                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'image')} disabled={uploading} />
@@ -191,14 +191,14 @@ export default function ReviewForm({ productId, onReviewSubmitted }) {
                     )}
                     
                     {videos.length < 1 && (
-                        <label className="w-20 h-20 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all text-gray-400 hover:text-primary">
+                        <label className="w-20 h-20 rounded-xl border-2 border-dashed border-border-main flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all text-text-muted hover:text-primary">
                             <FiVideo size={20} />
                             <span className="text-[10px] font-bold mt-1">Video</span>
                             <input type="file" className="hidden" accept="video/*" onChange={(e) => handleFileUpload(e, 'video')} disabled={uploading} />
                         </label>
                     )}
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1">Max 4 photos, 1 video. Helps other shoppers!</p>
+                <p className="text-[10px] text-text-muted mt-1">Max 4 photos, 1 video. Helps other shoppers!</p>
             </div>
 
             <button

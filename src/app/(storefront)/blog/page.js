@@ -23,11 +23,11 @@ export default function BlogListPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-12 pt-32 lg:pt-36">
+    <main className="bg-bg-main min-h-screen pb-12 text-text-main">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-12 text-center">
             <span className="text-primary font-bold tracking-widest uppercase text-sm">Our Journal</span>
-            <h1 className="text-4xl md:text-5xl font-display font-bold mt-2 text-gray-900">Latest News & Stories</h1>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mt-2 text-text-main">Latest News & Stories</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -37,7 +37,7 @@ export default function BlogListPage() {
                     href={`/blog/${blog.slug}`}
                     className="group flex flex-col gap-4"
                 >
-                    <div className="aspect-[4/3] rounded-2xl overflow-hidden relative bg-gray-100">
+                    <div className="aspect-[4/3] rounded-2xl overflow-hidden relative bg-bg-section/50 border border-border-main">
                         {blog.coverImage ? (
                             <Image 
                                 src={blog.coverImage} 
@@ -46,19 +46,19 @@ export default function BlogListPage() {
                                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                         ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-gray-300 bg-gray-50">
+                            <div className="absolute inset-0 flex items-center justify-center text-text-muted/30 bg-bg-section/30">
                                 No Image
                             </div>
                         )}
                     </div>
                     <div className="space-y-2">
-                        <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <div className="flex items-center gap-3 text-sm text-text-muted">
                             <span>{format(new Date(blog.createdAt), "MMMM d, yyyy")}</span>
                         </div>
-                        <h2 className="text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-primary transition-colors">
+                        <h2 className="text-xl font-bold text-text-main line-clamp-2 group-hover:text-primary transition-colors">
                             {blog.title}
                         </h2>
-                        <p className="text-gray-500 line-clamp-2 text-sm leading-relaxed">
+                        <p className="text-text-muted line-clamp-2 text-sm leading-relaxed">
                             {blog.excerpt || "Read more about this topic..."}
                         </p>
                     </div>
@@ -67,7 +67,7 @@ export default function BlogListPage() {
         </div>
 
         {blogs?.length === 0 && (
-            <div className="text-center py-20 text-gray-500">
+            <div className="text-center py-20 text-text-muted">
                 <p>No posts published yet. Check back soon!</p>
             </div>
         )}

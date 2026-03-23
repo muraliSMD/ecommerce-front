@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FiTruck, FiClock, FiPackage, FiMapPin } from "react-icons/fi";
 import { motion } from "framer-motion";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ShippingPolicyPage() {
   const shippingDetails = [
@@ -29,7 +30,8 @@ export default function ShippingPolicyPage() {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28 md:pt-28">
+    <div className="bg-bg-main min-h-screen pt-28 md:pt-28">
+      <Breadcrumbs />
       {/* Header */}
       <section className="bg-gray-900 text-white py-20 relative overflow-hidden text-center">
         <div className="absolute inset-0 z-0 opacity-10">
@@ -41,7 +43,7 @@ export default function ShippingPolicyPage() {
           />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Shipping Policy</h1>
+          <h1 className="text-3xl md:text-4xl font-display font-bold mb-4">Shipping Policy</h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto italic">
             Delivering style from Omalur to your doorstep.
           </p>
@@ -50,7 +52,7 @@ export default function ShippingPolicyPage() {
 
       <section className="py-16 -mt-10">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 p-8 md:p-16 border border-gray-100">
+          <div className="bg-bg-surface rounded-[2.5rem] shadow-xl shadow-black/5 p-8 md:p-16 border border-border-main">
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
               {shippingDetails.map((item, idx) => (
@@ -60,18 +62,18 @@ export default function ShippingPolicyPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-gray-50 p-8 rounded-3xl text-center space-y-4 border border-gray-100/50"
+                  className="bg-bg-section/50 dark:bg-bg-section/10 p-8 rounded-3xl text-center space-y-4 border border-border-main"
                 >
                   <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto">
                     <item.icon size={28} />
                   </div>
-                  <h3 className="font-bold text-gray-900 text-lg">{item.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
+                  <h3 className="font-bold text-text-main text-lg">{item.title}</h3>
+                  <p className="text-text-muted text-sm leading-relaxed">{item.description}</p>
                 </motion.div>
               ))}
             </div>
 
-            <div className="prose prose-lg max-w-none text-gray-600 space-y-8">
+            <div className="prose prose-lg max-w-none text-text-muted space-y-8">
               <div>
                 <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">1. Order Processing</h2>
                 <p>
@@ -84,18 +86,18 @@ export default function ShippingPolicyPage() {
                 <p>
                   Shipping charges for your order will be calculated and displayed at checkout. Standard shipping is <strong>FREE</strong> for orders above ₹1499 across India.
                 </p>
-                <div className="bg-gray-50 rounded-2xl overflow-hidden mt-4">
+                <div className="bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-hidden mt-4 border border-border-main">
                   <table className="w-full text-left">
-                    <thead className="bg-gray-100">
+                    <thead className="bg-bg-section/50 dark:bg-bg-section/20">
                       <tr>
-                        <th className="px-6 py-4 font-bold text-gray-900">Destination</th>
-                        <th className="px-6 py-4 font-bold text-gray-900">Estimated Delivery</th>
-                        <th className="px-6 py-4 font-bold text-gray-900">Cost</th>
+                        <th className="px-6 py-4 font-bold text-text-main">Destination</th>
+                        <th className="px-6 py-4 font-bold text-text-main">Estimated Delivery</th>
+                        <th className="px-6 py-4 font-bold text-text-main">Cost</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-border-main">
                       <tr>
-                        <td className="px-6 py-4">Tamil Nadu</td>
+                        <td className="px-6 py-4 text-text-muted">Tamil Nadu</td>
                         <td className="px-6 py-4">1-5 Business Days</td>
                         <td className="px-6 py-4"> minimum ₹60 (Free over ₹1499)</td>
                       </tr>

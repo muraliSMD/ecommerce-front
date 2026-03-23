@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { FiChevronDown, FiHelpCircle, FiSearch, FiMessageCircle } from "react-icons/fi";
 import Link from "next/link";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function FAQPage() {
   const [openId, setOpenId] = useState(null);
@@ -28,13 +29,13 @@ export default function FAQPage() {
   const categories = [...new Set(faqs?.map(f => f.category) || [])];
 
   if (isLoading) return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-bg-main">
       <div className="w-12 h-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
     </div>
   );
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-bg-main min-h-screen">
         {/* Hero Section */}
         <section className="container mx-auto px-4 md:px-8 max-w-4xl text-center mb-20">
             <motion.div
@@ -45,15 +46,15 @@ export default function FAQPage() {
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-black uppercase tracking-widest mb-6">
                     <FiHelpCircle /> Help Center
                 </div>
-                <h1 className="text-4xl md:text-6xl font-display font-bold text-gray-900 mb-6 leading-tight">
+                <h1 className="text-3xl md:text-5xl font-display font-bold text-text-main mb-6 leading-tight">
                     How can we help?
                 </h1>
-                <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+                <p className="text-text-muted text-lg md:text-xl max-w-2xl mx-auto mb-10">
                     Find quick answers to your questions about our products, shipping, and more.
                 </p>
 
                 <div className="relative max-w-xl mx-auto group">
-                    <div className="absolute inset-y-0 left-6 flex items-center text-gray-400 group-focus-within:text-primary transition-colors">
+                    <div className="absolute inset-y-0 left-6 flex items-center text-text-muted group-focus-within:text-primary transition-colors">
                         <FiSearch size={20} />
                     </div>
                     <input 
@@ -61,7 +62,7 @@ export default function FAQPage() {
                         placeholder="Search for answers..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-100 rounded-[2rem] pl-16 pr-8 py-6 text-sm focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all outline-none"
+                        className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main rounded-[2rem] pl-16 pr-8 py-6 text-sm focus:bg-bg-surface focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all outline-none text-text-main"
                     />
                 </div>
             </motion.div>
@@ -76,30 +77,30 @@ export default function FAQPage() {
 
                     return (
                         <div key={category} className="space-y-8">
-                            <h2 className="text-2xl font-display font-bold text-gray-900 px-4 border-l-4 border-primary">
+                            <h2 className="text-2xl font-display font-bold text-text-main px-4 border-l-4 border-primary">
                                 {category}
                             </h2>
                             <div className="space-y-4">
                                 {categoryFaqs.map((faq) => (
                                     <div 
                                         key={faq._id}
-                                        className={`bg-white border rounded-[2rem] overflow-hidden transition-all duration-300 ${
+                                        className={`bg-bg-surface border rounded-[2rem] overflow-hidden transition-all duration-300 ${
                                             openId === faq._id 
                                             ? "border-primary/20 shadow-xl shadow-primary/5" 
-                                            : "border-gray-100 hover:border-gray-200"
+                                            : "border-border-main hover:border-primary/20"
                                         }`}
                                     >
                                         <button 
                                             onClick={() => setOpenId(openId === faq._id ? null : faq._id)}
                                             className="w-full text-left p-8 flex items-start justify-between gap-6"
                                         >
-                                            <span className="font-bold text-gray-900 md:text-lg leading-snug">
+                                            <span className="font-bold text-text-main md:text-lg leading-snug">
                                                 {faq.question}
                                             </span>
                                             <div className={`mt-1.5 p-2 rounded-xl transition-all ${
                                                 openId === faq._id 
                                                 ? "bg-primary text-white rotate-180 shadow-lg shadow-primary/20" 
-                                                : "bg-gray-50 text-gray-400"
+                                                : "bg-bg-section/30 dark:bg-bg-section/10 text-text-muted"
                                             }`}>
                                                 <FiChevronDown />
                                             </div>
@@ -113,8 +114,8 @@ export default function FAQPage() {
                                                     exit={{ height: 0, opacity: 0 }}
                                                     transition={{ duration: 0.3, ease: "easeInOut" }}
                                                 >
-                                                    <div className="px-8 pb-10 text-gray-600 leading-relaxed md:text-lg">
-                                                        <div className="h-[1px] bg-gray-50 mb-8"></div>
+                                                    <div className="px-8 pb-10 text-text-muted leading-relaxed md:text-lg">
+                                                        <div className="h-[1px] bg-border-main mb-8"></div>
                                                         {faq.answer}
                                                     </div>
                                                 </motion.div>
@@ -128,9 +129,9 @@ export default function FAQPage() {
                 })}
 
                 {filteredFaqs?.length === 0 && (
-                    <div className="text-center py-20 bg-gray-50 rounded-[3rem] border border-gray-100 border-dashed">
-                        <p className="text-xl font-display font-medium text-gray-900 mb-2">No results found for &quot;{search}&quot;</p>
-                        <p className="text-gray-500">Try a different keyword or contact our support team.</p>
+                    <div className="text-center py-20 bg-bg-surface rounded-[3rem] border border-border-main border-dashed">
+                        <p className="text-xl font-display font-medium text-text-main mb-2">No results found for &quot;{search}&quot;</p>
+                        <p className="text-text-muted">Try a different keyword or contact our support team.</p>
                     </div>
                 )}
             </div>

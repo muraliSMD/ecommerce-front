@@ -51,16 +51,16 @@ export default function WishlistPage() {
   if (items.length === 0) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6 text-center px-4">
-        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
+        <div className="w-20 h-20 bg-bg-section/30 dark:bg-bg-section/10 rounded-full flex items-center justify-center text-text-muted mb-4">
             <FiHeart size={40} />
         </div>
-        <h1 className="text-3xl font-display font-bold text-gray-900">Your Wishlist is Empty</h1>
-        <p className="text-gray-500 max-w-md">
+        <h1 className="text-3xl font-display font-bold text-text-main">Your Wishlist is Empty</h1>
+        <p className="text-text-muted max-w-md">
           Looks like you haven&apos;t saved any items yet. Browse our shop and find something you love!
         </p>
         <Link 
             href="/shop"
-            className="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all"
+            className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-secondary transition-all"
         >
             Start Shopping
         </Link>
@@ -69,17 +69,11 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 md:px-8 pt-24 md:pt-28 pb-12 min-h-screen">
-      <div className="mb-4">
-        <Breadcrumbs items={[
-          { label: "Home", href: "/" },
-          { label: "Wishlist", href: "/wishlist" },
-        ]} />
-      </div>
+    <div className="container mx-auto px-4 md:px-8 pb-12 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 className="text-4xl font-display font-bold text-gray-900">My Wishlist</h1>
-            <p className="text-gray-500 mt-2">{items.length} items saved for later</p>
+            <h1 className="text-4xl font-display font-bold text-text-main">My Wishlist</h1>
+            <p className="text-text-muted mt-2">{items.length} items saved for later</p>
         </div>
         <div className="flex items-center gap-4">
             <button 
@@ -100,9 +94,9 @@ export default function WishlistPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {items.map((product) => (
-          <div key={product._id} className="group bg-white rounded-2xl p-4 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all border border-gray-100 relative">
+          <div key={product._id} className="group bg-bg-surface rounded-2xl p-4 shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all border border-border-main relative">
             
-            <div className="aspect-[3/4] rounded-xl overflow-hidden bg-gray-100 mb-4 relative">
+            <div className="aspect-[3/4] rounded-xl overflow-hidden bg-bg-section/30 dark:bg-bg-section/10 mb-4 relative">
                 <Image
                     src={product.images?.[0] || '/placeholder.png'}
                     alt={product.name}
@@ -111,19 +105,19 @@ export default function WishlistPage() {
                 />
                  <button 
                     onClick={() => removeItem(product._id)}
-                    className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors z-10"
+                    className="absolute top-3 right-3 w-8 h-8 bg-bg-surface/80 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-bg-surface transition-colors z-10"
                 >
                     <FiTrash2 size={16} />
                 </button>
             </div>
 
             <div className="space-y-2">
-                <h3 className="font-bold text-gray-900 truncate">{product.name}</h3>
+                <h3 className="font-bold text-text-main truncate">{product.name}</h3>
                 <p className="text-primary font-bold">${product.price}</p>
                 
                 <button 
                     onClick={() => handleAddToCart(product)}
-                    className="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-colors"
+                    className="w-full mt-4 bg-primary text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-secondary transition-colors"
                 >
                     <FiShoppingCart size={18} /> Add to Cart
                 </button>
@@ -136,10 +130,10 @@ export default function WishlistPage() {
       {showShareModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowShareModal(false)}></div>
-            <div className="bg-white rounded-[2.5rem] w-full max-w-md p-8 relative z-10 shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="bg-bg-surface rounded-[2.5rem] w-full max-w-md p-8 relative z-10 shadow-2xl animate-in fade-in zoom-in duration-300 border border-border-main">
                 <button 
                     onClick={() => setShowShareModal(false)}
-                    className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute top-6 right-6 text-text-muted hover:text-text-main transition-colors"
                 >
                     <FiX size={24} />
                 </button>
@@ -148,20 +142,20 @@ export default function WishlistPage() {
                     <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-4">
                         <FiShare2 size={32} />
                     </div>
-                    <h3 className="text-2xl font-display font-bold text-gray-900">Share Wishlist</h3>
-                    <p className="text-gray-500 text-sm mt-2">Anyone with this link can view your wishlist items.</p>
+                    <h3 className="text-2xl font-display font-bold text-text-main">Share Wishlist</h3>
+                    <p className="text-text-muted text-sm mt-2">Anyone with this link can view your wishlist items.</p>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center gap-3 mb-6">
+                <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main flex items-center gap-3 mb-6">
                     <input 
                         type="text" 
                         readOnly 
                         value={`${typeof window !== 'undefined' ? window.location.origin : ''}/wishlist/share/${shareId}`}
-                        className="bg-transparent border-none outline-none text-sm text-gray-600 flex-1 font-mono"
+                        className="bg-transparent border-none outline-none text-sm text-text-muted flex-1 font-mono"
                     />
                     <button 
                         onClick={handleCopy}
-                        className="w-10 h-10 bg-white shadow-sm border border-gray-100 rounded-xl flex items-center justify-center text-gray-900 hover:bg-gray-50 transition-all active:scale-90"
+                        className="w-10 h-10 bg-bg-surface shadow-sm border border-border-main rounded-xl flex items-center justify-center text-text-main hover:bg-bg-section/30 transition-all active:scale-90"
                     >
                         {copied ? <FiCheck className="text-green-500" /> : <FiCopy />}
                     </button>
@@ -169,7 +163,7 @@ export default function WishlistPage() {
 
                 <button 
                     onClick={() => setShowShareModal(false)}
-                    className="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold hover:bg-black transition-all"
+                    className="w-full bg-primary text-white py-4 rounded-2xl font-bold hover:bg-secondary transition-all"
                 >
                     Done
                 </button>

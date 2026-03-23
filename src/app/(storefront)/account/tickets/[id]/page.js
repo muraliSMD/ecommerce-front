@@ -50,16 +50,16 @@ export default function TicketDetailPage() {
     scrollToBottom();
   }, [ticket?.messages]);
 
-  if (isLoading) return <div className="p-8 text-center">Loading conversation...</div>;
-  if (!ticket) return <div className="p-8 text-center">Ticket not found</div>;
+   if (isLoading) return <div className="p-8 text-center text-text-muted">Loading conversation...</div>;
+  if (!ticket) return <div className="p-8 text-center text-text-muted font-bold">Ticket not found</div>;
 
-  return (
-    <div className="h-[calc(100vh-140px)] flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+   return (
+    <div className="h-[calc(100vh-140px)] flex flex-col bg-bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden text-text-main">
+       {/* Header */}
+      <div className="p-4 border-b border-border-main bg-bg-section flex justify-between items-center">
         <div>
-            <h1 className="font-bold text-gray-900 text-lg">{ticket.subject}</h1>
-            <p className="text-xs text-gray-500">Ticket ID: {ticket._id}</p>
+            <h1 className="font-bold text-text-main text-lg">{ticket.subject}</h1>
+            <p className="text-xs text-text-muted">Ticket ID: {ticket._id}</p>
         </div>
         <div className="flex items-center gap-3">
              <span className={`px-2 py-1 rounded-full text-xs font-bold ${
@@ -78,19 +78,19 @@ export default function TicketDetailPage() {
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30">
+       {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-bg-section/20">
         {ticket.messages.map((msg, index) => {
             const isUser = msg.sender === 'user';
             return (
                 <div key={index} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-2xl p-4 ${
+                     <div className={`max-w-[80%] rounded-2xl p-4 ${
                         isUser 
                             ? 'bg-primary text-white rounded-br-none' 
-                            : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm'
+                            : 'bg-bg-surface border border-border-main text-text-main rounded-bl-none shadow-sm'
                     }`}>
-                        <div className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</div>
-                        <div className={`text-[10px] mt-2 opacity-70 flex justify-end gap-1 ${isUser ? 'text-white' : 'text-gray-400'}`}>
+                         <div className="text-sm leading-relaxed whitespace-pre-wrap">{msg.message}</div>
+                        <div className={`text-[10px] mt-2 opacity-70 flex justify-end gap-1 ${isUser ? 'text-white' : 'text-text-muted/60'}`}>
                             {format(new Date(msg.timestamp), "MMM d, HH:mm")}
                         </div>
                     </div>
@@ -100,20 +100,20 @@ export default function TicketDetailPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Reply Input */}
-      <div className="p-4 bg-white border-t border-gray-100">
-        {ticket.status === 'Closed' ? (
-            <div className="text-center p-4 bg-gray-50 rounded-xl text-gray-500 text-sm">
+       {/* Reply Input */}
+      <div className="p-4 bg-bg-surface border-t border-border-main">
+         {ticket.status === 'Closed' ? (
+            <div className="text-center p-4 bg-bg-section rounded-xl text-text-muted text-sm border border-border-main/50">
                 This ticket has been closed. You can create a new ticket if you have other issues.
             </div>
         ) : (
             <form onSubmit={handleSubmit} className="flex gap-2">
-                <input
+                 <input
                     type="text"
                     value={replyMessage}
                     onChange={(e) => setReplyMessage(e.target.value)}
                     placeholder="Type your reply..."
-                    className="flex-1 p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20"
+                    className="flex-1 p-3 bg-bg-section/50 border border-border-main rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-text-main"
                 />
                 <button 
                     type="submit" 

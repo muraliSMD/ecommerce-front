@@ -40,19 +40,19 @@ const InstagramSection = () => {
   const displayItems = galleryItems?.length > 0 ? galleryItems : placeholders.map((url, i) => ({ _id: i, imageUrl: url }));
 
   return (
-    <section className="py-16 md:py-24 bg-white overflow-hidden">
+    <section className="py-10 md:py-16 bg-bg-main overflow-hidden">
       <div className="container mx-auto px-4 md:px-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-primary">
               <FiInstagram size={20} className="animate-pulse" />
               <span className="text-sm font-bold tracking-[0.2em] uppercase">Social Inspiration</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-display font-bold text-gray-900 tracking-tight">
+            <h2 className="text-3xl md:text-5xl font-display font-bold text-text-main tracking-tight">
               Shop Our Instagram
             </h2>
-            <p className="text-gray-500 text-lg max-w-xl">
+            <p className="text-text-muted text-lg max-w-xl">
               Tag <span className="text-primary font-bold">@grabszy</span> in your photos for a chance to be featured in our seasonal gallery.
             </p>
           </div>
@@ -61,13 +61,13 @@ const InstagramSection = () => {
               <div className="hidden md:flex items-center gap-2 mr-4">
                 <button 
                     onClick={() => scroll('left')}
-                    className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-all active:scale-90"
+                    className="w-12 h-12 rounded-full border border-border-main flex items-center justify-center hover:bg-bg-section/50 transition-all active:scale-90"
                 >
                     <FiChevronLeft size={20} />
                 </button>
                 <button 
                     onClick={() => scroll('right')}
-                    className="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-all active:scale-90"
+                    className="w-12 h-12 rounded-full border border-border-main flex items-center justify-center hover:bg-bg-section/50 transition-all active:scale-90"
                 >
                     <FiChevronRight size={20} />
                 </button>
@@ -76,7 +76,7 @@ const InstagramSection = () => {
                 href="https://instagram.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-primary transition-all shadow-xl shadow-gray-900/10 active:scale-95 whitespace-nowrap"
+                className="inline-flex items-center gap-3 bg-btn-dark text-btn-text px-8 py-4 rounded-2xl font-bold hover:bg-btn-dark-hover transition-all shadow-xl shadow-black/10 active:scale-95 whitespace-nowrap"
               >
                 <FiInstagram size={18} />
                 Follow Us
@@ -96,7 +96,7 @@ const InstagramSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1, duration: 0.6 }}
-                className="min-w-[280px] md:min-w-[320px] aspect-square rounded-[2rem] overflow-hidden relative group cursor-pointer snap-start"
+                className="w-[46%] min-w-[150px] md:min-w-[220px] md:w-[220px] aspect-square rounded-[1.5rem] md:rounded-[2rem] overflow-hidden relative group cursor-pointer snap-start flex-shrink-0"
               >
                 <Image 
                   src={item.imageUrl} 

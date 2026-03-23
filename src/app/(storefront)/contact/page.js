@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { FiMapPin, FiPhone, FiMail, FiSend } from "react-icons/fi";
+import { FiMapPin, FiPhone, FiMail, FiSend } from "react-icons/fi"; // Keep original icons
 import toast from "react-hot-toast";
 import { useSettingsStore } from "@/store/settingsStore";
+import Breadcrumbs from "@/components/Breadcrumbs"; // Ensure only one import
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -49,7 +50,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28 md:pt-28">
+    <div className="bg-bg-main min-h-screen">
       {/* Header */}
       <section className="bg-gray-900 text-white py-20 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-10">
@@ -61,7 +62,7 @@ export default function ContactPage() {
             />
         </div>
         <div className="container mx-auto px-4 md:px-8 relative z-10 text-center">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Contact Us</h1>
+            <h1 className="text-2xl md:text-3xl font-display font-bold mb-4">Contact Us</h1> {/* Reduced h1 font size */}
             <p className="text-gray-400 text-lg max-w-xl mx-auto">
                 Have questions? We&apos;d love to hear from you. Reach out to our team for any inquiries or support.
             </p>
@@ -70,7 +71,7 @@ export default function ContactPage() {
 
       <section className="py-10 md:py-16 -mt-10">
         <div className="container mx-auto px-4 md:px-8">
-            <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 overflow-hidden border border-gray-100">
+            <div className="bg-bg-surface rounded-[2.5rem] shadow-xl shadow-black/5 overflow-hidden border border-border-main">
                 <div className="grid grid-cols-1 lg:grid-cols-2">
                     
                     {/* Contact Info */}
@@ -123,53 +124,53 @@ export default function ContactPage() {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-500 uppercase tracking-widest">Name</label>
+                                    <label className="text-sm font-bold text-text-muted uppercase tracking-widest">Name</label>
                                     <input 
                                         type="text" 
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
                                         required
-                                        className="w-full bg-gray-50 border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all"
+                                        className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all text-text-main"
                                         placeholder="Your Name"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-500 uppercase tracking-widest">Email</label>
+                                    <label className="text-sm font-bold text-text-muted uppercase tracking-widest">Email</label>
                                     <input 
                                         type="email" 
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
                                         required
-                                        className="w-full bg-gray-50 border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all"
+                                        className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all text-text-main"
                                         placeholder="your@email.com"
                                     />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-500 uppercase tracking-widest">Subject</label>
+                                <label className="text-sm font-bold text-text-muted uppercase tracking-widest">Subject</label>
                                 <input 
                                     type="text" 
                                     name="subject"
                                     value={formData.subject}
                                     onChange={handleChange}
                                     required
-                                    className="w-full bg-gray-50 border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all text-text-main"
                                     placeholder="Order Inquiry / General Question"
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-500 uppercase tracking-widest">Message</label>
+                                <label className="text-sm font-bold text-text-muted uppercase tracking-widest">Message</label>
                                 <textarea 
                                     name="message"
                                     value={formData.message}
                                     onChange={handleChange}
                                     required
                                     rows={5}
-                                    className="w-full bg-gray-50 border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all resize-none"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-xl outline-none transition-all resize-none text-text-main"
                                     placeholder="How can we help you today?"
                                 />
                             </div>

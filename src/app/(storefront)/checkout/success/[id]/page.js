@@ -59,20 +59,20 @@ export default function CheckoutSuccessPage() {
 
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 pt-24 pb-12 bg-surface">
-      <div className="max-w-md w-full bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-green-900/5 text-center border border-green-100 relative z-10">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-in zoom-in duration-500">
-          <FiCheckCircle className="text-5xl text-green-600" />
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 pb-12 bg-bg-main">
+      <div className="max-w-md w-full bg-bg-surface rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-green-900/5 text-center border border-border-main relative z-10">
+        <div className="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 animate-in zoom-in duration-500">
+          <FiCheckCircle className="text-5xl text-green-600 dark:text-green-400" />
         </div>
         
-        <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">Order Placed!</h1>
-        <p className="text-gray-500 mb-8">
+        <h1 className="text-3xl font-display font-bold text-text-main mb-2">Order Placed!</h1>
+        <p className="text-text-muted mb-8">
           Thank you for your purchase. Your order has been placed successfully.
         </p>
 
-        <div className="bg-gray-50 rounded-2xl p-4 mb-8 border border-gray-100">
-          <p className="text-sm text-gray-500 uppercase tracking-wider font-bold mb-1">Order ID</p>
-          <p className="text-xl font-mono font-bold text-gray-900">#{orderFriendlyId || id.slice(-6).toUpperCase()}</p>
+        <div className="bg-bg-section/50 rounded-2xl p-4 mb-8 border border-border-main">
+          <p className="text-sm text-text-muted uppercase tracking-wider font-bold mb-1">Order ID</p>
+          <p className="text-xl font-mono font-bold text-text-main">#{orderFriendlyId || id.slice(-6).toUpperCase()}</p>
         </div>
 
         <div className="space-y-4">
@@ -80,11 +80,11 @@ export default function CheckoutSuccessPage() {
             <div className="space-y-4">
                <button 
                 onClick={() => setAuthModalOpen(true, "signup", orderEmail)}
-                className="block w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/20"
+                className="block w-full py-4 bg-btn-dark text-btn-text rounded-xl font-bold hover:bg-btn-dark-hover transition-all shadow-lg"
               >
                 Create Account to Track Order
               </button>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-text-muted">
                 Already have an account? {" "}
                 <button 
                   onClick={() => setAuthModalOpen(true, "login", orderEmail)}
@@ -97,7 +97,7 @@ export default function CheckoutSuccessPage() {
           ) : (
             <Link 
               href={`/account/orders/${id}`}
-              className="block w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/20"
+              className="block w-full py-4 bg-btn-dark text-btn-text rounded-xl font-bold hover:bg-btn-dark-hover transition-all shadow-lg"
             >
               View Order Details
             </Link>
@@ -105,7 +105,7 @@ export default function CheckoutSuccessPage() {
           
           <Link 
             href="/"
-            className="block w-full py-4 bg-white text-gray-900 border-2 border-gray-100 rounded-xl font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+            className="block w-full py-4 bg-bg-surface text-text-main border-2 border-border-main rounded-xl font-bold hover:bg-bg-section/50 transition-colors flex items-center justify-center gap-2"
           >
             <FiShoppingBag /> Continue Shopping
           </Link>

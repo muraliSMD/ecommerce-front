@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionLoader } from "@/components/Loader";
 import { FiImage, FiMaximize2 } from "react-icons/fi";
+// Removed unused Breadcrumbs import
 
 
 export default function GalleryPage() {
@@ -25,7 +27,7 @@ export default function GalleryPage() {
   const { data: images, isLoading } = useQuery({
     queryKey: ["gallery", activeCategory],
     queryFn: async () => {
-      const url = activeCategory === "All" ? "/gallery?activeOnly=true" : `/gallery?category=${activeCategory}&activeOnly=true`;
+      const url = activeCategory === "All" ? "/gallery?activeOnly=true" : "/gallery?category=" + activeCategory + "&activeOnly=true";
       const { data } = await api.get(url);
       return data;
     },
@@ -34,7 +36,7 @@ export default function GalleryPage() {
   const allCategories = ["All", ...(categories?.map(c => ({ id: c._id, name: c.name })) || [])];
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] pt-24 pb-20">
+    <div className="min-h-screen bg-bg-main pb-20">
       {/* Hero Section */}
       <section className="container mx-auto px-6 mb-16 text-center">
         <motion.div
@@ -43,8 +45,8 @@ export default function GalleryPage() {
            transition={{ duration: 0.6 }}
         >
           <span className="text-primary font-bold tracking-[0.2em] uppercase text-xs mb-4 block">Visual Journey</span>
-          <h1 className="text-5xl md:text-7xl font-display font-bold text-gray-900 mb-6 italic">Our Gallery</h1>
-          <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-text-main mb-6 italic">Our Gallery</h1> {/* Reduced h1 font size */}
+          <p className="text-text-muted max-w-2xl mx-auto text-lg leading-relaxed">
             A curated collection of our finest moments, traditional crafts, and vibrant community.
           </p>
         </motion.div>
@@ -62,11 +64,11 @@ export default function GalleryPage() {
               <button
                 key={categoryId}
                 onClick={() => setActiveCategory(categoryId)}
-                className={`relative px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 isolate ${
+                className={"relative px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 isolate " + (
                   isActive
                     ? "text-white"
-                    : "text-gray-500 hover:text-gray-900 bg-white border border-gray-100 shadow-sm"
-                }`}
+                    : "text-text-muted hover:text-text-main bg-bg-surface border border-border-main shadow-sm"
+                )}
               >
                 {isActive && (
                   <motion.div
@@ -103,7 +105,7 @@ export default function GalleryPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
-                    className="group relative aspect-[4/5] bg-white rounded-lg md:rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer"
+                    className="group relative aspect-[4/5] bg-bg-surface rounded-lg md:rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-border-main"
                     onClick={() => setSelectedImage(image)}
                   >
                     <Image
@@ -128,7 +130,7 @@ export default function GalleryPage() {
 
 
                     <div className="absolute top-2 right-2 md:top-4 md:right-4 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                       <div className="w-6 h-6 md:w-10 md:h-10 bg-white/20 backdrop-blur-md rounded-md md:rounded-xl flex items-center justify-center text-white border border-white/30">
+                       <div className="w-6 h-6 md:w-10 md:h-10 bg-bg-surface/20 backdrop-blur-md rounded-md md:rounded-xl flex items-center justify-center text-text-main border border-border-main/30">
                           <FiMaximize2 size={12} className="md:w-4 md:h-4" />
                        </div>
                     </div>
@@ -138,10 +140,10 @@ export default function GalleryPage() {
             </AnimatePresence>
 
             {images?.length === 0 && (
-              <div className="col-span-full py-32 text-center bg-white rounded-[3rem] border border-dashed border-gray-200">
-                <FiImage className="mx-auto text-gray-300 mb-6" size={64} />
-                <h3 className="text-2xl font-display font-bold text-gray-900 mb-2">Moments yet to be captured</h3>
-                <p className="text-gray-500">Check back soon for new updates in this category.</p>
+              <div className="col-span-full py-32 text-center bg-bg-surface rounded-[3rem] border border-dashed border-border-main">
+                <FiImage className="mx-auto text-text-muted mb-6" size={64} />
+                <h3 className="text-2xl font-display font-bold text-text-main mb-2">Moments yet to be captured</h3>
+                <p className="text-text-muted">Check back soon for new updates in this category.</p>
               </div>
             )}
           </motion.div>

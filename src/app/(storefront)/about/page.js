@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FiCheck, FiAward, FiUsers, FiTrendingUp } from "react-icons/fi";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function AboutPage() {
   return (
-    <div className="bg-white pt-28 md:pt-28">
+    <div className="bg-bg-main">
       {/* Hero Section */}
       <section className="relative py-16 md:py-20 overflow-hidden bg-gray-900 text-white">
         <div className="absolute inset-0 z-0 opacity-20">
@@ -19,8 +20,8 @@ export default function AboutPage() {
             />
         </div>
         <div className="container mx-auto px-4 md:px-8 relative z-10 text-center">
-          <span className="text-primary font-bold tracking-widest uppercase text-sm md:text-base mb-4 block animate-in fade-in slide-in-from-bottom-4 duration-700">Since 1999</span>
-          <h1 className="text-4xl md:text-6xl font-display font-bold mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+          <span className="text-primary font-bold tracking-widest uppercase text-sm md:text-base mb-4 block">Since 1999</span>
+          <h1 className="text-3xl md:text-5xl font-display font-bold mb-6">
             We Are <span className="text-primary">GRABSZY</span>
           </h1>
           <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
@@ -42,24 +43,24 @@ export default function AboutPage() {
                     />
                 </div>
                 <div className="space-y-6">
-                    <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900">
+                    <h2 className="text-3xl md:text-4xl font-display font-bold text-text-main">
                         25 Years of <span className="text-primary">Excellence</span>
                     </h2>
-                    <p className="text-gray-600 leading-relaxed text-lg">
+                    <p className="text-text-muted leading-relaxed text-lg">
                         What started as a small wholesale operation two decades ago has grown into a trusted name in the industry. For over 25 years, we have been the silent force behind many successful retailers, providing them with top-tier products at unbeatable wholesale rates.
                     </p>
-                    <p className="text-gray-600 leading-relaxed text-lg">
-                        Our journey has always been defined by one core principle: <strong className="text-gray-900">Quality shouldn&apos;t come at a premium.</strong> We believe that everyone deserves access to high-standard goods without the exorbitant markups.
+                    <p className="text-text-muted leading-relaxed text-lg">
+                        Our journey has always been defined by one core principle: <strong className="text-text-main">Quality shouldn&apos;t come at a premium.</strong> We believe that everyone deserves access to high-standard goods without the exorbitant markups.
                     </p>
                     
                     <div className="grid grid-cols-2 gap-6 pt-6">
-                        <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                        <div className="bg-bg-section/50 dark:bg-bg-section/10 p-6 rounded-2xl border border-border-main">
                             <h4 className="text-4xl font-bold text-primary mb-2">25+</h4>
-                            <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">Years Experience</p>
+                            <p className="text-sm font-bold text-text-muted uppercase tracking-wide">Years Experience</p>
                         </div>
-                        <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                        <div className="bg-bg-section/50 dark:bg-bg-section/10 p-6 rounded-2xl border border-border-main">
                             <h4 className="text-4xl font-bold text-primary mb-2">10k+</h4>
-                            <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">Happy Customers</p>
+                            <p className="text-sm font-bold text-text-muted uppercase tracking-wide">Happy Customers</p>
                         </div>
                     </div>
                 </div>
@@ -68,39 +69,39 @@ export default function AboutPage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-10 md:py-16 bg-gray-50">
+      <section className="py-10 md:py-16 bg-bg-section/40 dark:bg-bg-section/10">
         <div className="container mx-auto px-4 md:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-900 mb-4">Why Shop With Us?</h2>
-                <p className="text-gray-500">We bring the wholesale advantage directly to your doorstep.</p>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-text-main mb-4">Why Shop With Us?</h2>
+                <p className="text-text-muted">We bring the wholesale advantage directly to your doorstep.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all">
+                <div className="bg-bg-surface p-8 rounded-3xl shadow-sm border border-border-main hover:shadow-xl hover:-translate-y-1 transition-all">
                     <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6">
                         <FiAward size={28} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Premium Quality</h3>
-                    <p className="text-gray-500 leading-relaxed">
+                    <h3 className="text-xl font-bold text-text-main mb-3">Premium Quality</h3>
+                    <p className="text-text-muted leading-relaxed">
                         We don&apos;t compromise. Every product is hand-picked and rigorously checked to ensure it meets our 25-year standard of excellence.
                     </p>
                 </div>
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all">
+                <div className="bg-bg-surface p-8 rounded-3xl shadow-sm border border-border-main hover:shadow-xl hover:-translate-y-1 transition-all">
                     <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6">
                         <FiTrendingUp size={28} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Wholesale Rates</h3>
-                    <p className="text-gray-500 leading-relaxed">
+                    <h3 className="text-xl font-bold text-text-main mb-3">Wholesale Rates</h3>
+                    <p className="text-text-muted leading-relaxed">
                         By cutting out the middlemen, we pass the savings directly to you. Get the best market rates without bulk buying requirements.
                     </p>
                 </div>
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all">
+                <div className="bg-bg-surface p-8 rounded-3xl shadow-sm border border-border-main hover:shadow-xl hover:-translate-y-1 transition-all">
                     <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6">
                         <FiUsers size={28} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Customer First</h3>
-                    <p className="text-gray-500 leading-relaxed">
-                        Our legacy is built on trust and relationships. Our support team is here to ensure your shopping experience is seamless.
+                    <h3 className="text-xl font-bold text-text-main mb-3">Direct Support</h3>
+                    <p className="text-text-muted leading-relaxed">
+                        Our dedicated team is always here to assist you. Experience personalized service that only a established business can provide.
                     </p>
                 </div>
             </div>

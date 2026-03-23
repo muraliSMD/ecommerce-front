@@ -39,7 +39,7 @@ export default function BlogPostPage() {
   });
 
   if (isLoading) return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-bg-main">
       <div className="relative">
           <div className="w-12 h-12 rounded-full border-4 border-primary/20 animate-ping"></div>
           <div className="absolute inset-0 w-12 h-12 rounded-full border-t-4 border-primary animate-spin"></div>
@@ -50,8 +50,8 @@ export default function BlogPostPage() {
   if (!blog) return (
     <section className="container mx-auto px-4 md:px-8 max-w-7xl py-12 min-h-[60vh] flex items-center justify-center">
         <div className="flex flex-col items-center justify-center gap-6 text-center">
-            <h2 className="text-4xl font-display font-bold text-gray-900">Post Not Found</h2>
-            <p className="text-gray-500">The blog post you&apos;re looking for doesn&apos;t exist.</p>
+            <h2 className="text-4xl font-display font-bold text-text-main">Post Not Found</h2>
+            <p className="text-text-muted">The blog post you&apos;re looking for doesn&apos;t exist.</p>
             <Link href="/blog" className="px-8 py-4 bg-primary text-white rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20">
                 Back to Blog
             </Link>
@@ -60,7 +60,7 @@ export default function BlogPostPage() {
   );
 
   return (
-    <main className="bg-white min-h-screen">
+    <main className="bg-bg-main min-h-screen">
         {/* Progress Bar */}
         <motion.div
             className="fixed top-0 left-0 right-0 h-1.5 bg-primary z-50 origin-[0%]"
@@ -143,22 +143,22 @@ export default function BlogPostPage() {
                         whileInView={{ opacity: 1 }}
                         transition={{ duration: 0.8 }}
                         viewport={{ once: true }}
-                        className="prose prose-2xl prose-gray max-w-none prose-headings:font-display prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:rounded-[2.5rem] prose-img:shadow-2xl prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-gray-50 prose-blockquote:p-8 prose-blockquote:rounded-r-3xl prose-blockquote:not-italic"
+                        className="prose prose-2xl dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-headings:text-text-main prose-p:text-text-muted prose-p:leading-relaxed prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:rounded-[2.5rem] prose-img:shadow-2xl prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-bg-section/50 prose-blockquote:p-8 prose-blockquote:rounded-r-3xl prose-blockquote:not-italic"
                     >
                         <ReactMarkdown>{blog.content}</ReactMarkdown>
                     </motion.div>
 
-                    {/* Social Meta */}
-                    <div className="mt-16 pt-12 border-t border-gray-100 flex items-center justify-between">
+                     {/* Social Meta */}
+                    <div className="mt-16 pt-12 border-t border-border-main flex items-center justify-between">
                         <div className="flex gap-4">
-                            <button 
+                             <button 
                                 onClick={() => setIsLiked(!isLiked)}
-                                className={`p-4 rounded-2xl border transition-all flex items-center gap-2 font-bold ${isLiked ? 'bg-red-50 border-red-100 text-red-500 scale-105' : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200'}`}
+                                className={`p-4 rounded-2xl border transition-all flex items-center gap-2 font-bold ${isLiked ? 'bg-red-500/10 border-red-500/20 text-red-500 scale-105' : 'bg-bg-surface border-border-main text-text-muted hover:border-text-muted/50'}`}
                             >
                                 <FiHeart fill={isLiked ? "currentColor" : "transparent"} size={20} />
                                 {isLiked ? 'Favorited' : 'Like'}
                             </button>
-                            <button className="p-4 rounded-2xl border border-gray-100 text-gray-400 hover:border-gray-200 transition-all flex items-center gap-2 font-bold">
+                            <button className="p-4 rounded-2xl border border-border-main text-text-muted hover:border-text-muted/50 transition-all flex items-center gap-2 font-bold bg-bg-surface">
                                 <FiShare2 size={20} />
                                 Share
                             </button>
@@ -166,17 +166,17 @@ export default function BlogPostPage() {
                     </div>
                 </article>
 
-                <aside className="w-full lg:w-1/3 space-y-12">
+                 <aside className="w-full lg:w-1/3 space-y-12">
                     {/* Newsletter Widget */}
-                    <div className="bg-gray-900 rounded-[2.5rem] p-10 text-white relative overflow-hidden group">
+                    <div className="bg-bg-surface-dark border border-white/5 rounded-[2.5rem] p-10 text-white relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:scale-125"></div>
                         <h3 className="text-2xl font-display font-bold mb-4 relative z-10">Stay Inspired</h3>
                         <p className="text-gray-400 text-sm mb-8 leading-relaxed relative z-10">Subscribe to our weekly editorial for trends and behind-the-scenes stories.</p>
-                        <form className="relative z-10 space-y-4">
+                         <form className="relative z-10 space-y-4">
                             <input 
                                 type="email" 
                                 placeholder="Your email address" 
-                                className="w-full bg-white/10 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-primary/50 transition-colors"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm focus:outline-none focus:border-primary/50 transition-colors text-white"
                             />
                             <button className="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                                 Join Editorial
@@ -184,8 +184,8 @@ export default function BlogPostPage() {
                         </form>
                     </div>
 
-                    {/* Related Articles */}
-                    <div className="bg-white border border-gray-100 rounded-[2.5rem] p-10">
+                     {/* Related Articles */}
+                    <div className="bg-bg-surface border border-border-main rounded-[2.5rem] p-10">
                         <h3 className="text-xl font-display font-bold mb-8 flex items-center justify-between">
                             More Stories
                             <Link href="/blog" className="text-xs font-bold text-primary hover:underline">See all</Link>
@@ -197,7 +197,7 @@ export default function BlogPostPage() {
                                     href={`/blog/${item.slug}`}
                                     className="group block"
                                 >
-                                    <div className="relative aspect-video rounded-3xl overflow-hidden mb-4 bg-gray-50 border border-gray-50">
+                                     <div className="relative aspect-video rounded-3xl overflow-hidden mb-4 bg-bg-section/50 border border-border-main">
                                         {item.coverImage && (
                                             <Image 
                                                 src={item.coverImage} 
@@ -211,7 +211,7 @@ export default function BlogPostPage() {
                                     <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-2">
                                         {format(new Date(item.createdAt), "MMM d, yyyy")}
                                     </p>
-                                    <h4 className="font-bold text-gray-900 group-hover:text-primary transition-colors leading-snug">
+                                     <h4 className="font-bold text-text-main group-hover:text-primary transition-colors leading-snug">
                                         {item.title}
                                     </h4>
                                 </Link>
@@ -224,16 +224,16 @@ export default function BlogPostPage() {
 
         {/* Floating Action Menu */}
         <div className="fixed bottom-10 right-10 z-40 hidden md:block">
-            <motion.div 
+             <motion.div 
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white/80 backdrop-blur-xl border border-gray-100 p-2 rounded-2xl shadow-2xl flex items-center gap-1"
+                className="bg-bg-surface/80 backdrop-blur-xl border border-border-main p-2 rounded-2xl shadow-2xl flex items-center gap-1"
             >
-                <Link href="/blog" className="p-3 text-gray-400 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-all" title="All Posts">
+                <Link href="/blog" className="p-3 text-text-muted hover:text-text-main hover:bg-bg-section/50 rounded-xl transition-all" title="All Posts">
                     <FiArrowLeft size={18} />
                 </Link>
-                <div className="w-[1px] h-6 bg-gray-100 mx-1"></div>
-                <button className="p-3 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all" title="Share Article">
+                <div className="w-[1px] h-6 bg-border-main mx-1"></div>
+                <button className="p-3 text-text-muted hover:text-primary hover:bg-primary/5 rounded-xl transition-all" title="Share Article">
                     <FiShare2 size={18} />
                 </button>
             </motion.div>

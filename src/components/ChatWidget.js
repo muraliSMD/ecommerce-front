@@ -1,4 +1,5 @@
 "use client";
+// Forced rebuild to resolve ChunkLoadError
 
 import { useState, useRef, useEffect } from "react";
 import { useSettingsStore } from "@/store/settingsStore";

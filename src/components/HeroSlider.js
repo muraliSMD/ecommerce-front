@@ -38,7 +38,7 @@ export default function HeroSlider() {
     },
   };
 
-  if (isLoading) return <div className="container mx-auto px-4 md:px-8 mt-4"><div className="w-full h-[200px] md:h-[300px] lg:h-[400px] rounded-2xl bg-gray-100 animate-pulse" /></div>;
+  if (isLoading) return <div className="container mx-auto px-4 md:px-8 mt-4"><div className="w-full h-[200px] md:h-[300px] lg:h-[400px] rounded-2xl bg-bg-section/50 animate-pulse" /></div>;
   if (!slides || slides.length === 0) return null;
 
   return (
@@ -76,7 +76,7 @@ export default function HeroSlider() {
           <div className="absolute inset-y-0 left-4 flex items-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <button 
               onClick={(e) => { e.preventDefault(); setIndex((prev) => (prev - 1 + slides.length) % slides.length); }}
-              className="w-10 h-10 md:w-12 md:h-12 bg-white/80 hover:bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm transition-all"
+              className="w-10 h-10 md:w-12 md:h-12 bg-bg-surface/80 hover:bg-bg-surface text-text-main rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm transition-all"
               aria-label="Previous Slide"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
@@ -87,7 +87,7 @@ export default function HeroSlider() {
           <div className="absolute inset-y-0 right-4 flex items-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <button 
               onClick={(e) => { e.preventDefault(); setIndex((prev) => (prev + 1) % slides.length); }}
-              className="w-10 h-10 md:w-12 md:h-12 bg-white/80 hover:bg-white text-gray-900 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm transition-all"
+              className="w-10 h-10 md:w-12 md:h-12 bg-bg-surface/80 hover:bg-bg-surface text-text-main rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm transition-all"
               aria-label="Next Slide"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
@@ -104,7 +104,7 @@ export default function HeroSlider() {
               key={i}
               onClick={() => setIndex(i)}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === index ? "w-8 bg-primary" : "w-3 bg-gray-300 hover:bg-gray-400"
+                i === index ? "w-8 bg-primary" : "w-3 bg-border-main hover:bg-text-muted/30"
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />

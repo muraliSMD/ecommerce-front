@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiRotateCcw, FiShield, FiCheckCircle, FiHelpCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ReturnsPage() {
   const features = [
@@ -30,7 +31,8 @@ export default function ReturnsPage() {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28 md:pt-28">
+    <div className="bg-bg-main min-h-screen pt-28 md:pt-28">
+      <Breadcrumbs />
       {/* Header */}
       <section className="bg-gray-900 text-white py-20 relative overflow-hidden text-center">
         <div className="absolute inset-0 z-0 opacity-10">
@@ -42,7 +44,7 @@ export default function ReturnsPage() {
           />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Returns & Exchanges</h1>
+          <h1 className="text-3xl md:text-4xl font-display font-bold mb-4">Returns & Exchange</h1>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Your satisfaction is our priority. Hassle-free returns at GRABSZY.
           </p>
@@ -51,7 +53,7 @@ export default function ReturnsPage() {
 
       <section className="py-16 -mt-10">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 p-8 md:p-16 border border-gray-100">
+          <div className="bg-bg-surface rounded-[2.5rem] shadow-xl shadow-black/5 p-8 md:p-16 border border-border-main">
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
               {features.map((item, idx) => (
@@ -61,18 +63,18 @@ export default function ReturnsPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-gray-50 p-8 rounded-3xl text-center space-y-4 border border-gray-100/50"
+                  className="bg-bg-section/50 dark:bg-bg-section/10 p-8 rounded-3xl text-center space-y-4 border border-border-main"
                 >
-                  <div className="w-14 h-14 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center mx-auto">
+                  <div className="w-20 h-20 bg-bg-section/30 dark:bg-bg-section/10 rounded-full flex items-center justify-center text-text-muted mb-4">
                     <item.icon size={28} />
                   </div>
-                  <h3 className="font-bold text-gray-900 text-lg">{item.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
+                  <h3 className="font-bold text-text-main text-lg">{item.title}</h3>
+                  <p className="text-text-muted text-sm leading-relaxed">{item.description}</p>
                 </motion.div>
               ))}
             </div>
 
-            <div className="prose prose-lg max-w-none text-gray-600 space-y-8">
+            <div className="prose prose-lg max-w-none text-text-muted space-y-8">
               <div>
                 <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">Conditions for Return</h2>
                 <p>
@@ -86,11 +88,11 @@ export default function ReturnsPage() {
                 </ul>
               </div>
 
-              <div className="bg-blue-50/50 p-8 rounded-[2rem] border border-blue-100 flex gap-6 items-start">
+               <div className="bg-primary/5 p-8 rounded-[2rem] border border-primary/20 flex gap-6 items-start">
                   <FiShield size={32} className="text-primary shrink-0 mt-1" />
                   <div>
-                      <h4 className="font-display font-bold text-gray-900 mb-2">Exchanges (Indian Orders Only)</h4>
-                      <p className="text-sm leading-relaxed">
+                      <h4 className="font-display font-bold text-text-main mb-2">Exchanges (Indian Orders Only)</h4>
+                      <p className="text-sm leading-relaxed text-text-muted">
                           We only replace items if they are defective, damaged, or size mismatched. If you need to exchange it for the same item, feel free to contact us via the help desk or account orders section.
                       </p>
                   </div>
@@ -115,14 +117,14 @@ export default function ReturnsPage() {
                 </ul>
               </div>
 
-              <div className="pt-8 border-t border-gray-100 text-center">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Need help with a return?</h3>
-                  <p className="text-gray-500 mb-6 font-medium">Our support team is just a click away.</p>
+               <div className="pt-8 border-t border-border-main text-center">
+                  <h3 className="text-xl font-bold text-text-main mb-4">Need help with a return?</h3>
+                  <p className="text-text-muted mb-6 font-medium">Our support team is just a click away.</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <Link href="/contact" className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-primary transition-all active:scale-95 shadow-lg shadow-gray-900/10 text-center">
+                      <Link href="/contact" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-secondary transition-all active:scale-95 shadow-lg shadow-primary/10 text-center">
                           Contact Support
                       </Link>
-                      <Link href="/account/orders" className="bg-white text-gray-900 border border-gray-200 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95 text-center">
+                      <Link href="/account/orders" className="bg-bg-surface text-text-main border border-border-main px-8 py-3 rounded-xl font-bold hover:bg-bg-section/30 transition-all active:scale-95 text-center">
                           Track Your Order
                       </Link>
                   </div>
