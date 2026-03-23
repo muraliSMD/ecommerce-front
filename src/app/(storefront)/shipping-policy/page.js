@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { FiTruck, FiClock, FiPackage, FiMapPin } from "react-icons/fi";
 import { motion } from "framer-motion";
-import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ShippingPolicyPage() {
   const shippingDetails = [
@@ -30,8 +29,7 @@ export default function ShippingPolicyPage() {
   ];
 
   return (
-    <div className="bg-bg-main min-h-screen pt-28 md:pt-28">
-      <Breadcrumbs />
+    <div className="bg-bg-main min-h-screen pt-4 md:pt-8 overflow-x-hidden">
       {/* Header */}
       <section className="bg-gray-900 text-white py-20 relative overflow-hidden text-center">
         <div className="absolute inset-0 z-0 opacity-10">
@@ -75,14 +73,14 @@ export default function ShippingPolicyPage() {
 
             <div className="prose prose-lg max-w-none text-text-muted space-y-8">
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">1. Order Processing</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">1. Order Processing</h2>
                 <p>
                   All orders are processed within 1-2 business days. Orders placed on weekends or public holidays will be processed on the next business day. You will receive a notification email or SMS once your order has been dispatched from our facility in <strong>Omalur, Salem</strong>.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">2. Shipping Rates & Delivery Estimates</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">2. Shipping Rates & Delivery Estimates</h2>
                 <p>
                   Shipping charges for your order will be calculated and displayed at checkout. Standard shipping is <strong>FREE</strong> for orders above ₹1499 across India.
                 </p>
@@ -112,21 +110,21 @@ export default function ShippingPolicyPage() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">3. Shipment Confirmation & Tracking</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">3. Shipment Confirmation & Tracking</h2>
                 <p>
                   You will receive a Shipment Confirmation email/SMS once your order has shipped containing your tracking number(s). The tracking number will be active within 24 hours.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">4. Customs, Duties & Taxes</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">4. Customs, Duties & Taxes</h2>
                 <p>
                   GRABSZY is not responsible for any customs and taxes applied to your order. All fees imposed during or after shipping are the responsibility of the customer (tariffs, taxes, etc.).
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">5. Damages</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">5. Damages</h2>
                 <p>
                   If you received your order damaged, please contact us immediately to file a claim. Please save all packaging materials and damaged goods before filing a claim.
                 </p>

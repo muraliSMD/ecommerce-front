@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiRotateCcw, FiShield, FiCheckCircle, FiHelpCircle } from "react-icons/fi";
 import { motion } from "framer-motion";
-import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ReturnsPage() {
   const features = [
@@ -31,8 +30,7 @@ export default function ReturnsPage() {
   ];
 
   return (
-    <div className="bg-bg-main min-h-screen pt-28 md:pt-28">
-      <Breadcrumbs />
+    <div className="bg-bg-main min-h-screen pt-4 md:pt-8 overflow-x-hidden">
       {/* Header */}
       <section className="bg-gray-900 text-white py-20 relative overflow-hidden text-center">
         <div className="absolute inset-0 z-0 opacity-10">
@@ -76,7 +74,7 @@ export default function ReturnsPage() {
 
             <div className="prose prose-lg max-w-none text-text-muted space-y-8">
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">Conditions for Return</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">Conditions for Return</h2>
                 <p>
                   In order for the Goods to be eligible for a return, please make sure that:
                 </p>
@@ -99,14 +97,14 @@ export default function ReturnsPage() {
               </div>
 
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">Refund Process</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">Refund Process</h2>
                 <p>
                   Once we receive and inspect your returned product, we will send you an email to notify you of the approval or rejection of your refund. If approved, your refund will be processed, and a credit will automatically be applied to your original method of payment within 5-7 business days.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">Non-Returnable Items</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main mb-4">Non-Returnable Items</h2>
                 <p>
                   The following Goods cannot be returned:
                 </p>

@@ -314,30 +314,14 @@ export default function Header() {
           </div>
 
           {/* Mobile Actions */}
-          <div className="flex lg:hidden items-center gap-2 sm:gap-4 ml-auto">
+          <div className="flex lg:hidden items-center gap-3 ml-auto">
             <ThemeToggle />
-            <button
-                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="p-1 text-text-main"
-                aria-label="Search"
-            >
-                <FiSearch size={22} />
-            </button>
             
             {user && (
-                <div className="flex items-center justify-center -mx-1">
+                <div className="flex items-center justify-center">
                     <NotificationBell align="right" />
                 </div>
             )}
-
-            <Link href="/wishlist" className="relative p-1" aria-label={`Wishlist with ${wishlistCount} items`}>
-              <FiHeart size={22} className="text-text-main" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
-                  {wishlistCount}
-                </span>
-              )}
-            </Link>
 
             <Link href="/cart" className="relative p-1" aria-label={`Cart with ${cartCount} items`}>
               <FiShoppingBag size={22} className="text-text-main" />
@@ -541,6 +525,14 @@ export default function Header() {
 
                    <div className="space-y-2">
                      <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-text-main hover:text-primary">Home</Link>
+                     <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between py-2.5 text-lg font-bold text-text-main hover:text-primary">
+                        <span>Wishlist</span>
+                        {wishlistCount > 0 && (
+                          <span className="bg-primary text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">
+                            {wishlistCount}
+                          </span>
+                        )}
+                     </Link>
                      <div className="py-2.5">
                         <p className="text-lg font-bold text-text-main mb-2">Shop</p>
                         <div className="pl-4 space-y-3 border-l-2 border-border-main">
@@ -579,14 +571,22 @@ export default function Header() {
                            </div>
                            <div>
                               <p className="font-bold text-text-main">{user.name}</p>
-                              <p className="text-xs text-text-muted">{user.email}</p>
+                               <p className="text-xs text-text-muted">{user.email}</p>
                            </div>
                         </div>
                          <Link href="/account/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-text-muted p-2 hover:bg-bg-surface rounded-lg transition-colors">
                            <FiUser /> Profile
                         </Link>
                         <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-text-muted p-2 hover:bg-bg-surface rounded-lg transition-colors">
-                           <FiHeart /> Wishlist ({wishlistCount})
+                           <div className="relative">
+                             <FiHeart />
+                             {wishlistCount > 0 && (
+                               <span className="absolute -top-2 -right-2 bg-primary text-white text-[8px] w-3.5 h-3.5 flex items-center justify-center rounded-full font-bold border border-white">
+                                 {wishlistCount}
+                               </span>
+                             )}
+                           </div>
+                           Wishlist
                         </Link>
                         <button onClick={async () => { await logout(); setIsMobileMenuOpen(false); router.refresh(); }} className="flex items-center gap-3 text-red-500 p-2 hover:bg-white rounded-lg w-full transition-colors">
                            <FiLogOut /> Logout
