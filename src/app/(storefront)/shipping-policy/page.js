@@ -84,25 +84,25 @@ export default function ShippingPolicyPage() {
                 <p>
                   Shipping charges for your order will be calculated and displayed at checkout. Standard shipping is <strong>FREE</strong> for orders above ₹1499 across India.
                 </p>
-                <div className="bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-hidden mt-4 border border-border-main">
-                  <table className="w-full text-left">
-                    <thead className="bg-bg-section/50 dark:bg-bg-section/20">
+                <div className="bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-x-auto mt-4 border border-border-main scrollbar-hide">
+                  <table className="w-full text-left min-w-[600px]">
+                    <thead className="bg-bg-section/50 dark:bg-bg-section/20 whitespace-nowrap">
                       <tr>
                         <th className="px-6 py-4 font-bold text-text-main">Destination</th>
                         <th className="px-6 py-4 font-bold text-text-main">Estimated Delivery</th>
                         <th className="px-6 py-4 font-bold text-text-main">Cost</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border-main">
+                    <tbody className="divide-y divide-border-main whitespace-nowrap text-sm">
                       <tr>
                         <td className="px-6 py-4 text-text-muted">Tamil Nadu</td>
                         <td className="px-6 py-4">1-5 Business Days</td>
-                        <td className="px-6 py-4"> minimum ₹60 (Free over ₹1499)</td>
+                        <td className="px-6 py-4"> minimum ₹60 </td>
                       </tr>
                       <tr>
-                        <td className="px-6 py-4">Rest of India</td>
+                        <td className="px-6 py-4 text-text-muted">Rest of India</td>
                         <td className="px-6 py-4">3-9 Business Days</td>
-                        <td className="px-6 py-4"> minimum ₹90 (Free over ₹1499)</td>
+                        <td className="px-6 py-4"> minimum ₹90 </td>
                       </tr>
                     </tbody>
                   </table>
