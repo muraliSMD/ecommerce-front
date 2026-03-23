@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "react-hot-toast";
 import { FiSave, FiArrowLeft, FiImage } from "react-icons/fi";
+import { SectionLoader } from "@/components/Loader";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -87,7 +88,7 @@ export default function EditBlogPage() {
     updateMutation.mutate(formData);
   };
 
-  if (isLoading) return <div className="p-10 text-center">Loading editor...</div>;
+  if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   return (
     <div className="max-w-4xl mx-auto pb-20">

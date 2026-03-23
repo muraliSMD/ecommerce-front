@@ -6,7 +6,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
-import { FiPlus, FiEdit2, FiTrash2, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiSearch, FiExternalLink, FiCalendar, FiUser } from "react-icons/fi";
+import { SectionLoader } from "@/components/Loader";
 import { toast } from "react-hot-toast";
 import { format } from "date-fns";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -42,7 +43,7 @@ export default function AdminBlogsPage() {
     setBlogToDelete(blog);
   };
 
-  if (isLoading) return <div className="p-8 text-center">Loading blogs...</div>;
+  if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   return (
     <div className="space-y-6">

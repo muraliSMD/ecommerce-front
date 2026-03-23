@@ -2,23 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { 
-  FiShoppingBag, 
-  FiClock, 
-  FiTrendingUp, 
-  FiCheckCircle, 
-  FiTruck,
-  FiSearch,
-  FiFilter,
-  FiMoreVertical,
-  FiArrowRight,
-  FiUser,
-  FiMapPin,
-  FiMail,
-  FiPhone,
-  FiTrash2,
-  FiX
-} from "react-icons/fi";
+import { FiSearch, FiFilter, FiEye, FiDownload, FiPackage, FiTruck, FiCheckCircle, FiXCircle, FiClock, FiAlertCircle, FiShoppingBag, FiTrendingUp, FiX, FiMoreVertical, FiArrowRight, FiUser, FiMapPin, FiMail, FiPhone, FiTrash2 } from "react-icons/fi";
+import { SectionLoader } from "@/components/Loader";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -85,11 +70,7 @@ export default function AdminOrders() {
     return matchesSearch && matchesStatus && matchesType;
   }) || [];
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
-    </div>
-  );
+  if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   return (
     <div className="space-y-8">

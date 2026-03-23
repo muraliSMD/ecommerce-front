@@ -3,7 +3,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
-import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiX } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiChevronDown, FiChevronUp, FiHelpCircle, FiSearch, FiCheck, FiX } from "react-icons/fi";
+import { SectionLoader } from "@/components/Loader";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import ConfirmationModal from "@/components/ConfirmationModal";
@@ -41,7 +42,7 @@ export default function AdminFAQsPage() {
     },
   });
 
-  if (isLoading) return <div className="p-8 text-center text-gray-500">Loading FAQs...</div>;
+  if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   return (
     <div className="space-y-10">

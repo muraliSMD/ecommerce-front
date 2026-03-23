@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { FiEye, FiMessageSquare, FiFilter } from "react-icons/fi";
+import { SectionLoader } from "@/components/Loader";
 import { format } from "date-fns";
 
 export default function AdminTicketsPage() {
@@ -23,7 +24,7 @@ export default function AdminTicketsPage() {
       return ticket.status === filter;
   });
 
-  if (isLoading) return <div className="p-8 text-center">Loading tickets...</div>;
+  if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
 
   return (
     <div className="space-y-6">

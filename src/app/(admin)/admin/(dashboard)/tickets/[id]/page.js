@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
 import { FiSend, FiUser, FiArrowLeft, FiSave } from "react-icons/fi";
+import { SectionLoader } from "@/components/Loader";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 
@@ -73,7 +74,7 @@ export default function AdminTicketDetailPage() {
     scrollToBottom();
   }, [ticket?.messages]);
 
-  if (isLoading) return <div className="p-8 text-center">Loading ticket details...</div>;
+  if (isLoading) return <SectionLoader className="min-h-[60vh]" />;
   if (!ticket) return <div className="p-8 text-center">Ticket not found</div>;
 
   return (

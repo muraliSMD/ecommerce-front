@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { FiArrowLeft, FiSave } from "react-icons/fi";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
+import { SectionLoader } from "@/components/Loader";
 
 export default function FAQFormPage() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function FAQFormPage() {
     mutation.mutate(formData);
   };
 
-  if (isLoading && isEdit) return <div className="p-8 text-center">Loading...</div>;
+  if (isLoading && isEdit) return <SectionLoader className="min-h-[40vh]" />;
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
