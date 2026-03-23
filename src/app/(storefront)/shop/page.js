@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
-import Breadcrumbs from "@/components/Breadcrumbs";
+// Removed unused Breadcrumbs import
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
 import { useSettingsStore } from "@/store/settingsStore";
@@ -32,7 +32,7 @@ const CategoryButton = ({ category, selectedCategory, setSelectedCategory, level
           className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium flex items-center justify-between ${
             selectedCategory === (category.slug || category.name)
               ? "bg-primary text-white shadow-lg shadow-primary/20"
-              : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+              : "text-text-muted hover:bg-bg-section/50 hover:text-text-main dark:hover:bg-bg-surface"
           }`}
           style={{ paddingLeft: `${level * 1 + 1}rem` }}
         >
@@ -69,26 +69,26 @@ const FilterContent = ({
     <div className="space-y-8">
       {/* Search */}
       <div className="relative">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
         <input
           type="text"
           placeholder="Search products..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+          className="w-full pl-10 pr-4 py-3 bg-bg-surface border border-border-main rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-text-main placeholder:text-text-muted/50"
         />
       </div>
 
       {/* Categories */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-4">Categories</h3>
+        <h3 className="font-bold text-text-main mb-4 uppercase tracking-widest text-sm">Categories</h3>
         <div className="space-y-1 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
            <button
               onClick={() => setSelectedCategory("All")}
               className={`w-full text-left px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
                 selectedCategory === "All"
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                  : "text-text-muted hover:bg-bg-section/50 hover:text-text-main dark:hover:bg-bg-surface"
               }`}
             >
               All Categories
@@ -107,12 +107,12 @@ const FilterContent = ({
       {/* Color Filter */}
       {availableColors.length > 0 && (
         <div>
-          <h3 className="font-bold text-gray-900 mb-4">Filter by Color</h3>
+          <h3 className="font-bold text-text-main mb-4 uppercase tracking-widest text-sm">Filter by Color</h3>
           <VariantSlider>
             <button
                type="button"
                onClick={() => setSelectedColor(null)}
-               className={`w-10 h-10 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all snap-start ${!selectedColor ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-gray-100 bg-white hover:border-gray-300'}`}
+               className={`w-10 h-10 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all snap-start ${!selectedColor ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-border-main bg-bg-surface hover:border-text-muted/30'}`}
                title="All Colors"
             >
                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-red-500 via-green-500 to-blue-500 shadow-inner"></div>
@@ -122,11 +122,11 @@ const FilterContent = ({
                  type="button"
                  key={color}
                  onClick={() => setSelectedColor(selectedColor === color ? null : color)}
-                 className={`w-10 h-10 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all snap-start ${selectedColor === color ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-gray-100 bg-white hover:border-gray-300'}`}
+                 className={`w-10 h-10 flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all snap-start ${selectedColor === color ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-border-main bg-bg-surface hover:border-text-muted/30'}`}
                  title={color.startsWith('#') ? getClosestColorName(color) : (color.charAt(0).toUpperCase() + color.slice(1))}
                >
                  <div 
-                   className="w-7 h-7 rounded-full border border-gray-100 shadow-sm" 
+                   className="w-7 h-7 rounded-full border border-border-main/50 shadow-sm" 
                    style={{ backgroundColor: color }}
                  ></div>
                </button>
@@ -138,7 +138,7 @@ const FilterContent = ({
       {/* Size Filter */}
       {availableSizes.length > 0 && (
         <div>
-          <h3 className="font-bold text-gray-900 mb-4">Filter by Size</h3>
+          <h3 className="font-bold text-text-main mb-4 uppercase tracking-widest text-sm">Filter by Size</h3>
           <div className="flex flex-wrap gap-2">
             {availableSizes.map((size) => (
               <button
@@ -147,7 +147,7 @@ const FilterContent = ({
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
                   selectedSize === size 
                     ? "bg-primary text-white border-primary shadow-sm" 
-                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                    : "bg-bg-surface text-text-muted border-border-main hover:border-text-muted/30"
                 }`}
               >
                 {size}
@@ -159,21 +159,21 @@ const FilterContent = ({
 
       {/* Price Range */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-4">Price Range</h3>
+        <h3 className="font-bold text-text-main mb-4 uppercase tracking-widest text-sm">Price Range</h3>
         <div className="flex gap-4">
           <input
             type="number"
             placeholder="Min"
             value={priceRange.min}
             onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm shadow-sm"
+            className="w-full px-4 py-2.5 bg-bg-surface border border-border-main rounded-lg outline-none focus:border-primary text-sm shadow-sm text-text-main placeholder:text-text-muted/50"
           />
           <input
             type="number"
             placeholder="Max"
             value={priceRange.max}
             onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg outline-none focus:border-primary text-sm shadow-sm"
+            className="w-full px-4 py-2.5 bg-bg-surface border border-border-main rounded-lg outline-none focus:border-primary text-sm shadow-sm text-text-main placeholder:text-text-muted/50"
           />
         </div>
       </div>
@@ -328,25 +328,17 @@ export default function ShopPage() {
   };
 
   return (
-    <main className="bg-white min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
+    <main className="bg-bg-main min-h-screen pb-8 md:pb-12">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="mb-4">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Shop", href: "/shop" },
-            ]}
-          />
-        </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Mobile Filter Toggle */}
           <button 
-            className="lg:hidden flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200 font-bold shadow-sm text-gray-900"
+            className="lg:hidden flex items-center justify-between bg-bg-surface p-4 rounded-xl border border-border-main font-bold shadow-sm text-text-main"
             onClick={() => setShowMobileFilters(true)}
           >
             <span className="flex items-center gap-2"><FiFilter /> Filter & Sort</span>
-            <span className="bg-black text-white px-2 py-0.5 rounded-full text-xs">{products?.length || 0}</span>
+            <span className="bg-btn-dark text-btn-text px-2 py-0.5 rounded-full text-xs">{products?.length || 0}</span>
           </button>
 
           {/* Desktop Sidebar */}
@@ -389,8 +381,8 @@ export default function ShopPage() {
                     className="fixed inset-y-0 right-0 z-50 w-full max-w-xs bg-surface p-6 shadow-2xl overflow-y-auto lg:hidden"
                 >
                     <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-xl font-bold font-display">Filters</h2>
-                        <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-gray-100 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
+                        <h2 className="text-xl font-bold font-display text-text-main">Filters</h2>
+                        <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-bg-section/50 dark:bg-bg-section/10 rounded-full hover:bg-red-500/10 hover:text-red-500 transition-colors">
                             <FiX size={20}/>
                         </button>
                     </div>
@@ -424,10 +416,10 @@ export default function ShopPage() {
 
 
           {/* Product Grid */}
-          <div className="flex-1 bg-bg-section rounded-[2.5rem] p-6 md:p-8 border border-blue-200 shadow-sm relative overflow-hidden">
+          <div className="flex-1 bg-bg-section/40 dark:bg-bg-section/10 rounded-[2.5rem] p-6 md:p-8 border border-border-main shadow-sm relative overflow-hidden">
             {/* Top Bar */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-              <p className="text-gray-900 font-medium hidden sm:block">
+              <p className="text-text-main font-medium hidden sm:block">
                 Showing <span className="font-bold">{products?.length || 0}</span> results
               </p>
 
@@ -436,26 +428,26 @@ export default function ShopPage() {
                     <select
                         value={sort}
                         onChange={(e) => setSort(e.target.value)}
-                        className="w-full appearance-none px-4 py-2.5 bg-white/80 backdrop-blur-sm border border-white/50 rounded-xl outline-none focus:border-primary cursor-pointer text-sm font-medium shadow-sm"
+                        className="w-full appearance-none px-4 py-2.5 bg-bg-surface/80 backdrop-blur-sm border border-border-main rounded-xl outline-none focus:border-primary cursor-pointer text-sm font-medium shadow-sm text-text-main"
                     >
-                        <option value="newest">Newest Arrivals</option>
-                        <option value="price_asc">Price: Low to High</option>
-                        <option value="price_desc">Price: High to Low</option>
-                        <option value="oldest">Oldest First</option>
+                        <option value="newest" className="bg-bg-surface">Newest Arrivals</option>
+                        <option value="price_asc" className="bg-bg-surface">Price: Low to High</option>
+                        <option value="price_desc" className="bg-bg-surface">Price: High to Low</option>
+                        <option value="oldest" className="bg-bg-surface">Oldest First</option>
                     </select>
-                    <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 </div>
 
                 <div className="flex bg-white/80 backdrop-blur-sm rounded-xl border border-white/50 p-1 shadow-sm">
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-gray-100 text-primary shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+                    className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-bg-section/50 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}
                   >
                     <FiGrid size={20} />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-gray-100 text-primary shadow-sm" : "text-gray-400 hover:text-gray-600"}`}
+                    className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-bg-section/50 text-primary shadow-sm" : "text-text-muted hover:text-text-main"}`}
                   >
                     <FiList size={20} />
                   </button>
@@ -522,7 +514,7 @@ export default function ShopPage() {
                                 viewport={{ once: true, margin: "-50px" }}
                                 transition={{ duration: 0.4 }}
                                 exit={{ opacity: 0 }}
-                                className="bg-white p-4 rounded-[2rem] border border-gray-100 flex flex-col sm:flex-row gap-6 items-start sm:items-center group hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all"
+                                className="bg-bg-surface p-4 rounded-[2rem] border border-border-main flex flex-col sm:flex-row gap-6 items-start sm:items-center group hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all"
                             >
                                  <Link href={`/product/${product.slug || product._id}`} className="block w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 bg-surface rounded-2xl overflow-hidden relative">
                                     <Image 
@@ -539,10 +531,10 @@ export default function ShopPage() {
                                                 {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "Collection")}
                                             </p>
                                              <Link href={`/product/${product.slug || product._id}`}>
-                                                <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-primary transition-colors">{product.name}</h3>
+                                                <h3 className="text-xl font-bold text-text-main mb-2 hover:text-primary transition-colors">{product.name}</h3>
                                             </Link>
                                         </div>
-                                        <span className="text-xl font-bold text-gray-900">{formatPrice(product.price)}</span>
+                                        <span className="text-xl font-bold text-text-main">{formatPrice(product.price)}</span>
                                     </div>
                                     <p className="text-gray-500 line-clamp-2 mb-4 text-sm max-w-xl">{product.description}</p>
                                     <div className="flex items-center gap-3">
@@ -552,7 +544,7 @@ export default function ShopPage() {
                                                 href={`/product/${product.slug || product._id}`} 
                                                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 flex items-center gap-2 ${
                                                     product.variants.every(v => v.stock <= 0 && !v.isPreBook && !product.isPreBook)
-                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                                        ? "bg-bg-section/50 text-text-muted cursor-not-allowed shadow-none"
                                                         : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
                                                 }`}
                                             >
@@ -570,7 +562,7 @@ export default function ShopPage() {
                                                     }}
                                                     className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-colors shadow-lg shadow-gray-900/10 active:scale-95 ${
                                                         isOutOfStock
-                                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                                            ? "bg-bg-section/50 text-text-muted cursor-not-allowed shadow-none"
                                                             : "bg-btn-dark text-btn-text hover:bg-btn-dark-hover"
                                                     }`}
                                                 >
@@ -591,9 +583,9 @@ export default function ShopPage() {
                                             </div>
                                             );
                                         })()}
-                                        <Link href={`/product/${product.slug || product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
-                                            View Details
-                                        </Link>
+                                         <Link href={`/product/${product.slug || product._id}`} className="px-6 py-2.5 rounded-xl text-sm font-bold text-text-muted hover:bg-bg-section/50 transition-colors">
+                                             View Details
+                                         </Link>
                                     </div>
                                  </div>
                             </motion.div>
@@ -608,11 +600,11 @@ export default function ShopPage() {
                         <button
                             onClick={() => fetchNextPage()}
                             disabled={isFetchingNextPage}
-                            className="bg-white border border-gray-200 text-gray-900 px-8 py-3 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                            className="bg-bg-surface border border-border-main text-text-main px-8 py-3 rounded-xl font-bold hover:bg-bg-section/50 hover:border-text-muted/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         >
                             {isFetchingNextPage ? (
                                 <span className="flex items-center gap-2">
-                                    <div className="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-text-main border-t-transparent rounded-full animate-spin"></div>
                                     Loading...
                                 </span>
                             ) : (

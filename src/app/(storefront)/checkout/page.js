@@ -527,7 +527,7 @@ export default function CheckoutPage() {
 
   if (!items.length && !isOrderPlaced) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
-      <h2 className="text-3xl font-display font-bold">Your cart is empty</h2>
+      <h2 className="text-3xl font-display font-bold text-text-main">Your cart is empty</h2>
       <Link href="/" className="bg-primary text-white px-8 py-3 rounded-2xl font-bold hover:bg-secondary transition-all">
         Back to Shop
       </Link>
@@ -535,19 +535,10 @@ export default function CheckoutPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28 lg:pt-32">
+    <main className="bg-bg-main min-h-screen pb-8 md:pb-12">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="py-4">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Cart", href: "/cart" },
-              { label: "Checkout", href: "/checkout" },
-            ]}
-          />
-        </div>
 
-        <h1 className="text-3xl md:text-4xl font-display font-bold mb-8">Checkout</h1>
+        <h1 className="text-3xl md:text-4xl font-display font-bold mb-8 text-text-main">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-7 space-y-8">
@@ -555,14 +546,14 @@ export default function CheckoutPage() {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.4 }}
-               className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100"
+               className="bg-bg-surface rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-border-main"
             >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
                     <FiTruck size={24} />
                     </div>
-                    <h2 className="text-2xl font-display font-bold">Shipping Details</h2>
+                    <h2 className="text-2xl font-display font-bold text-text-main">Shipping Details</h2>
                 </div>
                 {!showAddressForm && userInfo && addresses.length > 0 && (
                      <button 
@@ -583,11 +574,11 @@ export default function CheckoutPage() {
               {isLoadingAddresses ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-pulse">
                       {[1, 2].map((i) => (
-                          <div key={i} className="border-2 border-gray-100 rounded-2xl p-5 space-y-3">
-                              <div className="h-4 bg-gray-100 rounded w-1/3"></div>
-                              <div className="h-3 bg-gray-50 rounded w-full"></div>
-                              <div className="h-3 bg-gray-50 rounded w-2/3"></div>
-                              <div className="h-3 bg-gray-100 rounded w-1/4 mt-4"></div>
+                          <div key={i} className="border-2 border-border-main/50 rounded-2xl p-5 space-y-3">
+                              <div className="h-4 bg-bg-section/50 rounded w-1/3"></div>
+                              <div className="h-3 bg-bg-section/30 rounded w-full"></div>
+                              <div className="h-3 bg-bg-section/30 rounded w-2/3"></div>
+                              <div className="h-3 bg-bg-section/50 rounded w-1/4 mt-4"></div>
                           </div>
                       ))}
                   </div>
@@ -600,165 +591,165 @@ export default function CheckoutPage() {
                             className={`border-2 rounded-2xl p-5 cursor-pointer transition-all relative ${
                                 selectedAddressId === addr._id 
                                 ? "border-primary bg-primary/5" 
-                                : "border-gray-100 hover:border-gray-200"
+                                : "border-border-main hover:border-primary/20 bg-bg-surface"
                             } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                                 <div className="flex items-center gap-2 mb-2">
                                     {(addr.label === "Home" || !addr.label) && <FiHome className="text-primary" />}
                                     {addr.label === "Office" && <FiBriefcase className="text-primary" />}
                                     {!["Home", "Office", "", undefined].includes(addr.label) && <FiMapPin className="text-primary" />}
-                                    <span className="font-bold text-gray-900">{addr.label || "Address"}</span>
-                                    {addr.isDefault && <span className="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Default</span>}
-                                </div>
-                                <p className="font-bold text-gray-900 pr-8">{addr.name}</p>
+                                     <span className="font-bold text-text-main">{addr.label || "Address"}</span>
+                                     {addr.isDefault && <span className="bg-bg-section border border-border-main text-text-muted text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Default</span>}
+                                 </div>
+                                 <p className="font-bold text-text-main pr-8">{addr.name}</p>
                                 
                                 {addr.address1 ? (
                                     <>
-                                        <p className="text-sm text-gray-500 mt-1">
-                                            {addr.address1}
-                                            {addr.address2 ? `, ${addr.address2}` : ""}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            {addr.city}
-                                            {addr.state ? `, ${addr.state}` : ""} 
-                                            {addr.pincode ? ` - ${addr.pincode}` : ""}
-                                        </p>
+                                         <p className="text-sm text-text-muted mt-1">
+                                             {addr.address1}
+                                             {addr.address2 ? `, ${addr.address2}` : ""}
+                                         </p>
+                                         <p className="text-sm text-text-muted">
+                                             {addr.city}
+                                             {addr.state ? `, ${addr.state}` : ""} 
+                                             {addr.pincode ? ` - ${addr.pincode}` : ""}
+                                         </p>
                                     </>
                                 ) : (
-                                    <p className="text-sm text-gray-500 mt-1">{addr.address}</p>
+                                    <p className="text-sm text-text-muted mt-1">{addr.address}</p>
                                 )}
                                 
-                                <p className="text-sm text-gray-500 mt-2">{addr.phone}</p>
+                                 <p className="text-sm text-text-muted mt-2">{addr.phone}</p>
                           </div>
                       ))}
                   </div>
               ) : (
                   <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name *</label>
+                             <div className="md:col-span-2">
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Full Name *</label>
                                 <input
                                     type="text"
                                     name="name"
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="Full Name"
                                 />
                             </div>
-                              <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address *</label>
+                               <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Email Address *</label>
                                 <input
                                     type="email"
                                     name="email"
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="john@example.com"
                                     required
                                 />
                             </div>
-                             <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Phone Number *</label>
+                              <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Phone Number *</label>
                                 <input
                                     type="tel"
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="+1 (555) 000-0000"
                                 />
                             </div>
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Line 1 *</label>
+                             <div className="md:col-span-2">
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Address Line 1 *</label>
                                 <input
                                     type="text"
                                     name="address1"
                                     value={formData.address1}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="House No, Building Name"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Line 2</label>
+                             <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Address Line 2</label>
                                 <input
                                     type="text"
                                     name="address2"
                                     value={formData.address2}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="Street, Area"
                                 />
                             </div>
-                             <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Line 3</label>
+                              <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Address Line 3</label>
                                 <input
                                     type="text"
                                     name="address3"
                                     value={formData.address3}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="Landmark (Optional)"
                                 />
                             </div>
-                             <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">City *</label>
+                              <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">City *</label>
                                 <input
                                     type="text"
                                     name="city"
                                     value={formData.city}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="New York"
                                 />
                             </div>
-                             <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">State</label>
+                              <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">State</label>
                                 <input
                                     type="text"
                                     name="state"
                                     value={formData.state}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="NY"
                                 />
                             </div>
-                             <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Pincode *</label>
+                              <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Pincode *</label>
                                 <input
                                     type="text"
                                     name="pincode"
                                     value={formData.pincode}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="10001"
                                 />
                             </div>
-                             <div>
-                                <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Landmark</label>
+                              <div>
+                                 <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Landmark</label>
                                 <input
                                     type="text"
                                     name="landmark"
                                     value={formData.landmark}
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
-                                    className="w-full bg-surface border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-gray-300 disabled:opacity-50"
+                                    className="w-full bg-bg-section/30 dark:bg-bg-section/10 border border-border-main focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-text-main"
                                     placeholder="Near Central Park"
                                 />
                             </div>
                             {userInfo && (
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">Address Type</label>
+                                 <div className="md:col-span-2">
+                                     <label className="block text-sm font-bold text-text-muted uppercase tracking-wider mb-2">Address Type</label>
                                     <div className="flex gap-4">
                                         {["Home", "Office", "Other"].map(label => (
                                             <button
@@ -766,10 +757,10 @@ export default function CheckoutPage() {
                                                 onClick={() => setFormData({...formData, label})}
                                                 disabled={isSubmitting}
                                                 className={`px-6 py-3 rounded-xl font-bold border-2 transition-all ${
-                                                    formData.label === label 
-                                                    ? "border-primary bg-primary text-white" 
-                                                    : "border-gray-200 text-gray-500 hover:border-gray-300"
-                                                } disabled:opacity-50`}
+                                                     formData.label === label 
+                                                     ? "border-primary bg-primary text-white" 
+                                                     : "border-border-main text-text-muted hover:border-text-muted/30"
+                                                 } disabled:opacity-50`}
                                             >
                                                 {label}
                                             </button>
@@ -779,21 +770,21 @@ export default function CheckoutPage() {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                         <div className="flex items-center gap-4 pt-4 border-t border-border-main">
                             <button
-                                onClick={handleSaveAddress}
-                                disabled={isSubmitting}
-                                className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-black transition-colors disabled:opacity-50"
+                                 onClick={handleSaveAddress}
+                                 disabled={isSubmitting}
+                                 className="bg-btn-dark text-btn-text px-8 py-3 rounded-xl font-bold hover:bg-btn-dark-hover transition-colors disabled:opacity-50"
                             >
                                 {isSubmitting ? "Saving..." : "Save Address"}
                             </button>
                             {addresses.length > 0 && (
-                                <button
-                                    onClick={() => setShowAddressForm(false)}
-                                    className="text-gray-500 font-bold hover:text-gray-900"
-                                >
-                                    Cancel
-                                </button>
+                                 <button
+                                     onClick={() => setShowAddressForm(false)}
+                                     className="text-text-muted font-bold hover:text-text-main"
+                                 >
+                                     Cancel
+                                 </button>
                             )}
                         </div>
                   </div>
@@ -804,13 +795,13 @@ export default function CheckoutPage() {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.4, delay: 0.1 }}
-               className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100"
+               className="bg-bg-surface rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-border-main"
             >
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
                   <FiCreditCard size={24} />
                 </div>
-                <h2 className="text-2xl font-display font-bold">Payment Method</h2>
+                <h2 className="text-2xl font-display font-bold text-text-main">Payment Method</h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -826,8 +817,8 @@ export default function CheckoutPage() {
                         {paymentMethod === "COD" && <div className="w-3 h-3 bg-primary rounded-full" />}
                     </div>
                     <div className="text-left">
-                        <p className="font-bold text-gray-900">Cash on Delivery</p>
-                        <p className="text-sm text-gray-400">Pay when you receive</p>
+                        <p className="font-bold text-text-main">Cash on Delivery</p>
+                        <p className="text-sm text-text-muted">Pay when you receive</p>
                     </div>
                     </button>
                 )}
@@ -844,8 +835,8 @@ export default function CheckoutPage() {
                         {paymentMethod === "Online" && <div className="w-3 h-3 bg-primary rounded-full" />}
                     </div>
                     <div className="text-left">
-                        <p className="font-bold text-gray-900">Online Payment</p>
-                        <p className="text-sm text-gray-400">Secure Razorpay payment</p>
+                        <p className="font-bold text-text-main">Online Payment</p>
+                        <p className="text-sm text-text-muted">Secure Razorpay payment</p>
                     </div>
                     </button>
                 )}
@@ -865,14 +856,14 @@ export default function CheckoutPage() {
                initial={{ opacity: 0, x: 20 }}
                animate={{ opacity: 1, x: 0 }}
                transition={{ duration: 0.4, delay: 0.2 }}
-               className="bg-gray-900 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl sticky top-28"
+               className="bg-bg-surface rounded-[2.5rem] p-8 md:p-10 text-text-main border border-border-main shadow-2xl sticky top-28"
             >
               <h2 className="text-2xl font-display font-bold mb-8">Your Order</h2>
               
-              <div className="space-y-6 mb-8 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
+              <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {items.filter(item => item.product).map((item, i) => (
                   <div key={i} className="flex gap-4">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/10 flex-shrink-0 relative">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-bg-section/30 dark:bg-bg-section/10 flex-shrink-0 relative">
                       <Image 
                         src={item.variant?.images?.[0] || item.product?.images?.[0] || "/placeholder.png"} 
                         alt={item.product?.name || "Product"} 

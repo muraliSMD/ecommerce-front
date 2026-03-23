@@ -42,12 +42,12 @@ export default function TicketsPage() {
     createMutation.mutate(newTicket);
   };
 
-  if (isLoading) return <div className="p-8 text-center">Loading tickets...</div>;
+   if (isLoading) return <div className="p-8 text-center text-text-muted">Loading tickets...</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Support Tickets</h1>
+       <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-text-main">Support Tickets</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl font-bold hover:bg-secondary transition-colors"
@@ -56,23 +56,23 @@ export default function TicketsPage() {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+       <div className="bg-bg-surface rounded-2xl shadow-sm border border-border-main overflow-hidden">
         {tickets?.length > 0 ? (
-            <table className="w-full text-left">
-                <thead className="bg-gray-50 border-b border-gray-100">
+             <table className="w-full text-left">
+                <thead className="bg-bg-section border-b border-border-main">
                     <tr>
-                        <th className="p-4 font-bold text-gray-500 text-sm">Subject</th>
-                        <th className="p-4 font-bold text-gray-500 text-sm">Status</th>
-                        <th className="p-4 font-bold text-gray-500 text-sm">Last Update</th>
-                        <th className="p-4 font-bold text-gray-500 text-sm text-right">Action</th>
+                         <th className="p-4 font-bold text-text-muted text-sm">Subject</th>
+                        <th className="p-4 font-bold text-text-muted text-sm">Status</th>
+                        <th className="p-4 font-bold text-text-muted text-sm">Last Update</th>
+                        <th className="p-4 font-bold text-text-muted text-sm text-right">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                 <tbody>
                     {tickets.map((ticket) => (
-                        <tr key={ticket._id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                            <td className="p-4">
-                                <p className="font-bold text-gray-900">{ticket.subject}</p>
-                                <p className="text-xs text-gray-400">ID: {ticket._id.slice(-6)}</p>
+                        <tr key={ticket._id} className="border-b border-border-main/50 last:border-0 hover:bg-bg-section/30 transition-colors">
+                             <td className="p-4">
+                                <p className="font-bold text-text-main">{ticket.subject}</p>
+                                <p className="text-xs text-text-muted/60">ID: {ticket._id.slice(-6)}</p>
                             </td>
                             <td className="p-4">
                                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${
@@ -80,10 +80,10 @@ export default function TicketsPage() {
                                     ticket.status === 'In Progress' ? 'bg-blue-100 text-blue-700' :
                                     'bg-gray-100 text-gray-600'
                                 }`}>
-                                    {ticket.status}
+                                     {ticket.status}
                                 </span>
                             </td>
-                            <td className="p-4 text-sm text-gray-600">
+                            <td className="p-4 text-sm text-text-muted">
                                 {format(new Date(ticket.updatedAt), "MMM d, HH:mm")}
                             </td>
                             <td className="p-4 text-right">
@@ -99,57 +99,57 @@ export default function TicketsPage() {
                 </tbody>
             </table>
         ) : (
-            <div className="p-12 text-center text-gray-500">
+             <div className="p-12 text-center text-text-muted">
                 <p>No support tickets found.</p>
                 <button onClick={() => setIsModalOpen(true)} className="text-primary font-bold mt-2 hover:underline">Create one?</button>
             </div>
         )}
       </div>
 
-      {/* New Ticket Modal */}
+       {/* New Ticket Modal */}
       {isModalOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900">Create New Ticket</h2>
-                  <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+              <div className="bg-bg-surface rounded-2xl w-full max-w-md p-6 space-y-4 border border-border-main shadow-2xl">
+                  <h2 className="text-xl font-bold text-text-main">Create New Ticket</h2>
+                   <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
-                          <label className="block text-sm font-bold text-gray-700 mb-1">Subject</label>
+                          <label className="block text-sm font-bold text-text-muted mb-1">Subject</label>
                           <input 
                               type="text" 
                               required
-                              value={newTicket.subject}
+                               value={newTicket.subject}
                               onChange={(e) => setNewTicket({...newTicket, subject: e.target.value})}
-                              className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20"
+                              className="w-full bg-bg-surface p-3 border border-border-main rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-text-main"
                               placeholder="e.g., Order #1234 Issue"
                           />
                       </div>
-                      <div>
-                          <label className="block text-sm font-bold text-gray-700 mb-1">Priority</label>
+                       <div>
+                          <label className="block text-sm font-bold text-text-muted mb-1">Priority</label>
                           <select 
-                              value={newTicket.priority}
+                               value={newTicket.priority}
                               onChange={(e) => setNewTicket({...newTicket, priority: e.target.value})}
-                              className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 bg-white"
+                              className="w-full bg-bg-surface p-3 border border-border-main rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-text-main"
                           >
                               <option value="Low">Low</option>
                               <option value="Medium">Medium</option>
                               <option value="High">High</option>
                           </select>
                       </div>
-                      <div>
-                          <label className="block text-sm font-bold text-gray-700 mb-1">Message</label>
+                       <div>
+                          <label className="block text-sm font-bold text-text-muted mb-1">Message</label>
                           <textarea 
                               required
-                              value={newTicket.message}
+                               value={newTicket.message}
                               onChange={(e) => setNewTicket({...newTicket, message: e.target.value})}
-                              className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 h-32 resize-none"
+                              className="w-full bg-bg-surface p-3 border border-border-main rounded-xl outline-none focus:ring-2 focus:ring-primary/20 h-32 resize-none text-text-main"
                               placeholder="Describe your issue..."
                           />
                       </div>
                       <div className="flex gap-3 pt-2">
-                          <button 
+                           <button 
                               type="button" 
                               onClick={() => setIsModalOpen(false)}
-                              className="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-gray-600 hover:bg-gray-50"
+                              className="flex-1 py-3 rounded-xl border border-border-main font-bold text-text-muted hover:bg-bg-section/50"
                           >
                               Cancel
                           </button>

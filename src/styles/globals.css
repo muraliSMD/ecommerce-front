@@ -7,17 +7,20 @@
   --color-secondary: oklch(0.65 0.22 310); /* Vibrant Magenta/Pink */
   --color-accent: oklch(0.85 0.15 180); /* Teal/Cyan */
 
-  --color-surface: oklch(0.99 0.005 260); /* Very light cool gray */
-  --color-surface-dark: oklch(0.96 0.01 260);
-
-  /* Global UI Tokens */
-  --color-bg-section: #dbeafe; /* Primary section background like on Shop view */
-  --color-bg-card: #ffffff;
-  --color-text-main: #111827;
-  --color-text-muted: #6b7280;
-  --color-btn-dark: #111827;
-  --color-btn-dark-hover: oklch(0.55 0.25 260);
-  --color-btn-text: #ffffff;
+  /* Global UI Tokens using CSS Variables */
+  --color-bg-main: var(--bg-main);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-section: var(--bg-section);
+  --color-bg-card: var(--bg-card);
+  
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  
+  --color-border-main: var(--border-main);
+  
+  --color-btn-dark: var(--btn-dark);
+  --color-btn-dark-hover: var(--btn-dark-hover);
+  --color-btn-text: var(--btn-text);
 
   --font-sans: var(--font-open-sans), "Open Sans", ui-sans-serif, system-ui;
   --font-display:
@@ -36,6 +39,20 @@
 }
 
 :root {
+  --bg-main: oklch(0.99 0.005 260);
+  --bg-surface: oklch(0.99 0.005 260);
+  --bg-section: #dbeafe;
+  --bg-card: #ffffff;
+  
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  
+  --border-main: #f3f4f6;
+  
+  --btn-dark: #111827;
+  --btn-dark-hover: oklch(0.55 0.25 260);
+  --btn-text: #ffffff;
+
   --bg-gradient: linear-gradient(
     135deg,
     oklch(0.99 0.005 260) 0%,
@@ -46,9 +63,35 @@
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
+.dark {
+  --bg-main: oklch(0.15 0.02 260);
+  --bg-surface: oklch(0.18 0.02 260);
+  --bg-section: oklch(0.2 0.04 260);
+  --bg-card: oklch(0.22 0.02 260);
+  
+  --text-main: oklch(0.95 0.01 260);
+  --text-muted: oklch(0.7 0.02 260);
+  
+  --border-main: oklch(0.25 0.02 260);
+  
+  --btn-dark: oklch(0.95 0.01 260);
+  --btn-dark-hover: oklch(0.85 0.05 260);
+  --btn-text: oklch(0.15 0.02 260);
+
+  --bg-gradient: linear-gradient(
+    135deg,
+    oklch(0.15 0.02 260) 0%,
+    oklch(0.1 0.03 280) 100%
+  );
+  --glass-bg: rgba(20, 20, 30, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
 body {
-  background: var(--bg-gradient);
-  color: oklch(0.2 0.03 260);
+  background: var(--bg-main); /* Fallback to bg-main, gradient can be applied to a wrapper or here if handled carefully */
+  background-image: var(--bg-gradient);
+  color: var(--text-main);
   font-family: var(--font-sans);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;

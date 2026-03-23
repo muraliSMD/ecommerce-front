@@ -12,9 +12,9 @@ export default function Breadcrumbs({ items }) {
 
   if (items) {
     return (
-      <div className="container mx-auto px-4 md:px-8 py-2">
+      <div className="container mx-auto px-4 md:px-8 py-2 border-b border-border-main/30">
         <nav aria-label="Breadcrumb" className="text-sm">
-          <ol className="flex items-center gap-2 text-gray-500 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
+          <ol className="flex items-center gap-2 text-text-muted overflow-x-auto flex-nowrap md:flex-wrap pb-1 scroll-smooth scrollbar-hide">
             {items.map((item, idx) => {
               const isLast = idx === items.length - 1;
               // Truncate only if it's not the first few items or if label is very long
@@ -28,7 +28,7 @@ export default function Breadcrumbs({ items }) {
                       {displayLabel}
                     </Link>
                   ) : (
-                    <span className="text-gray-900 font-medium whitespace-nowrap">{displayLabel}</span>
+                    <span className="text-text-main font-medium whitespace-nowrap">{displayLabel}</span>
                   )}
                 </li>
               );
@@ -40,28 +40,35 @@ export default function Breadcrumbs({ items }) {
   }
 
   // split path into parts
-  const segments = pathname.split("/").filter(Boolean);
-
-  return (
-    <div className="container mx-auto px-4 md:px-8 py-2">
-      <nav aria-label="Breadcrumb" className="text-sm">
-        <ol className="flex items-center gap-2 text-gray-500 overflow-x-auto flex-nowrap md:flex-wrap pb-1 no-scrollbar">
-          {/* Always render Home first */}
-          <li>
-            <Link href="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-          </li>
-
-          {segments.map((segment, idx) => {
-            const href = "/" + segments.slice(0, idx + 1).join("/");
-            const isLast = idx === segments.length - 1;
-            
-            let label = decodeURIComponent(segment)
-              .replace(/-/g, " ")
-              .replace(/\b\w/g, (l) => l.toUpperCase());
-            
-            label = truncate(label, isLast ? 20 : 25);
+    const segments = pathname.split("/").filter(Boolean);
+  
+    // Mapping for segments that don't have direct pages or should point elsewhere
+    const segmentMapping = {
+      product: { href: "/shop", label: "Shop" },
+      account: { href: "/account", label: "My Account" },
+    };
+  
+    return (
+      <div className="container mx-auto px-4 md:px-8 py-2 border-b border-border-main/30">
+        <nav aria-label="Breadcrumb" className="text-sm">
+          <ol className="flex items-center gap-2 text-text-muted overflow-x-auto flex-nowrap md:flex-wrap pb-1 scroll-smooth scrollbar-hide">
+            {/* Always render Home first */}
+            <li>
+              <Link href="/" className="hover:text-primary transition-colors">
+                Home
+              </Link>
+            </li>
+  
+            {segments.map((segment, idx) => {
+              const mapping = segmentMapping[segment.toLowerCase()];
+              const href = mapping ? mapping.href : "/" + segments.slice(0, idx + 1).join("/");
+              const isLast = idx === segments.length - 1;
+              
+              let label = mapping ? mapping.label : decodeURIComponent(segment)
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase());
+              
+              label = truncate(label, isLast ? 20 : 25);
 
             return (
               <li key={idx} className="flex items-center gap-1 flex-shrink-0">
@@ -71,7 +78,7 @@ export default function Breadcrumbs({ items }) {
                     {label}
                   </Link>
                 ) : (
-                  <span className="text-gray-900 font-medium whitespace-nowrap">{label}</span>
+                  <span className="text-text-main font-medium whitespace-nowrap">{label}</span>
                 )}
               </li>
             );

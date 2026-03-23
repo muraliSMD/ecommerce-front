@@ -4,6 +4,7 @@ import QueryProvider from "./QueryProvider";
 import { Montserrat, Open_Sans } from "next/font/google";
 import SettingsInitializer from "@/components/SettingsInitializer";
 import GlobalOverlays from "@/components/GlobalOverlays";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -83,24 +84,26 @@ export default async function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://api.razorpay.com" />
       </head>
       <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-bg-main min-h-screen antialiased`} suppressHydrationWarning={true}>
-        <QueryProvider>
-          <SettingsInitializer />
-          <PwaManager />
-          <GlobalOverlays />
-          <ScriptManager scripts={settings.scripts} />
-          <OrganizationJsonLd 
-            siteName={settings.siteName || "GRABSZY"}
-            logo={settings.logo || `${siteUrl}/logo.png`}
-            url={siteUrl}
-            supportEmail={settings.supportEmail}
-          />
-          <WebSiteJsonLd 
-            siteName={settings.siteName || "GRABSZY"}
-            url={siteUrl}
-          />
-          {children}
-          <Toaster position="top-right" />   
-        </QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>
+            <SettingsInitializer />
+            <PwaManager />
+            <GlobalOverlays />
+            <ScriptManager scripts={settings.scripts} />
+            <OrganizationJsonLd 
+              siteName={settings.siteName || "GRABSZY"}
+              logo={settings.logo || `${siteUrl}/logo.png`}
+              url={siteUrl}
+              supportEmail={settings.supportEmail}
+            />
+            <WebSiteJsonLd 
+              siteName={settings.siteName || "GRABSZY"}
+              url={siteUrl}
+            />
+            {children}
+            <Toaster position="top-right" />   
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

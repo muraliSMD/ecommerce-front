@@ -9,9 +9,9 @@ import Image from "next/image";
 export default function Footer() {
   const settings = useSettingsStore((state) => state.settings);
   return (
-    <footer className="relative bg-surface mt-20 pt-20 pb-10 overflow-hidden">
+    <footer className="relative bg-bg-main mt-20 pt-20 pb-10 overflow-hidden">
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border-main to-transparent" />
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-secondary/5 rounded-full blur-[100px] pointer-events-none" />
 
@@ -37,18 +37,18 @@ export default function Footer() {
                 <div className="bg-gradient-to-br from-primary to-secondary w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 transform group-hover:scale-110 transition-transform duration-300">
                     <span className="text-white font-bold text-lg">{settings?.siteName?.charAt(0) || "G"}</span>
                 </div>
-                <span className="text-2xl font-display font-bold tracking-tight text-gray-900 group-hover:text-primary transition-colors">
+                  <span className="text-2xl font-display font-bold tracking-tight text-text-main group-hover:text-primary transition-colors">
                     {settings?.siteName || "GRABSZY"}
                 </span>
                 </>
               )}
             </Link>
-            <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+            <p className="text-text-muted leading-relaxed text-sm md:text-base">
               Curating the finest contemporary fashion since 2024. Your destination for style, quality, and conscious living.
             </p>
             <div className="flex gap-3">
               {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary hover:border-primary transition-all shadow-sm hover:shadow-lg hover:shadow-primary/30" aria-label={Icon.name}>
+                <a key={i} href="#" className="w-10 h-10 rounded-full bg-bg-surface border border-border-main flex items-center justify-center text-text-muted hover:text-white hover:bg-primary hover:border-primary transition-all shadow-sm hover:shadow-lg hover:shadow-primary/30" aria-label={Icon.name}>
                   <Icon size={18} />
                 </a>
               ))}
@@ -57,8 +57,8 @@ export default function Footer() {
 
           {/* Links Column 1 */}
           <div>
-            <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">Collections</h4>
-            <ul className="space-y-4 text-gray-600 text-sm md:text-base">
+            <h4 className="font-display font-bold text-text-main mb-6 text-lg">Collections</h4>
+            <ul className="space-y-4 text-text-muted text-sm md:text-base">
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">New Arrivals</Link></li>
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Best Sellers</Link></li>
               <li><Link href="/shop" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Summer &apos;26</Link></li>
@@ -69,8 +69,8 @@ export default function Footer() {
 
           {/* Links Column 2 */}
           <div>
-            <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">Customer Care</h4>
-            <ul className="space-y-4 text-gray-600 text-sm md:text-base">
+            <h4 className="font-display font-bold text-text-main mb-6 text-lg">Customer Care</h4>
+            <ul className="space-y-4 text-text-muted text-sm md:text-base">
               <li><Link href="/account/orders" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Track Order</Link></li>
               <li><Link href="/shipping-policy" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Shipping Policy</Link></li>
               <li><Link href="/returns-and-exchange" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Returns & Exchanges</Link></li>
@@ -80,22 +80,22 @@ export default function Footer() {
 
           {/* Contact Column */}
           <div>
-            <h4 className="font-display font-bold text-gray-900 mb-6 text-lg">{settings?.siteName || "GRABSZY"} HQ</h4>
-            <p className="text-gray-600 leading-relaxed mb-4 text-sm md:text-base whitespace-pre-line">
+            <h4 className="font-display font-bold text-text-main mb-6 text-lg">{settings?.siteName || "GRABSZY"} HQ</h4>
+            <p className="text-text-muted leading-relaxed mb-4 text-sm md:text-base whitespace-pre-line">
               {settings?.address || "54/1 Ottar Street\nOmalur, Salem 636455"}
             </p>
-            <a href={`mailto:${settings?.supportEmail || "support@grabszy.com"}`} className="text-gray-900 font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">
+            <a href={`mailto:${settings?.supportEmail || "support@grabszy.com"}`} className="text-text-main font-bold underline decoration-primary decoration-2 underline-offset-4 hover:text-primary transition-colors">
               {settings?.supportEmail || "support@grabszy.com"}
             </a>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-gray-400">
+        <div className="pt-8 border-t border-border-main flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-text-muted">
           <p>© {new Date().getFullYear()} {settings?.siteName || "GRABSZY"}. All rights reserved.</p>
           <div className="flex gap-8">
-            <Link href="/privacy-policy" className="hover:text-gray-900 transition-colors">Privacy Policy</Link>
-            <Link href="/terms-of-service" className="hover:text-gray-900 transition-colors">Terms of Service</Link>
+            <Link href="/privacy-policy" className="hover:text-text-main transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="hover:text-text-main transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

@@ -73,12 +73,12 @@ export default function AccountOverview() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-6">
-        <h1 className="text-3xl font-display font-bold text-gray-900">Dashboard</h1>
+       <div className="flex items-center gap-6">
+        <h1 className="text-2xl font-display font-bold text-text-main">Dashboard</h1>
       </div>
 
-      {/* Welcome Banner & Avatar */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-[2.5rem] p-8 md:p-10 text-white relative overflow-hidden flex flex-col md:flex-row items-center gap-8 shadow-2xl shadow-gray-900/20">
+       {/* Welcome Banner & Avatar */}
+      <div className="bg-bg-surface-dark rounded-[2.5rem] p-8 md:p-10 text-white relative overflow-hidden flex flex-col md:flex-row items-center gap-8 shadow-2xl">
         <div className="relative group shrink-0">
             <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white/20 overflow-hidden relative bg-white/10">
                 {userInfo?.image ? (
@@ -103,13 +103,13 @@ export default function AccountOverview() {
             {isUploading && <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full"><div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>}
         </div>
         
-        <div className="relative z-10 text-center md:text-left flex-1">
+         <div className="relative z-10 text-center md:text-left flex-1">
             <h2 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, {userInfo?.name}!</h2>
-            <p className="text-gray-300 mb-6 max-w-lg mx-auto md:mx-0">
+            <p className="text-white/70 mb-6 max-w-lg mx-auto md:mx-0">
                 Manage your profile, check your order status, and update your shipping information all in one place.
             </p>
             <div className="flex gap-3 justify-center md:justify-start">
-                <Link href="/shop" className="bg-white text-gray-900 px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors inline-block shadow-lg">
+                 <Link href="/shop" className="bg-white text-gray-900 px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors inline-block shadow-lg">
                     Start Shopping
                 </Link>
                 <Link href="/account/orders" className="bg-white/10 text-white border border-white/20 px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-colors inline-block">
@@ -121,28 +121,28 @@ export default function AccountOverview() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link href="/account/orders" className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-            <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+         <Link href="/account/orders" className="bg-bg-surface p-8 rounded-[2rem] border border-border-main shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
+            <div className="w-14 h-14 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <FiPackage size={28} />
             </div>
-            <h3 className="font-bold text-gray-900 text-xl mb-2">Orders</h3>
-            <p className="text-gray-500">Track, return, and buy things again</p>
+            <h3 className="font-bold text-text-main text-xl mb-2">Orders</h3>
+            <p className="text-text-muted text-sm">Track, return, and buy things again</p>
         </Link>
         
-        <Link href="/wishlist" className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-            <div className="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+         <Link href="/wishlist" className="bg-bg-surface p-8 rounded-[2rem] border border-border-main shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
+            <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <FiHeart size={28} />
             </div>
-            <h3 className="font-bold text-gray-900 text-xl mb-2">Wishlist</h3>
-            <p className="text-gray-500">Your favorite items saved for later</p>
+            <h3 className="font-bold text-text-main text-xl mb-2">Wishlist</h3>
+            <p className="text-text-muted text-sm">Your favorite items saved for later</p>
         </Link>
 
-        <Link href="/account/addresses" className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
-            <div className="w-14 h-14 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+         <Link href="/account/addresses" className="bg-bg-surface p-8 rounded-[2rem] border border-border-main shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group">
+            <div className="w-14 h-14 bg-purple-500/10 text-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <FiMapPin size={28} />
             </div>
-            <h3 className="font-bold text-gray-900 text-xl mb-2">Addresses</h3>
-            <p className="text-gray-500">Manage shipping addresses</p>
+            <h3 className="font-bold text-text-main text-xl mb-2">Addresses</h3>
+            <p className="text-text-muted text-sm">Manage shipping addresses</p>
         </Link>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FiShield, FiLock, FiEye, FiFileText } from "react-icons/fi";
 import { motion } from "framer-motion";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function PrivacyPolicyPage() {
   const policyHighlights = [
@@ -29,7 +30,8 @@ export default function PrivacyPolicyPage() {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-28 md:pt-28">
+    <div className="bg-bg-main min-h-screen pt-28 md:pt-28">
+      <Breadcrumbs />
       {/* Header */}
       <section className="bg-gray-900 text-white py-20 relative overflow-hidden text-center">
         <div className="absolute inset-0 z-0 opacity-10">
@@ -41,8 +43,8 @@ export default function PrivacyPolicyPage() {
           />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Privacy Policy</h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto italic">
+          <h1 className="text-3xl md:text-4xl font-display font-bold mb-4">Privacy Policy</h1>
+          <p className="text-text-muted text-lg max-w-xl mx-auto italic">
             Your privacy is critically important to us.
           </p>
         </div>
@@ -50,7 +52,7 @@ export default function PrivacyPolicyPage() {
 
       <section className="py-16 -mt-10">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-black/5 p-8 md:p-16 border border-gray-100">
+          <div className="bg-bg-surface rounded-[2.5rem] shadow-xl shadow-black/5 p-8 md:p-16 border border-border-main">
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
               {policyHighlights.map((item, idx) => (
@@ -60,18 +62,18 @@ export default function PrivacyPolicyPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-gray-50 p-8 rounded-3xl text-center space-y-4 border border-gray-100/50"
+                  className="bg-bg-section/50 dark:bg-bg-section/10 p-8 rounded-3xl text-center space-y-4 border border-border-main"
                 >
                   <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto">
                     <item.icon size={28} />
                   </div>
-                  <h3 className="font-bold text-gray-900 text-lg">{item.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
+                  <h3 className="font-bold text-text-main text-lg">{item.title}</h3>
+                  <p className="text-text-muted text-sm leading-relaxed">{item.description}</p>
                 </motion.div>
               ))}
             </div>
 
-            <div className="prose prose-lg max-w-none text-gray-600 space-y-8">
+            <div className="prose prose-lg max-w-none text-text-muted space-y-8">
               <div>
                 <h2 className="text-2xl font-display font-bold text-gray-900 mb-4">1. Information We Collect</h2>
                 <p>

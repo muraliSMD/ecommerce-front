@@ -28,18 +28,18 @@ const CollectionSlider = ({ collection }) => {
 
   return (
     <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
-      <div className="bg-[#eef2ff] rounded-[2.5rem] p-6 md:p-8 border border-indigo-200 shadow-sm relative overflow-hidden">
+      <div className="bg-bg-section/50 dark:bg-bg-section/10 rounded-[2.5rem] p-6 md:p-8 border border-border-main shadow-sm relative overflow-hidden">
         <div className="flex justify-between items-center mb-6 px-2">
           <div>
-            <h2 className="text-xl md:text-2xl font-display font-bold text-gray-900">
+            <h2 className="text-xl md:text-2xl font-display font-bold text-text-main">
               {collection.name}
             </h2>
-            {collection.description && <p className="text-gray-500 text-sm mt-1 max-w-xl">{collection.description}</p>}
+            {collection.description && <p className="text-text-muted text-sm mt-1 max-w-xl">{collection.description}</p>}
           </div>
           <div className="flex items-center gap-2">
             <button 
               onClick={() => scroll('left')}
-              className="w-10 h-10 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm active:scale-95"
+              className="w-10 h-10 bg-bg-surface text-text-main rounded-full flex items-center justify-center hover:bg-bg-section transition-colors shadow-sm active:scale-95 border border-border-main"
               aria-label="Scroll collections left"
               title="Scroll Left"
             >
@@ -47,7 +47,7 @@ const CollectionSlider = ({ collection }) => {
             </button>
             <button 
               onClick={() => scroll('right')}
-              className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
+              className="w-10 h-10 bg-btn-dark text-btn-text rounded-full flex items-center justify-center hover:bg-btn-dark-hover transition-colors shadow-lg active:scale-95"
               aria-label="Scroll collections right"
               title="Scroll Right"
             >
@@ -135,21 +135,21 @@ export default function Home() {
   });
 
   return (
-    <main className="bg-surface min-h-screen pt-28 md:pt-32">
+    <main className="bg-bg-main min-h-screen">
       <h1 className="sr-only">GRABSZY | Premium Clothing & Lifestyle - Online Fashion Store</h1>
       <HeroSlider />
 
       {/* Categories Section */}
       <section className="container mx-auto py-6 md:py-10 px-4 md:px-8">
-        <div className="bg-[#bfdbfe] rounded-[2.5rem] p-6 md:p-8 border border-blue-300 shadow-sm relative overflow-hidden">
+        <div className="bg-bg-section rounded-[2.5rem] p-6 md:p-8 border border-border-main shadow-sm relative overflow-hidden">
           <div className="flex justify-between items-center mb-6 px-2">
-            <h2 className="text-xl md:text-2xl font-display font-bold text-gray-900">
+            <h2 className="text-xl md:text-2xl font-display font-bold text-text-main">
               Shop by Category
             </h2>
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => scrollCategories('left')}
-                className="w-10 h-10 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-sm active:scale-95"
+                className="w-10 h-10 bg-bg-surface text-text-main rounded-full flex items-center justify-center hover:bg-bg-section transition-colors shadow-sm active:scale-95 border border-border-main"
                 aria-label="Scroll categories left"
                 title="Scroll Left"
               >
@@ -157,7 +157,7 @@ export default function Home() {
               </button>
               <button 
                 onClick={() => scrollCategories('right')}
-                className="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-primary transition-colors shadow-lg active:scale-95"
+                className="w-10 h-10 bg-btn-dark text-btn-text rounded-full flex items-center justify-center hover:bg-btn-dark-hover transition-colors shadow-lg active:scale-95"
                 aria-label="Scroll categories right"
                 title="Scroll Right"
               >
@@ -168,7 +168,7 @@ export default function Home() {
           
           {isCategoriesLoading ? (
             <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4 snap-x">
-                 {[...Array(8)].map((_, i) => <div key={i} className="min-w-[68px] md:min-w-[92px] aspect-square bg-white/50 rounded-2xl animate-pulse"></div>)}
+                 {[...Array(8)].map((_, i) => <div key={i} className="min-w-[68px] md:min-w-[92px] aspect-square bg-bg-surface/50 rounded-2xl animate-pulse"></div>)}
             </div>
           ) : (
             <div 
@@ -185,7 +185,7 @@ export default function Home() {
                     transition={{ delay: i * 0.05 }}
                     className="space-y-3 w-full"
                 >
-                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all bg-white">
+                     <div className="relative w-full aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all bg-bg-surface">
                         {cat.image ? (
                             <Image 
                             src={cat.image} 
@@ -195,12 +195,12 @@ export default function Home() {
                             className="object-cover transition-transform duration-700 group-hover:scale-110" 
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-white text-gray-400 font-bold text-lg text-center p-2">
+                            <div className="w-full h-full flex items-center justify-center bg-bg-surface text-text-muted font-bold text-lg text-center p-2">
                                 {cat.name}
                             </div>
                         )}
                     </div>
-                    <h3 title={cat.name} className="text-sm md:text-base font-bold text-gray-900 text-center truncate group-hover:text-primary transition-colors w-full">{cat.name}</h3>
+                    <h3 title={cat.name} className="text-sm md:text-base font-bold text-text-main text-center truncate group-hover:text-primary transition-colors w-full">{cat.name}</h3>
                 </motion.div>
                 </Link>
             ))}
@@ -211,7 +211,7 @@ export default function Home() {
 
       {/* Featured Products Section */}
       {featuredProducts?.length > 0 && (
-          <section className="bg-white py-6 md:py-10">
+          <section className="bg-bg-surface/50 dark:bg-bg-surface/10 py-6 md:py-10">
             <div className="container mx-auto px-4 md:px-8">
                 <div className="text-center mb-8">
                     <span className="text-primary font-bold tracking-widest uppercase text-xs md:text-sm">Don&apos;t Miss Out</span>
@@ -220,7 +220,7 @@ export default function Home() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
-                        className="text-2xl md:text-3xl font-display font-bold mt-2 text-gray-900"
+                        className="text-2xl md:text-3xl font-display font-bold mt-2 text-text-main"
                     >
                         Featured Products
                     </motion.h2>

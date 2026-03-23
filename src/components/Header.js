@@ -8,6 +8,7 @@ import { useState, useEffect, Fragment } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useUserStore } from "@/store/userStore";
+import { ThemeToggle } from "./ThemeToggle";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { FiSearch, FiShoppingBag, FiUser, FiMenu, FiX, FiHeart, FiLogOut, FiChevronDown, FiChevronRight, FiGrid } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -131,14 +132,14 @@ export default function Header() {
     }
   };
 
-  const logoColor = "text-gray-900";
-  const iconColor = "text-gray-600";
+   const logoColor = "text-text-main";
+   const iconColor = "text-text-muted";
 
   return (
     <>
     <header 
       onMouseLeave={() => setActiveCategory(null)}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white shadow-sm border-b border-gray-100 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-bg-surface shadow-sm border-b border-border-main ${
         isScrolled ? "py-1" : "py-2"
       }`}
     >
@@ -149,7 +150,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="relative z-50 flex-shrink-0">
             {settings?.logo ? (
-                <div className="relative h-16 w-44 lg:h-24 lg:w-64">
+                <div className="relative h-12 w-32 lg:h-24 lg:w-64">
                     <Image 
                         src={settings.logo} 
                         alt={settings.siteName || "Logo"} 
@@ -171,7 +172,7 @@ export default function Header() {
           <div className="hidden lg:flex flex-1 max-w-2xl relative group">
             <form onSubmit={handleSearch} className="relative w-full">
               <div className="relative flex items-center w-full">
-                <FiSearch size={20} className="absolute left-4 text-gray-400" />
+                 <FiSearch size={20} className="absolute left-4 text-text-muted" />
                 <input
                   type="text"
                   placeholder="Try Saree, Kurti or Search by Product Code"
@@ -179,31 +180,31 @@ export default function Header() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsInputFocused(true)}
                   onBlur={() => setTimeout(() => setIsInputFocused(false), 200)}
-                  className="w-full pl-12 pr-4 py-2.5 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-sm"
+                  className="w-full pl-12 pr-4 py-2.5 rounded-md border border-border-main bg-bg-surface focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all text-sm text-text-main"
                 />
               </div>
             </form>
 
             <AnimatePresence>
                 {isInputFocused && searchQuery.length > 2 && (
-                    <motion.div
+                     <motion.div
                         key="search-preview-results"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute top-full left-0 w-full bg-white rounded-b-md shadow-xl border border-gray-100 mt-0 overflow-hidden z-[60]"
+                        className="absolute top-full left-0 w-full bg-bg-surface rounded-b-md shadow-xl border border-border-main mt-0 overflow-hidden z-[60]"
                     >
-                        {isLoadingSearch ? (
-                            <div className="p-4 text-center text-gray-400 text-sm">Searching...</div>
+                         {isLoadingSearch ? (
+                            <div className="p-4 text-center text-text-muted text-sm">Searching...</div>
                         ) : searchResults?.length > 0 ? (
                             <ul>
                                 {searchResults.map((product) => product && (
-                                    <li key={product._id}>
+                                     <li key={product._id}>
                                         <Link 
                                             href={`/product/${product.slug || product._id}`}
-                                            className="flex items-center gap-4 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
+                                            className="flex items-center gap-4 p-3 hover:bg-bg-section/50 transition-colors border-b border-border-main/50 last:border-0"
                                         >
-                                            <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden relative flex-shrink-0">
+                                             <div className="w-10 h-10 bg-bg-section rounded overflow-hidden relative flex-shrink-0">
                                                 <Image 
                                                     src={product.images?.[0] || product.variants?.[0]?.images?.[0] || "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=2070"} 
                                                     alt={product.name} 
@@ -213,23 +214,23 @@ export default function Header() {
                                                 />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="text-xs font-bold text-gray-900 truncate">{product.name}</h4>
+                                                <h4 className="text-xs font-bold text-text-main truncate">{product.name}</h4>
                                                 <p className="text-xs text-primary font-bold">{settings?.currency} {product.price}</p>
                                             </div>
                                         </Link>
                                     </li>
                                 ))}
                                 <li>
-                                    <Link 
+                                     <Link 
                                         href={`/shop?search=${encodeURIComponent(searchQuery)}`}
-                                        className="block text-center py-2 text-xs font-bold text-primary hover:bg-gray-50 transition-colors"
+                                        className="block text-center py-2 text-xs font-bold text-primary hover:bg-bg-section/50 transition-colors"
                                     >
                                         View All Results
                                     </Link>
                                 </li>
                             </ul>
-                        ) : (
-                            <div className="p-4 text-center text-gray-400 text-sm">
+                         ) : (
+                            <div className="p-4 text-center text-text-muted text-sm">
                                 No products found.
                             </div>
                         )}
@@ -239,7 +240,8 @@ export default function Header() {
           </div>
 
           {/* Desktop Actions (Labeled) */}
-          <div className="hidden lg:flex items-center gap-10 ml-auto">
+          <div className="hidden lg:flex items-center gap-6 ml-auto">
+            <ThemeToggle />
             {/* Notifications */}
             {user && (
               <div className="flex flex-col items-center group relative">
@@ -252,25 +254,25 @@ export default function Header() {
             <div className="relative group flex flex-col items-center">
               {user ? (
                 <>
-                  <Link href={user.role === 'admin' ? '/admin' : '/account'} className="flex flex-col items-center group">
-                    <FiUser size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
+                   <Link href={user.role === 'admin' ? '/admin' : '/account'} className="flex flex-col items-center group">
+                    <FiUser size={24} className="text-text-main group-hover:text-primary transition-colors" />
                   </Link>
-                  <div className="absolute top-full right-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50">
-                      <div className="bg-white rounded shadow-xl border border-gray-100 p-2 w-48 overflow-hidden">
-                          <div className="px-4 py-3 border-b border-gray-100 mb-2 text-center">
-                              <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
-                              <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                   <div className="absolute top-full right-0 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right z-50">
+                      <div className="bg-bg-surface rounded shadow-xl border border-border-main p-2 w-48 overflow-hidden">
+                          <div className="px-4 py-3 border-b border-border-main mb-2 text-center">
+                              <p className="text-sm font-bold text-text-main truncate">{user.name}</p>
+                              <p className="text-xs text-text-muted truncate">{user.email}</p>
                           </div>
-                          <Link href="/account" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors">
+                           <Link href="/account" className="flex items-center gap-2 px-4 py-2 text-xs text-text-muted hover:bg-bg-section/50 hover:text-primary transition-colors">
                               <FiGrid size={12} /> Dashboard
                           </Link>
-                          <Link href="/account/profile" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors">
+                          <Link href="/account/profile" className="flex items-center gap-2 px-4 py-2 text-xs text-text-muted hover:bg-bg-section/50 hover:text-primary transition-colors">
                               <FiUser size={12} /> My Profile
                           </Link>
-                          <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-xs text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors">
+                          <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-xs text-text-muted hover:bg-bg-section/50 hover:text-primary transition-colors">
                               <FiHeart size={12} /> Wishlist ({wishlistCount})
                           </Link>
-                          <button onClick={async () => { await logout(); router.refresh(); }} className="w-full flex items-center gap-2 px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors text-left mt-1 border-t border-gray-50">
+                           <button onClick={async () => { await logout(); router.refresh(); }} className="w-full flex items-center gap-2 px-4 py-2 text-xs text-red-500 hover:bg-red-500/10 transition-colors text-left mt-1 border-t border-border-main/50">
                               <FiLogOut size={12} /> Logout
                           </button>
                       </div>
@@ -281,7 +283,7 @@ export default function Header() {
                   onClick={() => setAuthModalOpen(true, "login")}
                   className="flex flex-col items-center group"
                 >
-                  <FiUser size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
+                  <FiUser size={24} className="text-text-main group-hover:text-primary transition-colors" />
                 </button>
               )}
             </div>
@@ -289,7 +291,7 @@ export default function Header() {
             {/* Wishlist */}
             <Link href="/wishlist" className="flex flex-col items-center group relative">
               <div className="relative">
-                <FiHeart size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
+                <FiHeart size={24} className="text-text-main group-hover:text-primary transition-colors" />
                 {wishlistCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                     {wishlistCount}
@@ -301,7 +303,7 @@ export default function Header() {
             {/* Cart */}
             <Link href="/cart" className="flex flex-col items-center group relative">
               <div className="relative">
-                <FiShoppingBag size={24} className="text-gray-700 group-hover:text-primary transition-colors" />
+                <FiShoppingBag size={24} className="text-text-main group-hover:text-primary transition-colors" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                     {cartCount}
@@ -312,10 +314,11 @@ export default function Header() {
           </div>
 
           {/* Mobile Actions */}
-          <div className="flex lg:hidden items-center gap-4 ml-auto">
+          <div className="flex lg:hidden items-center gap-2 sm:gap-4 ml-auto">
+            <ThemeToggle />
             <button
                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="p-1 text-gray-700"
+                className="p-1 text-text-main"
                 aria-label="Search"
             >
                 <FiSearch size={22} />
@@ -328,7 +331,7 @@ export default function Header() {
             )}
 
             <Link href="/wishlist" className="relative p-1" aria-label={`Wishlist with ${wishlistCount} items`}>
-              <FiHeart size={22} className="text-gray-700" />
+              <FiHeart size={22} className="text-text-main" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                   {wishlistCount}
@@ -337,7 +340,7 @@ export default function Header() {
             </Link>
 
             <Link href="/cart" className="relative p-1" aria-label={`Cart with ${cartCount} items`}>
-              <FiShoppingBag size={22} className="text-gray-700" />
+              <FiShoppingBag size={22} className="text-text-main" />
               {cartCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                   {cartCount}
@@ -347,7 +350,7 @@ export default function Header() {
 
             <button 
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-1 text-gray-700"
+                className="p-1 text-text-main"
                 aria-label="Open Menu"
             >
                 <FiMenu size={24} />
@@ -355,11 +358,11 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Bottom Section - Category Navigation */}
-        <nav className="hidden lg:flex items-center justify-between border-t border-gray-50">
+         {/* Bottom Section - Category Navigation */}
+        <nav className="hidden lg:flex items-center justify-between border-t border-border-main/50">
           <ul className="flex items-center gap-6 overflow-x-auto no-scrollbar py-2">
             <li className="flex-shrink-0">
-               <Link href="/" className={`text-sm font-medium whitespace-nowrap text-gray-700 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary pb-1`}>
+               <Link href="/" className={`text-sm font-medium whitespace-nowrap text-text-main hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary pb-1`}>
                  All
                </Link>
             </li>
@@ -371,14 +374,14 @@ export default function Header() {
               >
                 <Link 
                   href={`/shop?category=${cat.slug || cat.name}`}
-                  className={`text-sm font-medium whitespace-nowrap text-gray-700 hover:text-primary transition-colors border-b-2 ${activeCategory === cat._id ? 'border-primary' : 'border-transparent'} hover:border-primary pb-1`}
+                  className={`text-sm font-medium whitespace-nowrap text-text-main hover:text-primary transition-colors border-b-2 ${activeCategory === cat._id ? 'border-primary' : 'border-transparent'} hover:border-primary pb-1`}
                 >
                   {cat.name}
                 </Link>
               </li>
             ))}
             <li className="flex-shrink-0">
-               <Link href="/shop" className="text-sm font-medium whitespace-nowrap text-gray-700 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary pb-1">
+               <Link href="/shop" className="text-sm font-medium whitespace-nowrap text-text-main hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary pb-1">
                  New Arrivals
                </Link>
             </li>
@@ -388,12 +391,12 @@ export default function Header() {
         {/* Mobile Search Overlay */}
         <AnimatePresence>
             {isMobileSearchOpen && (
-                <motion.div
+                     <motion.div
                     key="mobile-search-overlay"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="lg:hidden absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-md z-40 overflow-hidden"
+                    className="lg:hidden absolute top-full left-0 w-full bg-bg-surface border-t border-border-main shadow-md z-40 overflow-hidden"
                 >
                     <div className="p-4">
                         <form onSubmit={handleSearch} className="relative">
@@ -403,13 +406,13 @@ export default function Header() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 autoFocus
-                                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 rounded-md outline-none focus:ring-1 focus:ring-primary/20 text-gray-900 text-sm"
+                                className="w-full pl-10 pr-4 py-2.5 bg-bg-section/50 rounded-md outline-none focus:ring-1 focus:ring-primary/20 text-text-main text-sm"
                             />
-                            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                             <button 
                                 type="button" 
                                 onClick={() => setIsMobileSearchOpen(false)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted/50 p-1"
                                 aria-label="Close search"
                             >
                                 <FiX size={18} />
@@ -428,7 +431,7 @@ export default function Header() {
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 5 }}
-                    className="absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-2xl py-8 z-40"
+                    className="absolute top-full left-0 w-full bg-bg-surface border-t border-border-main shadow-2xl py-8 z-40"
                     onMouseEnter={() => setActiveCategory(activeCategory)}
                     onMouseLeave={() => setActiveCategory(null)}
                 >
@@ -439,28 +442,28 @@ export default function Header() {
                                 if (!cat) return null;
                                 return (
                                     <>
-                                        <div className="col-span-1">
-                                            <h3 className="font-bold text-gray-900 mb-2 text-base">{cat.name}</h3>
-                                            <p className="text-xs text-gray-500 mb-4">Discover our premium collection of {cat.name.toLowerCase()}</p>
+                                         <div className="col-span-1">
+                                            <h3 className="font-bold text-text-main mb-2 text-base">{cat.name}</h3>
+                                            <p className="text-xs text-text-muted mb-4">Discover our premium collection of {cat.name.toLowerCase()}</p>
                                             <Link href={`/shop?category=${cat.slug || cat.name}`} className="text-primary font-bold text-xs hover:underline flex items-center gap-1">
                                               View All <FiChevronRight />
                                             </Link>
                                         </div>
-                                        {cat.children?.length > 0 ? (
-                                            <div className="col-span-4 grid grid-cols-4 gap-6 border-l border-gray-50 pl-8">
+                                         {cat.children?.length > 0 ? (
+                                            <div className="col-span-4 grid grid-cols-4 gap-6 border-l border-border-main/50 pl-8">
                                                 {cat.children.map(sub => (
                                                     <div key={sub._id}>
-                                                        <Link 
+                                                         <Link 
                                                             href={`/shop?category=${sub.slug || sub.name}`} 
-                                                            className="text-gray-800 font-bold text-xs uppercase tracking-wider hover:text-primary transition-colors mb-4 block"
+                                                            className="text-text-main font-bold text-xs uppercase tracking-wider hover:text-primary transition-colors mb-4 block"
                                                         >
                                                             {sub.name}
                                                         </Link>
                                                         {sub.children?.length > 0 && (
-                                                            <ul className="space-y-2">
+                                                             <ul className="space-y-2">
                                                                 {sub.children.map(grandChild => (
                                                                     <li key={grandChild._id}>
-                                                                        <Link href={`/shop?category=${grandChild.slug || grandChild.name}`} className="text-gray-500 hover:text-primary text-xs flex items-center gap-1 group">
+                                                                        <Link href={`/shop?category=${grandChild.slug || grandChild.name}`} className="text-text-muted hover:text-primary text-xs flex items-center gap-1 group">
                                                                             <span className="w-0 group-hover:w-1 h-0.5 bg-primary transition-all"></span> {grandChild.name}
                                                                         </Link>
                                                                     </li>
@@ -470,8 +473,8 @@ export default function Header() {
                                                     </div>
                                                 ))}
                                             </div>
-                                        ) : (
-                                            <div className="col-span-4 py-4 text-center text-gray-400 text-sm">
+                                         ) : (
+                                            <div className="col-span-4 py-4 text-center text-text-muted text-sm">
                                               No subcategories found for this category.
                                             </div>
                                         )}
@@ -508,11 +511,11 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-surface z-[70] shadow-2xl flex flex-col overflow-hidden"
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-bg-surface z-[70] shadow-2xl flex flex-col overflow-hidden"
             >
-               <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                  <span className="font-display font-bold text-xl">GRABSZY.</span>
-                  <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-gray-100" aria-label="Close menu">
+               <div className="p-6 border-b border-border-main flex justify-between items-center">
+                  <span className="font-display font-bold text-xl text-text-main">GRABSZY.</span>
+                  <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-full hover:bg-bg-section/50 text-text-main" aria-label="Close menu">
                      <FiX size={24} />
                   </button>
                </div>
@@ -523,51 +526,51 @@ export default function Header() {
                       Let's hiding it or keeping it doesn't hurt. But typically if we have header search, drawer search is redundant.
                       For now I'll leave it as is to avoid confusion, or user can decide to remove.
                   */}
-                  <form onSubmit={handleSearch} className="mb-6">
+                   <form onSubmit={handleSearch} className="mb-6">
                      <div className="relative">
                         <input
                            type="text"
                            placeholder="Search products..."
                            value={searchQuery}
                            onChange={(e) => setSearchQuery(e.target.value)}
-                           className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-primary/20"
+                           className="w-full pl-10 pr-4 py-3 bg-bg-section/50 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-text-main"
                         />
-                        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                        <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                      </div>
                   </form>
 
-                  <div className="space-y-2">
-                     <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Home</Link>
+                   <div className="space-y-2">
+                     <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-text-main hover:text-primary">Home</Link>
                      <div className="py-2.5">
-                        <p className="text-lg font-bold text-gray-900 mb-2">Shop</p>
-                        <div className="pl-4 space-y-3 border-l-2 border-gray-100">
-                           <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-600">All Products</Link>
-                           {categories?.map(cat => (
+                        <p className="text-lg font-bold text-text-main mb-2">Shop</p>
+                        <div className="pl-4 space-y-3 border-l-2 border-border-main">
+                           <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="block text-text-muted hover:text-primary">All Products</Link>
+                            {categories?.map(cat => (
                                <div key={cat._id} className="space-y-1">
-                                   <Link href={`/shop?category=${cat.slug || cat.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-gray-800 font-medium flex items-center justify-between">
+                                   <Link href={`/shop?category=${cat.slug || cat.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-text-main font-medium flex items-center justify-between">
                                       {cat.name}
                                    </Link>
-                                   {cat.children?.length > 0 && (
-                                       <div className="pl-4 border-l border-gray-100 space-y-1">
+                                    {cat.children?.length > 0 && (
+                                       <div className="pl-4 border-l border-border-main space-y-1">
                                            {cat.children.map(sub => (
-                                               <Link key={sub._id} href={`/shop?category=${sub.slug || sub.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-sm text-gray-500 hover:text-primary">
+                                               <Link key={sub._id} href={`/shop?category=${sub.slug || sub.name}`} onClick={() => setIsMobileMenuOpen(false)} className="block text-sm text-text-muted hover:text-primary">
                                                   {sub.name}
                                                </Link>
                                            ))}
                                        </div>
                                    )}
-                               </div>
+                                 </div>
                            ))}
                         </div>
                      </div>
-                     <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">About</Link>
-                     <Link href="/gallery" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Gallery</Link>
-                     <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Blog</Link>
-                     <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-gray-900 hover:text-primary">Contact</Link>
+                     <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-text-main hover:text-primary">About</Link>
+                     <Link href="/gallery" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-text-main hover:text-primary">Gallery</Link>
+                     <Link href="/blog" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-text-main hover:text-primary">Blog</Link>
+                     <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)} className="block py-2.5 text-lg font-bold text-text-main hover:text-primary">Contact</Link>
                   </div>
                </div>
 
-               <div className="p-6 border-t border-gray-100 bg-gray-50/50">
+                <div className="p-6 border-t border-border-main bg-bg-section/30">
                   {user ? (
                      <div className="space-y-4">
                         <div className="flex items-center gap-3 mb-4">
@@ -575,14 +578,14 @@ export default function Header() {
                               {user.name[0]}
                            </div>
                            <div>
-                              <p className="font-bold text-gray-900">{user.name}</p>
-                              <p className="text-xs text-gray-500">{user.email}</p>
+                              <p className="font-bold text-text-main">{user.name}</p>
+                              <p className="text-xs text-text-muted">{user.email}</p>
                            </div>
                         </div>
-                        <Link href="/account/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-gray-600 p-2 hover:bg-white rounded-lg transition-colors">
+                         <Link href="/account/profile" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-text-muted p-2 hover:bg-bg-surface rounded-lg transition-colors">
                            <FiUser /> Profile
                         </Link>
-                        <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-gray-600 p-2 hover:bg-white rounded-lg transition-colors">
+                        <Link href="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-text-muted p-2 hover:bg-bg-surface rounded-lg transition-colors">
                            <FiHeart /> Wishlist ({wishlistCount})
                         </Link>
                         <button onClick={async () => { await logout(); setIsMobileMenuOpen(false); router.refresh(); }} className="flex items-center gap-3 text-red-500 p-2 hover:bg-white rounded-lg w-full transition-colors">
@@ -590,9 +593,9 @@ export default function Header() {
                         </button>
                      </div>
                   ) : (
-                     <div className="grid grid-cols-2 gap-4">
-                        <button onClick={() => { setIsMobileMenuOpen(false); setAuthModalOpen(true, "login"); }} className="flex items-center justify-center py-3 rounded-xl border border-gray-200 font-bold text-gray-900">Login</button>
-                        <button onClick={() => { setIsMobileMenuOpen(false); setAuthModalOpen(true, "signup"); }} className="flex items-center justify-center py-3 rounded-xl bg-gray-900 text-white font-bold">Register</button>
+                      <div className="grid grid-cols-2 gap-4">
+                        <button onClick={() => { setIsMobileMenuOpen(false); setAuthModalOpen(true, "login"); }} className="flex items-center justify-center py-3 rounded-xl border border-border-main font-bold text-text-main">Login</button>
+                        <button onClick={() => { setIsMobileMenuOpen(false); setAuthModalOpen(true, "signup"); }} className="flex items-center justify-center py-3 rounded-xl bg-btn-dark text-btn-text font-bold">Register</button>
                      </div>
                   )}
                </div>

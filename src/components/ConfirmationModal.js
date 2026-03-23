@@ -31,12 +31,12 @@ export default function ConfirmationModal({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-md bg-bg-surface rounded-[2.5rem] p-8 shadow-2xl overflow-hidden border border-border-main"
           >
             {/* Close Button */}
             <button 
               onClick={onClose}
-              className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-900 transition-colors"
+              className="absolute top-6 right-6 p-2 text-text-muted hover:text-text-main transition-colors"
             >
               <FiX size={24} />
             </button>
@@ -53,15 +53,15 @@ export default function ConfirmationModal({
 
               {/* Text */}
               <div className="space-y-2">
-                <h3 className="text-2xl font-display font-bold text-gray-900">{title}</h3>
-                <p className="text-gray-500 leading-relaxed px-4">{message}</p>
+                <h3 className="text-2xl font-display font-bold text-text-main">{title}</h3>
+                <p className="text-text-muted leading-relaxed px-4">{message}</p>
               </div>
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3 w-full pt-4">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-8 py-4 rounded-2xl font-bold bg-surface text-gray-600 hover:bg-gray-100 transition-all active:scale-[0.98]"
+                  className="flex-1 px-8 py-4 rounded-2xl font-bold bg-bg-section/50 text-text-main hover:bg-bg-section transition-all active:scale-[0.98] border border-border-main"
                 >
                   {cancelText}
                 </button>

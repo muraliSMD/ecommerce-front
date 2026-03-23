@@ -67,11 +67,11 @@ export default function CartPage() {
 
   if (!items.length) return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-6">
-      <div className="w-24 h-24 bg-surface rounded-full flex items-center justify-center text-gray-300">
+      <div className="w-24 h-24 bg-bg-section/50 dark:bg-bg-section/10 rounded-full flex items-center justify-center text-text-muted">
         <FiShoppingBag size={48} />
       </div>
-      <h2 className="text-3xl font-display font-bold">Your cart is empty</h2>
-      <p className="text-gray-500">Looks like you haven&apos;t added anything to your cart yet.</p>
+      <h2 className="text-3xl font-display font-bold text-text-main">Your cart is empty</h2>
+      <p className="text-text-muted">Looks like you haven&apos;t added anything to your cart yet.</p>
       <Link href="/" className="bg-primary text-white px-8 py-3 rounded-2xl font-bold hover:bg-secondary transition-all">
         Start Shopping
       </Link>
@@ -79,18 +79,10 @@ export default function CartPage() {
   );
 
   return (
-    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
+    <main className="bg-bg-main min-h-screen pb-8 md:pb-12">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="py-4">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Shopping Cart", href: "/cart" },
-            ]}
-          />
-        </div>
 
-        <h1 className="text-3xl md:text-4xl font-display font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-3xl md:text-4xl font-display font-bold mb-8 text-text-main">Shopping Cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Cart Items */}
@@ -120,21 +112,21 @@ export default function CartPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-gray-100 sticky top-28"
+              className="bg-bg-surface rounded-[2.5rem] p-8 shadow-xl shadow-black/5 border border-border-main sticky top-28"
             >
-              <h2 className="text-2xl font-display font-bold mb-8">Order Summary</h2>
+              <h2 className="text-2xl font-display font-bold mb-8 text-text-main">Order Summary</h2>
               
               <div className="space-y-4 mb-8">
-                <div className="flex justify-between text-gray-500">
+                <div className="flex justify-between text-text-muted">
                   <span>Subtotal</span>
-                  <span>{formatPrice(total)}</span>
+                  <span className="text-text-main font-bold">{formatPrice(total)}</span>
                 </div>
-                <div className="flex justify-between text-gray-500">
+                <div className="flex justify-between text-text-muted">
                   <span>Tax & Shipping</span>
-                  <span className="text-gray-400 font-medium">Calculated at checkout</span>
+                  <span className="text-text-muted font-medium italic">Calculated at checkout</span>
                 </div>
-                <div className="h-px bg-gray-100 my-4" />
-                <div className="flex justify-between text-xl font-bold text-gray-900">
+                <div className="h-px bg-border-main my-4" />
+                <div className="flex justify-between text-xl font-bold text-text-main">
                   <span>Estimated Total</span>
                   <span>{formatPrice(total)}</span>
                 </div>
@@ -172,7 +164,7 @@ export default function CartPage() {
                 Checkout Now <FiArrowRight />
               </Link>
               
-              <p className="text-center text-xs text-gray-400 mt-6 px-4">
+              <p className="text-center text-xs text-text-muted mt-6 px-4">
                 Prices are in {settings.currency}. Shipping and taxes calculated at checkout.
               </p>
             </motion.div>

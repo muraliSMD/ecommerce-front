@@ -203,3 +203,14 @@
   "userId": "698081fcc3e4cc458f359244",
   "role": "admin"
 } 
+2026-03-23 11:20:27 [[31merror[39m]: Login Error: {
+  "error": "Unexpected end of JSON input"
+} 
+SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)
+    at successSteps (node:internal/deps/undici/undici:5719:27)
+    at consumeBody (node:internal/deps/undici/undici:5725:9)
+    at NextRequest.json (node:internal/deps/undici/undici:5665:18)
+    at POST (webpack-internal:///(rsc)/./src/app/api/users/login/route.js:29:36)
+    at async AppRouteRouteModule.do (D:\projects\ecomerce-application\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:5:38696)

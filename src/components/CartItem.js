@@ -20,8 +20,8 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
   };
 
   return (
-    <div className="group bg-white rounded-[2rem] p-4 flex gap-6 items-center border border-gray-100 hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-black/5">
-      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-surface flex-shrink-0 relative">
+    <div className="group bg-bg-surface rounded-[2rem] p-4 flex gap-6 items-center border border-border-main hover:border-primary/20 transition-all hover:shadow-xl hover:shadow-black/5">
+      <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-bg-section/30 dark:bg-bg-section/10 flex-shrink-0 relative">
         <Image 
             src={image} 
             alt={item.product?.name || "Product"} 
@@ -34,7 +34,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
       <div className="flex-grow space-y-2">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-lg font-display font-bold text-gray-900 line-clamp-1">{item.product?.name || "Unknown Product"}</h3>
+            <h3 className="text-lg font-display font-bold text-text-main line-clamp-1">{item.product?.name || "Unknown Product"}</h3>
             {item.variant && (
               <p className="text-xs font-bold uppercase tracking-wider text-primary/60 mt-1 line-clamp-1">
                 {Object.entries(item.variant)
@@ -53,7 +53,7 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
           </div>
           <button 
             onClick={onRemove}
-            className="text-gray-300 hover:text-red-500 transition-colors p-2"
+            className="text-text-muted hover:text-red-500 transition-colors p-2"
           >
             <FiTrash2 size={20} />
           </button>
@@ -61,19 +61,19 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
 
         <div className="flex flex-col gap-2 pt-2">
           <div className="flex justify-between items-end">
-            <p className="text-xl font-bold text-gray-900">{formatPrice(price)}</p>
+            <p className="text-xl font-bold text-text-main">{formatPrice(price)}</p>
             
-            <div className="flex items-center bg-surface border border-gray-100 rounded-xl p-1">
+            <div className="flex items-center bg-bg-section/30 dark:bg-bg-section/10 border border-border-main rounded-xl p-1">
               <button 
                 onClick={onDecrement}
-                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-primary transition-colors"
               >
                 <FiMinus size={14} />
               </button>
-              <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
+              <span className="w-8 text-center font-bold text-sm text-text-main">{item.quantity}</span>
               <button 
                 onClick={onIncrement}
-                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-primary transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-text-muted hover:text-primary transition-colors"
               >
                 <FiPlus size={14} />
               </button>

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export const PageLoader = () => {
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-white/80 backdrop-blur-xl">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-bg-main/80 backdrop-blur-xl text-text-main">
       <div className="relative">
         {/* Animated Brand Logo */}
         <motion.div
@@ -40,15 +40,15 @@ export const SectionLoader = ({ className = "" }) => {
           borderRadius: ["20%", "50%", "20%"]
         }}
         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        className="w-10 h-10 border-4 border-gray-100 border-t-primary"
+        className="w-10 h-10 border-4 border-border-main border-t-primary"
       />
-      <p className="mt-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Fetching Data</p>
+      <p className="mt-4 text-xs font-bold text-text-muted uppercase tracking-widest">Fetching Data</p>
     </div>
   );
 };
 
 export const Skeleton = ({ className = "" }) => {
   return (
-    <div className={`animate-pulse bg-gray-100 rounded-2xl ${className}`} />
+    <div className={`animate-pulse bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl ${className}`} />
   );
 };

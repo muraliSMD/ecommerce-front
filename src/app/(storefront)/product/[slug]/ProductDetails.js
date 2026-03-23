@@ -424,83 +424,76 @@ export default function ProductDetails({ initialProduct }) {
   };
 
   return (
-    <main className="bg-surface min-h-screen pb-8 md:pb-12 pt-24 md:pt-28">
+    <main className="bg-bg-main min-h-screen pb-8 md:pb-12">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="mb-4 lg:mb-6 px-4 md:px-0">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Store", href: "/shop" },
-              { label: product.category?.name || "Shop", href: `/shop?category=${product.category?.slug || product.category?.name || ""}` },
-              { label: product.name, href: `/product/${slug}` },
-            ]}
-          />
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-          {/* Gallery Sidebar */}
-          <div className="lg:col-span-1 hidden lg:flex flex-col gap-4">
-            {gallery.map((media, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedMedia(media)}
-                className={`aspect-square bg-gray-50 rounded-2xl overflow-hidden border-2 transition-all relative flex items-center justify-center ${
-                  selectedMedia?.url === media.url ? "border-primary shadow-lg scale-105" : "border-transparent hover:border-gray-200"
-                }`}
+          {/* Left Column: Gallery */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="bg-bg-surface rounded-[2.5rem] p-4 md:p-8 shadow-xl shadow-black/5 border border-border-main relative overflow-hidden group">
+              {/* Main Image */}
+              <motion.div 
+                key={selectedMedia?.url}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-bg-surface shadow-xl shadow-black/5 relative border border-border-main flex items-center justify-center"
               >
-                {media.type === 'video' ? (
-                   <>
-                      <video src={media.url} className="object-cover w-full h-full opacity-60" />
-                      <FiPlayCircle className="absolute text-4xl text-gray-900 bg-white/50 backdrop-blur-sm rounded-full p-1" />
-                   </>
+                {selectedMedia?.type === 'video' ? (
+                    <video 
+                      src={selectedMedia.url} 
+                      autoPlay 
+                      muted 
+                      loop 
+                      playsInline
+                      className="w-full h-full object-cover" 
+                    />
                 ) : (
-                  <Image 
-                      src={media.url} 
-                      alt="" 
-                      fill
-                      className="object-cover" 
-                  />
+                    <ZoomImage src={selectedMedia?.url} zoomAmount={250} height={600} />
                 )}
-              </button>
-            ))}
-          </div>
+              </motion.div>
+              
+              {/* Mobile Thumbnails */}
+              <div className="flex lg:hidden gap-3 mt-4 overflow-x-auto pb-2 px-2 snap-x snap-mandatory">
+                {gallery.map((media, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedMedia(media)}
+                    className={`flex-shrink-0 w-20 h-20 bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-hidden relative border-2 snap-x flex items-center justify-center ${
+                      selectedMedia?.url === media.url ? "border-primary" : "border-transparent"
+                    }`}
+                  >
+                    {media.type === 'video' ? (
+                       <>
+                          <video src={media.url} className="object-cover w-full h-full opacity-60" />
+                          <FiPlayCircle className="absolute text-2xl text-text-main bg-bg-surface/50 backdrop-blur-sm rounded-full p-1" />
+                       </>
+                    ) : (
+                      <Image 
+                          src={media.url} 
+                          alt="" 
+                          fill
+                          className="object-cover" 
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {/* Main Image */}
-          <div className="lg:col-span-6 relative">
-            <motion.div 
-              key={selectedMedia?.url}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-white shadow-xl shadow-black/5 relative border border-gray-100 flex items-center justify-center"
-            >
-              {selectedMedia?.type === 'video' ? (
-                  <video 
-                    src={selectedMedia.url} 
-                    autoPlay 
-                    muted 
-                    loop 
-                    playsInline
-                    className="w-full h-full object-cover" 
-                  />
-              ) : (
-                  <ZoomImage src={selectedMedia?.url} zoomAmount={250} height={600} />
-              )}
-            </motion.div>
-            
-            {/* Mobile Thumbnails */}
-            <div className="flex lg:hidden gap-3 mt-4 overflow-x-auto pb-2 px-2 snap-x snap-mandatory">
+            {/* Gallery Sidebar */}
+            <div className="hidden lg:flex flex-wrap gap-4">
               {gallery.map((media, i) => (
                 <button
                   key={i}
                   onClick={() => setSelectedMedia(media)}
-                  className={`flex-shrink-0 w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden relative border-2 snap-start flex items-center justify-center ${
-                    selectedMedia?.url === media.url ? "border-primary" : "border-transparent"
+                  className={`aspect-square bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-hidden border-2 transition-all relative flex items-center justify-center ${
+                    selectedMedia?.url === media.url ? "border-primary shadow-lg scale-105" : "border-transparent hover:border-text-muted/30"
                   }`}
                 >
                   {media.type === 'video' ? (
                      <>
                         <video src={media.url} className="object-cover w-full h-full opacity-60" />
-                        <FiPlayCircle className="absolute text-2xl text-gray-900 bg-white/50 backdrop-blur-sm rounded-full p-1" />
+                        <FiPlayCircle className="absolute text-4xl text-text-main bg-bg-surface/50 backdrop-blur-sm rounded-full p-1" />
                      </>
                   ) : (
                     <Image 
@@ -529,8 +522,8 @@ export default function ProductDetails({ initialProduct }) {
                 
               </div>
 
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-gray-900 leading-tight order-2">
-                {product.name}
+              <h1 className="text-2xl md:text-3xl font-display font-bold text-text-main leading-tight capitalize">
+                {product.name.toLowerCase()}
               </h1>
               
               <div className="flex items-center gap-4 order-3">
@@ -548,11 +541,11 @@ export default function ProductDetails({ initialProduct }) {
                         </div>
                       )}
                       {Number(mrp) > Number(currentPrice) && (
-                        <p className="text-lg md:text-2xl text-gray-400 line-through">
+                        <p className="text-lg md:text-2xl text-text-muted line-through">
                           {mounted ? formatPrice(mrp).replace(/[^\d,.₹$]/g, '') : mrp}
                         </p>
                       )}
-                      <p className="text-xl md:text-3xl font-bold text-gray-900">
+                      <p className="text-xl md:text-3xl font-bold text-text-main">
                         {mounted ? formatPrice(currentPrice) : currentPrice}
                       </p>
                     </>
@@ -578,8 +571,8 @@ export default function ProductDetails({ initialProduct }) {
                           <FiShoppingBag />
                       </div>
                       <div>
-                          <p className="text-xs font-bold text-gray-500 uppercase">Estimated Shipping</p>
-                          <p className="text-sm font-bold text-gray-900">
+                          <p className="text-xs font-bold text-text-muted uppercase">Estimated Shipping</p>
+                          <p className="text-sm font-bold text-text-main">
                             {selectedVariant?.preBookDeliveryDate || product.preBookDeliveryDate || "10 Days from order placement"}
                           </p>
                       </div>
@@ -590,10 +583,10 @@ export default function ProductDetails({ initialProduct }) {
               <div className="flex items-center gap-2 order-4">
                 <div className="flex gap-1 text-yellow-400 text-sm">
                   {[...Array(5)].map((_, i) => (
-                     <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-gray-300"} />
+                     <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-text-muted/30"} />
                   ))}
                 </div>
-                <span className="text-sm text-gray-500 font-medium">({product.averageRating?.toFixed(1) || 0})</span>
+                <span className="text-sm text-text-muted font-medium">({product.averageRating?.toFixed(1) || 0})</span>
                 <button 
                   onClick={() => {
                       const tabsElement = document.getElementById("product-tabs");
@@ -610,67 +603,67 @@ export default function ProductDetails({ initialProduct }) {
               
               {/* Product Specifications */}
               {(product.color || product.size || product.length || product.age || product.silkType || product.withBlouse || product.blouseMeter) && (
-                <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-3 w-max min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
-                  <p className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">Product Specifications</p>
+                <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main space-y-3 w-max min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
+                  <p className="text-[12px] font-bold text-text-muted uppercase tracking-widest">Product Specifications</p>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                     {product.color && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-gray-500">Color:</span>
-                         <span className="font-bold text-gray-900 text-base">{resolveColorName(product.color)}</span>
+                         <span className="text-sm md:text-base text-text-muted">Color:</span>
+                         <span className="font-bold text-text-main text-base">{resolveColorName(product.color)}</span>
                       </div>
                     )}
                     {product.size && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-gray-500">Size:</span>
-                         <span className="font-bold text-gray-900 text-base">{product.size}</span>
+                         <span className="text-sm md:text-base text-text-muted">Size:</span>
+                         <span className="font-bold text-text-main text-base">{product.size}</span>
                       </div>
                     )}
                     {product.length && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-gray-500">Length:</span>
-                         <span className="font-bold text-gray-900 text-base">{product.length}</span>
+                         <span className="text-sm md:text-base text-text-muted">Length:</span>
+                         <span className="font-bold text-text-main text-base">{product.length}</span>
                       </div>
                     )}
                     {product.age && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-gray-500">Age:</span>
-                         <span className="font-bold text-gray-900 text-base">{product.age}</span>
+                         <span className="text-sm md:text-base text-text-muted">Age:</span>
+                         <span className="font-bold text-text-main text-base">{product.age}</span>
                       </div>
                     )}
                     {product.silkType && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-gray-500">Silk:</span>
-                         <span className="font-bold text-gray-900 text-base">{product.silkType}</span>
+                         <span className="text-sm md:text-base text-text-muted">Silk:</span>
+                         <span className="font-bold text-text-main text-base">{product.silkType}</span>
                       </div>
                     )}
                     {product.withBlouse && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-gray-500">Blouse:</span>
-                         <span className="font-bold text-gray-900 text-base">{product.withBlouse}</span>
+                         <span className="text-sm md:text-base text-text-muted">Blouse:</span>
+                         <span className="font-bold text-text-main text-base">{product.withBlouse}</span>
                       </div>
                     )}
                     {product.blouseMeter && (
                       <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-gray-500">Blouse Length:</span>
-                         <span className="font-bold text-gray-900 text-base">{product.blouseMeter}</span>
+                         <span className="text-sm md:text-base text-text-muted">Blouse Length:</span>
+                         <span className="font-bold text-text-main text-base">{product.blouseMeter}</span>
                       </div>
                     )}
                      {product.nSize && (
                        <div className="flex items-center gap-2">
-                          <span className="text-sm md:text-base text-gray-500">N-Size:</span>
-                          <span className="font-bold text-gray-900 text-base">{product.nSize}</span>
+                          <span className="text-sm md:text-base text-text-muted">N-Size:</span>
+                          <span className="font-bold text-text-main text-base">{product.nSize}</span>
                        </div>
                      )}
                   </div>
                 </div>
               )}
 
-            <div className="h-px bg-gray-200 w-full order-10" />
+            <div className="h-px bg-border-main w-full order-10" />
 
             {/* Colors */}
             {allColors.length > 0 && (
               <VariantSlider 
-                title={<span>Colour: <span className="text-gray-900 ml-2">{resolveColorName(selectedColor)}</span></span>}
+                title={<span>Colour: <span className="text-text-main ml-2">{resolveColorName(selectedColor)}</span></span>}
                 orderClass="order-5 lg:order-6 mt-4 md:mt-0"
               >
                 {allColors.map((color) => {
@@ -687,7 +680,7 @@ export default function ProductDetails({ initialProduct }) {
                       } ${
                         selectedColor === color
                           ? "border-2 border-primary ring-2 ring-primary/20 shadow-lg"
-                          : "border-2 border-gray-100 bg-white text-gray-600 hover:border-gray-300"
+                          : "border-2 border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                       }`}
                     >
                       {colorImage ? (
@@ -726,10 +719,10 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 decoration-slate-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-border-main bg-bg-section/50 text-text-muted/50 decoration-slate-400 line-through" :
                             selectedSize === size
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                              : "border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                           }`}
                         >
                           {size} {isOutOfStock && "(Out of Stock)"}
@@ -760,10 +753,10 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[50px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-border-main bg-bg-section/50 text-text-muted/50 decoration-slate-400 line-through" :
                             selectedLength === length
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                              : "border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                           }`}
                         >
                           {length} {isOutOfStock && "(Out of Stock)"}
@@ -794,10 +787,10 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-border-main bg-bg-section/50 text-text-muted/50 decoration-slate-400 line-through" :
                             selectedAge === age
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                              : "border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                           }`}
                         >
                           {age} {isOutOfStock && "(Out of Stock)"}
@@ -828,10 +821,10 @@ export default function ProductDetails({ initialProduct }) {
                           }}
                           className={`min-w-[60px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-border-main bg-bg-section/50 text-text-muted/50 decoration-slate-400 line-through" :
                             selectedNSize === nSize
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                              : "border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                           }`}
                         >
                           {nSize} {isOutOfStock && "(Out of Stock)"}
@@ -857,10 +850,10 @@ export default function ProductDetails({ initialProduct }) {
                           onClick={() => setSelectedSilkType(type)}
                           className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-border-main bg-bg-section/50 text-text-muted/50 decoration-slate-400 line-through" :
                             selectedSilkType === type
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                              : "border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                           }`}
                         >
                           {type} {isOutOfStock && "(Out of Stock)"}
@@ -886,10 +879,10 @@ export default function ProductDetails({ initialProduct }) {
                           onClick={() => setSelectedWithBlouse(opt)}
                           className={`min-w-[120px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start m-[2px] ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-border-main bg-bg-section/50 text-text-muted/50 decoration-slate-400 line-through" :
                             selectedWithBlouse === opt
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                              : "border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                           }`}
                         >
                           {opt} {isOutOfStock && "(Out of Stock)"}
@@ -915,10 +908,10 @@ export default function ProductDetails({ initialProduct }) {
                           onClick={() => setSelectedBlouseMeter(meter)}
                           className={`min-w-[100px] px-4 h-11 flex-shrink-0 rounded-xl border-2 transition-all flex items-center justify-center font-bold text-base snap-start ${
                             disabled ? "hidden" :
-                            isOutOfStock ? "opacity-30 cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 line-through" :
+                            isOutOfStock ? "opacity-30 cursor-not-allowed border-border-main bg-bg-section/50 text-text-muted/50 decoration-slate-400 line-through" :
                             selectedBlouseMeter === meter
                               ? "border-primary bg-primary text-white shadow-lg shadow-primary/20"
-                              : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
+                              : "border-border-main bg-bg-surface text-text-muted hover:border-text-muted/30"
                           }`}
                         >
                           {meter} {isOutOfStock && "(Out of Stock)"}
@@ -937,18 +930,18 @@ export default function ProductDetails({ initialProduct }) {
             <div className="flex flex-col gap-6 pt-4 order-8">
               {/* Utility Section: Quantity, Wishlist, Share */}
               <div className="flex items-center gap-4">
-                <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1.5 shadow-sm">
+                <div className="flex items-center bg-bg-surface border border-border-main rounded-2xl p-1.5 shadow-sm">
                   <button 
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
+                    className="w-10 h-10 flex items-center justify-center text-text-main/60 hover:text-primary transition-colors hover:bg-bg-section rounded-lg"
                     disabled={isOutOfStock}
                   >
                     <FiMinus />
                   </button>
-                  <span className="w-10 text-center font-bold text-lg">{quantity}</span>
+                  <span className="w-10 text-center font-bold text-lg text-text-main">{quantity}</span>
                   <button 
                     onClick={() => setQuantity(q => isPreBook ? q + 1 : Math.min(stock, q + 1))}
-                    className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary transition-colors hover:bg-gray-50 rounded-lg"
+                    className="w-10 h-10 flex items-center justify-center text-text-main/60 hover:text-primary transition-colors hover:bg-bg-section rounded-lg"
                     disabled={isOutOfStock && !isPreBook || (!isPreBook && quantity >= stock)}
                   >
                     <FiPlus />
@@ -1007,10 +1000,10 @@ export default function ProductDetails({ initialProduct }) {
                     addToCart(product, quantity, selectedVariant);
                     router.push(isPreBook ? '/cart' : '/checkout');
                   }}
-                  className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold text-white transition-all active:scale-95 shadow-xl text-base md:text-lg ${
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold transition-all active:scale-95 shadow-xl text-base md:text-lg ${
                     !canAdd
-                      ? "bg-gray-200 cursor-not-allowed text-gray-400" 
-                      : "bg-btn-dark hover:bg-black shadow-gray-900/20"
+                      ? "bg-bg-section/50 cursor-not-allowed text-text-muted/50" 
+                      : "bg-btn-dark hover:bg-btn-dark-hover text-btn-text shadow-gray-900/20"
                   }`}
                 >
                   <FiArrowRight size={20} />
@@ -1071,9 +1064,9 @@ export function ProductTabs({ product, refetch }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
-            className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-gray-100"
+            className="bg-bg-surface rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-black/5 border border-border-main"
         >
-            <div className="flex gap-8 border-b border-gray-100 mb-8 overflow-x-auto pb-4 md:pb-0">
+            <div className="flex gap-8 border-b border-border-main mb-8 overflow-x-auto pb-4 md:pb-0">
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
@@ -1081,7 +1074,7 @@ export function ProductTabs({ product, refetch }) {
                         className={`font-bold text-lg pb-4 border-b-2 transition-all whitespace-nowrap ${
                             activeTab === tab.id 
                             ? "text-primary border-primary" 
-                            : "text-gray-400 border-transparent hover:text-gray-600"
+                            : "text-text-main/50 border-transparent hover:text-text-main"
                         }`}
                     >
                         {tab.label}
@@ -1092,7 +1085,7 @@ export function ProductTabs({ product, refetch }) {
             <div className="min-h-[200px] pt-4">
                 {activeTab === "description" && (
                      <div 
-                        className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary [&_*]:break-words [&_*]:whitespace-normal"
+                        className="prose prose-lg dark:prose-invert max-w-none text-text-muted prose-headings:font-display prose-a:text-primary [&_*]:break-words [&_*]:whitespace-normal"
                         dangerouslySetInnerHTML={{ __html: product.description }}
                      />
                 )}
@@ -1100,11 +1093,11 @@ export function ProductTabs({ product, refetch }) {
                     <ReviewsSection product={product} refetch={refetch} />
                 )}
                 {activeTab === "manufacturer" && (
-                    <div className="prose prose-lg max-w-none text-gray-500 prose-headings:font-display prose-a:text-primary [&_*]:break-words [&_*]:whitespace-normal">
+                    <div className="prose prose-lg dark:prose-invert max-w-none text-text-muted prose-headings:font-display prose-a:text-primary [&_*]:break-words [&_*]:whitespace-normal">
                         {product.manufacturerInfo ? (
                             <div dangerouslySetInnerHTML={{ __html: product.manufacturerInfo }} />
                         ) : (
-                            <p className="italic text-gray-400">No manufacturer information available.</p>
+                            <p className="italic text-text-muted/50">No manufacturer information available.</p>
                         )}
                     </div>
                 )}
@@ -1135,7 +1128,7 @@ export function RelatedProducts({ categoryId, currentProductId }) {
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
         >
-            <h2 className="text-3xl font-display font-bold text-gray-900 mb-8 animate-fade-in-up">Related Products</h2>
+            <h2 className="text-3xl font-display font-bold text-text-main mb-8 animate-fade-in-up">Related Products</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
                 {relatedProducts.map(product => (
                     <ProductCard 

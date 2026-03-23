@@ -13,7 +13,7 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
   const router = useRouter();
 
   return (
-    <div className="group card-hover p-2 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/50 overflow-hidden relative h-full flex flex-col">
+    <div className="group card-hover p-2 bg-bg-surface/40 dark:bg-bg-surface/60 backdrop-blur-sm rounded-2xl border border-border-main/50 overflow-hidden relative h-full flex flex-col">
       {/* ... keeping existing JSX ... */}
       <Link href={`/product/${product.slug || product._id}`} className="block relative aspect-square overflow-hidden rounded-xl bg-surface">
         {product.videos?.filter(v => typeof v === 'string' && v.trim() !== '').length > 0 ? (
@@ -98,7 +98,7 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
           <div className="mt-2 flex gap-2">
             {(!product.isPreBook && !isOutOfStock) && (
               <button
-                className="flex-grow flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm border bg-white text-text-main border-gray-200 hover:bg-gray-50"
+                className="flex-grow flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm border bg-bg-surface text-text-main border-border-main hover:bg-bg-section/50"
                 onClick={(e) => {
                   e.preventDefault();
                   const variant = product.variants?.length === 1 ? product.variants[0] : null;
@@ -110,7 +110,7 @@ export default function ProductCard({ product, onAddToCart, priority = false }) 
             )}
             {(!isOutOfStock || product.isPreBook) && (
               <button
-                className={`flex-grow flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm bg-btn-dark text-white border-btn-dark hover:bg-black`}
+                className={`flex-grow flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm bg-btn-dark text-btn-text border-btn-dark hover:bg-btn-dark-hover`}
                 onClick={(e) => {
                   e.preventDefault();
                   const variant = product.variants?.length === 1 ? product.variants[0] : null;

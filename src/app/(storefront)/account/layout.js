@@ -34,19 +34,19 @@ export default function AccountLayout({ children }) {
   ];
 
   return (
-    <main className="bg-surface min-h-screen pb-12 pt-32">
+     <main className="bg-bg-main min-h-screen pb-12 text-text-main">
       <div className="container mx-auto px-4 md:px-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
-          <aside className="lg:w-64 flex-shrink-0">
-             <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 sticky top-32">
-                <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-100">
+           <aside className="lg:w-64 flex-shrink-0">
+             <div className="bg-bg-surface rounded-3xl p-6 shadow-sm border border-border-main sticky top-20 lg:top-32">
+                <div className="flex items-center gap-4 mb-8 pb-8 border-b border-border-main/50">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-xl">
                         {userInfo.name.charAt(0)}
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900">{userInfo.name}</h3>
-                        <p className="text-xs text-gray-400 truncate w-32">{userInfo.email}</p>
+                        <h3 className="font-bold text-text-main">{userInfo.name}</h3>
+                        <p className="text-xs text-text-muted truncate w-32">{userInfo.email}</p>
                     </div>
                 </div>
 
@@ -61,7 +61,7 @@ export default function AccountLayout({ children }) {
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
                                     isActive 
                                     ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                    : "text-text-muted hover:bg-bg-section/50 hover:text-text-main"
                                 }`}
                             >
                                 <Icon size={20} />
@@ -76,7 +76,7 @@ export default function AccountLayout({ children }) {
                             router.push("/");
                             router.refresh();
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-red-500 hover:bg-red-50 mt-4"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-red-500 hover:bg-red-500/10 mt-4"
                     >
                         <FiLogOut size={20} />
                         Logout
