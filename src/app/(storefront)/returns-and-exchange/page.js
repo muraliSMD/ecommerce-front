@@ -63,8 +63,8 @@ export default function ReturnsPage() {
                   viewport={{ once: true }}
                   className="bg-bg-section/50 dark:bg-bg-section/10 p-8 rounded-3xl text-center space-y-4 border border-border-main"
                 >
-                  <div className="w-20 h-20 bg-bg-section/30 dark:bg-bg-section/10 rounded-full flex items-center justify-center text-text-muted mb-4">
-                    <item.icon size={28} />
+                  <div className="w-20 h-20 bg-bg-section/30 dark:bg-bg-section/10 rounded-full flex items-center justify-center text-text-muted mb-4 mx-auto shadow-sm">
+                    <item.icon size={32} />
                   </div>
                   <h3 className="font-bold text-text-main text-lg">{item.title}</h3>
                   <p className="text-text-muted text-sm leading-relaxed">{item.description}</p>
