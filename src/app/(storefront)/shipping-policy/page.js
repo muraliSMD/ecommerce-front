@@ -82,7 +82,7 @@ export default function ShippingPolicyPage() {
               <div>
                 <h2 className="text-2xl font-display font-bold text-text-main mb-4">2. Shipping Rates & Delivery Estimates</h2>
                 <p>
-                  Shipping charges for your order will be calculated and displayed at checkout. Standard shipping is <strong>FREE</strong> for orders above ₹1499 across India.
+                  Shipping charges for your order will be calculated and displayed at checkout.
                 </p>
                 <div className="bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-x-auto mt-4 border border-border-main scrollbar-hide">
                   <table className="w-full text-left min-w-[600px]">
