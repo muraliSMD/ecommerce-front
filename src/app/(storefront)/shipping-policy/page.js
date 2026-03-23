@@ -97,12 +97,12 @@ export default function ShippingPolicyPage() {
                       <tr>
                         <td className="px-6 py-4 text-text-muted">Tamil Nadu</td>
                         <td className="px-6 py-4">1-5 Business Days</td>
-                        <td className="px-6 py-4"> minimum ₹60 (Free over ₹1499)</td>
+                        <td className="px-6 py-4"> minimum ₹60 </td>
                       </tr>
                       <tr>
                         <td className="px-6 py-4 text-text-muted">Rest of India</td>
                         <td className="px-6 py-4">3-9 Business Days</td>
-                        <td className="px-6 py-4"> minimum ₹90 (Free over ₹1499)</td>
+                        <td className="px-6 py-4"> minimum ₹90 </td>
                       </tr>
                     </tbody>
                   </table>
