@@ -88,6 +88,7 @@ export default async function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://api.razorpay.com" />
         <link rel="dns-prefetch" href="https://api.razorpay.com" />
+        <ScriptManager scripts={settings.scripts} />
       </head>
       <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-bg-main min-h-screen antialiased`} suppressHydrationWarning={true}>
         <ThemeProvider>
@@ -95,7 +96,6 @@ export default async function RootLayout({ children }) {
             <SettingsInitializer />
             <PwaManager />
             <GlobalOverlays />
-            <ScriptManager scripts={settings.scripts} />
             <OrganizationJsonLd 
               siteName={settings.siteName || "GRABSZY"}
               logo={settings.logo || `${siteUrl}/logo.png`}
