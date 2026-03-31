@@ -515,18 +515,18 @@ export default function ProductDetails({ initialProduct }) {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="lg:col-span-5 flex flex-col gap-6 md:gap-8"
           >
-              <div className="flex justify-between items-start order-1">
+              <div className="flex justify-between items-start order-1 lg:order-1">
                 <span className="text-primary font-bold tracking-widest uppercase text-sm">
                   {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
                 </span>
                 
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-display font-bold text-text-main leading-tight capitalize">
+              <h1 className="text-2xl md:text-3xl font-display font-bold text-text-main leading-tight capitalize order-3 lg:order-2">
                 {product.name.toLowerCase()}
               </h1>
               
-              <div className="flex items-center gap-4 order-3">
+              <div className="flex items-center gap-4 order-4 lg:order-4">
                 {(() => {
                   const currentPrice = selectedVariant?.price ?? product.price;
                   const mrp = selectedVariant?.mrp ?? product.mrp;
@@ -566,7 +566,7 @@ export default function ProductDetails({ initialProduct }) {
               </div>
               
               {isPreBook && (
-                  <div className="order-4 bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-center gap-3">
+                  <div className="order-8 lg:order-4 bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                           <FiShoppingBag />
                       </div>
@@ -580,7 +580,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Star Rating Summary */}
-              <div className="flex items-center gap-2 order-4">
+              <div className="flex items-center gap-2 order-5 lg:order-3">
                 <div className="flex gap-1 text-yellow-400 text-sm">
                   {[...Array(5)].map((_, i) => (
                      <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-text-muted/30"} />
@@ -658,13 +658,13 @@ export default function ProductDetails({ initialProduct }) {
                 </div>
               )}
 
-            <div className="h-px bg-border-main w-full order-10" />
+            <div className="h-px bg-border-main w-full order-10 lg:order-8" />
 
             {/* Colors */}
             {allColors.length > 0 && (
               <VariantSlider 
                 title={<span>Colour: <span className="text-text-main ml-2">{resolveColorName(selectedColor)}</span></span>}
-                orderClass="order-5 lg:order-6 mt-4 md:mt-0"
+                orderClass="order-2 lg:order-6 mt-4 md:mt-0"
               >
                 {allColors.map((color) => {
                   const colorVariantWithImage = variants.find(v => v.color === color && v.images && v.images.length > 0);
@@ -698,7 +698,7 @@ export default function ProductDetails({ initialProduct }) {
             )}
 
             {/* Attributes Slider for Mobile & Web */}
-            <VariantSlider orderClass="order-6 mt-2 md:mt-0 gap-4 lg:gap-2">
+            <VariantSlider orderClass="order-6 lg:order-7 mt-2 md:mt-0 gap-4 lg:gap-2">
               {/* Sizes */}
               {availableSizesForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
@@ -923,11 +923,11 @@ export default function ProductDetails({ initialProduct }) {
               )}
             </VariantSlider>
 
-            <div className="h-px bg-gray-200 w-full order-7 mt-6" />
+            <div className="h-px bg-gray-200 w-full order-7 lg:order-8 mt-6" />
 
             {/* Quantity and Actions */}
             {/* Quantity and Actions */}
-            <div className="flex flex-col gap-6 pt-4 order-8">
+            <div className="flex flex-col gap-6 pt-4 order-11 lg:order-9">
               {/* Utility Section: Quantity, Wishlist, Share */}
               <div className="flex items-center gap-4">
                 <div className="flex items-center bg-bg-surface border border-border-main rounded-2xl p-1.5 shadow-sm">

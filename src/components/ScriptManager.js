@@ -66,7 +66,7 @@ export default function ScriptManager({ scripts = {} }) {
       {customHeadScripts && (
         <div 
           dangerouslySetInnerHTML={{ __html: customHeadScripts }} 
-          style={{ display: 'none' }}
+          hidden={true}
         />
       )}
 
@@ -74,7 +74,7 @@ export default function ScriptManager({ scripts = {} }) {
       {customBodyScripts && (
         <div 
           dangerouslySetInnerHTML={{ __html: customBodyScripts }} 
-          style={{ display: 'none' }}
+          hidden={true}
         />
       )}
     </>
