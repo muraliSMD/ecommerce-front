@@ -29,6 +29,7 @@ const resolveColorName = (color) => {
 
 export default function ProductDetails({ initialProduct }) {
   const slug = initialProduct?.slug;
+  const imageRefs = useRef([]);
   const addToCart = useCartStore((state) => state.addToCart);
   const formatPrice = useSettingsStore((state) => state.formatPrice);
   const { addItem, removeItem, isInWishlist } = useWishlistStore();
@@ -423,110 +424,83 @@ export default function ProductDetails({ initialProduct }) {
     return color;
   };
 
+
+  const scrollToImage = (index) => {
+    imageRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
   return (
     <main className="bg-bg-main min-h-screen pb-8 md:pb-12">
       <div className="container mx-auto px-4 md:px-8">
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-          {/* Left Column: Gallery */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="bg-bg-surface rounded-[2.5rem] p-4 md:p-8 shadow-xl shadow-black/5 border border-border-main relative overflow-hidden group">
-              {/* Main Image */}
-              <motion.div 
-                key={selectedMedia?.url}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="aspect-square rounded-[2rem] md:rounded-[3rem] overflow-hidden bg-bg-surface shadow-xl shadow-black/5 relative border border-border-main flex items-center justify-center"
-              >
-                {selectedMedia?.type === 'video' ? (
-                    <video 
-                      src={selectedMedia.url} 
-                      autoPlay 
-                      muted 
-                      loop 
-                      playsInline
-                      className="w-full h-full object-cover" 
-                    />
-                ) : (
-                    <ZoomImage src={selectedMedia?.url} zoomAmount={250} height={600} />
-                )}
-              </motion.div>
-              
-              {/* Mobile Thumbnails */}
-              <div className="flex lg:hidden gap-3 mt-4 overflow-x-auto pb-2 px-2 snap-x snap-mandatory">
-                {gallery.map((media, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedMedia(media)}
-                    className={`flex-shrink-0 w-20 h-20 bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-hidden relative border-2 snap-x flex items-center justify-center ${
-                      selectedMedia?.url === media.url ? "border-primary" : "border-transparent"
-                    }`}
-                  >
-                    {media.type === 'video' ? (
-                       <>
-                          <video src={media.url} className="object-cover w-full h-full opacity-60" />
-                          <FiPlayCircle className="absolute text-2xl text-text-main bg-bg-surface/50 backdrop-blur-sm rounded-full p-1" />
-                       </>
-                    ) : (
-                      <Image 
-                          src={media.url} 
-                          alt="" 
-                          fill
-                          className="object-cover" 
-                      />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Gallery Sidebar */}
-            <div className="hidden lg:flex flex-wrap gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+          {/* Left Column: Gallery (Premium Vertical Stack with Thumbnails) */}
+          <div className="lg:col-span-7 flex flex-row gap-4 md:gap-6 relative">
+            {/* Sticky Thumbnail Strip (Desktop only for this specific look) */}
+            <div className="hidden lg:flex flex-col gap-4 sticky top-28 self-start w-16 xl:w-20">
               {gallery.map((media, i) => (
                 <button
                   key={i}
-                  onClick={() => setSelectedMedia(media)}
-                  className={`aspect-square bg-bg-section/30 dark:bg-bg-section/10 rounded-2xl overflow-hidden border-2 transition-all relative flex items-center justify-center ${
-                    selectedMedia?.url === media.url ? "border-primary shadow-lg scale-105" : "border-transparent hover:border-text-muted/30"
-                  }`}
+                  onClick={() => scrollToImage(i)}
+                  className="aspect-square bg-white rounded-md overflow-hidden border border-border-main hover:border-primary transition-all relative group"
                 >
-                  {media.type === 'video' ? (
-                     <>
-                        <video src={media.url} className="object-cover w-full h-full opacity-60" />
-                        <FiPlayCircle className="absolute text-4xl text-text-main bg-bg-surface/50 backdrop-blur-sm rounded-full p-1" />
-                     </>
-                  ) : (
-                    <Image 
-                        src={media.url} 
-                        alt="" 
-                        fill
-                        className="object-cover" 
-                    />
-                  )}
+                  <div className="relative w-full h-full opacity-60 group-hover:opacity-100 transition-opacity">
+                    {media.type === 'video' ? (
+                       <video src={media.url} className="object-cover w-full h-full" />
+                    ) : (
+                       <Image src={media.url} alt="" fill className="object-cover" />
+                    )}
+                  </div>
                 </button>
+              ))}
+            </div>
+
+            {/* Main Image Stack */}
+            <div className="flex-1 space-y-4 md:space-y-6">
+              {gallery.map((media, i) => (
+                <div 
+                  key={i} 
+                  ref={el => imageRefs.current[i] = el}
+                  className="bg-white rounded-3xl md:rounded-[2.5rem] p-2 md:p-3 shadow-2xl shadow-black/5 border border-border-main relative overflow-hidden group"
+                >
+                  <div className="aspect-square rounded-2xl md:rounded-[2rem] overflow-hidden bg-bg-surface relative border border-border-main flex items-center justify-center">
+                    {media.type === 'video' ? (
+                        <video 
+                          src={media.url} 
+                          autoPlay 
+                          muted 
+                          loop 
+                          playsInline
+                          className="w-full h-full object-cover" 
+                        />
+                    ) : (
+                        <ZoomImage src={media.url} zoomAmount={250} height={1000} />
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Product Details */}
+          {/* Right Column: Product Details (Sticky) */}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-5 flex flex-col gap-6 md:gap-8"
+            className="lg:col-span-5 flex flex-col gap-6 md:gap-8 lg:sticky lg:top-28 lg:self-start h-fit"
           >
-              <div className="flex justify-between items-start order-1">
+              <div className="flex justify-between items-start order-1 lg:order-1">
                 <span className="text-primary font-bold tracking-widest uppercase text-sm">
                   {product.category?.name || (typeof product.category === 'string' && !product.category.match(/^[0-9a-fA-F]{24}$/) ? product.category : "New Arrival")}
                 </span>
                 
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-display font-bold text-text-main leading-tight capitalize">
+              <h1 className="text-2xl md:text-3xl font-display font-bold text-text-main leading-tight capitalize order-3 lg:order-2">
                 {product.name.toLowerCase()}
               </h1>
               
-              <div className="flex items-center gap-4 order-3">
+              <div className="flex items-center gap-4 order-4 lg:order-4">
                 {(() => {
                   const currentPrice = selectedVariant?.price ?? product.price;
                   const mrp = selectedVariant?.mrp ?? product.mrp;
@@ -566,7 +540,7 @@ export default function ProductDetails({ initialProduct }) {
               </div>
               
               {isPreBook && (
-                  <div className="order-4 bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-center gap-3">
+                  <div className="order-8 lg:order-4 bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                           <FiShoppingBag />
                       </div>
@@ -580,7 +554,7 @@ export default function ProductDetails({ initialProduct }) {
               )}
 
               {/* Star Rating Summary */}
-              <div className="flex items-center gap-2 order-4">
+              <div className="flex items-center gap-2 order-5 lg:order-3">
                 <div className="flex gap-1 text-yellow-400 text-sm">
                   {[...Array(5)].map((_, i) => (
                      <FiStar key={i} className={i < Math.round(product.averageRating || 0) ? "fill-current" : "text-text-muted/30"} />
@@ -658,13 +632,13 @@ export default function ProductDetails({ initialProduct }) {
                 </div>
               )}
 
-            <div className="h-px bg-border-main w-full order-10" />
+            <div className="h-px bg-border-main w-full order-10 lg:order-8" />
 
             {/* Colors */}
             {allColors.length > 0 && (
               <VariantSlider 
                 title={<span>Colour: <span className="text-text-main ml-2">{resolveColorName(selectedColor)}</span></span>}
-                orderClass="order-5 lg:order-6 mt-4 md:mt-0"
+                orderClass="order-2 lg:order-6 mt-4 md:mt-0"
               >
                 {allColors.map((color) => {
                   const colorVariantWithImage = variants.find(v => v.color === color && v.images && v.images.length > 0);
@@ -698,7 +672,7 @@ export default function ProductDetails({ initialProduct }) {
             )}
 
             {/* Attributes Slider for Mobile & Web */}
-            <VariantSlider orderClass="order-6 mt-2 md:mt-0 gap-4 lg:gap-2">
+            <VariantSlider orderClass="order-6 lg:order-7 mt-2 md:mt-0 gap-4 lg:gap-2">
               {/* Sizes */}
               {availableSizesForColor.length > 0 && (
                 <div className="flex-shrink-0 min-w-max snap-start">
@@ -923,11 +897,11 @@ export default function ProductDetails({ initialProduct }) {
               )}
             </VariantSlider>
 
-            <div className="h-px bg-gray-200 w-full order-7 mt-6" />
+            <div className="h-px bg-gray-200 w-full order-7 lg:order-8 mt-6" />
 
             {/* Quantity and Actions */}
             {/* Quantity and Actions */}
-            <div className="flex flex-col gap-6 pt-4 order-8">
+            <div className="flex flex-col gap-6 pt-4 order-11 lg:order-9">
               {/* Utility Section: Quantity, Wishlist, Share */}
               <div className="flex items-center gap-4">
                 <div className="flex items-center bg-bg-surface border border-border-main rounded-2xl p-1.5 shadow-sm">

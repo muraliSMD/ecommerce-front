@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useUserStore } from "@/store/userStore";
 import { api } from "@/lib/api";
 
@@ -20,10 +20,10 @@ const urlBase64ToUint8Array = (base64String) => {
 };
 
 export default function PushNotificationManager() {
-  const { userInfo } = useUserStore();
+  const { token, isHydrated } = useUserStore();
 
   useEffect(() => {
-    if (!userInfo) return;
+    if (!isHydrated || !token) return;
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
 
     // Register Service Worker
@@ -50,10 +50,10 @@ export default function PushNotificationManager() {
       })
       .catch((err) => console.error("Service Worker registration failed:", err));
       
-  }, [userInfo]);
+  }, [token, isHydrated]);
 
-  const subscribeUser = async () => {
-     if (!("serviceWorker" in navigator)) return;
+  const subscribeUser = useCallback(async () => {
+     if (!isHydrated || !token || !("serviceWorker" in navigator)) return;
      
      try {
          const registration = await navigator.serviceWorker.ready;
@@ -83,17 +83,17 @@ export default function PushNotificationManager() {
             console.error("Subscription failed", err);
         }
     }
-};
+  }, [isHydrated, token]);
 
   // Auto-subscribe on load if logged in and permission granted? 
   // Or just render nothing and use this as a logic container.
   
   // Let's run subscribe logic once if permission is already granted to ensure backend is in sync
   useEffect(() => {
-      if(userInfo && Notification.permission === 'granted') {
+      if(isHydrated && token && Notification.permission === 'granted') {
           subscribeUser();
       }
-  }, [userInfo]);
+  }, [token, isHydrated, subscribeUser]);
 
   return null; // This component doesn't render anything visible, just handles logic
 }

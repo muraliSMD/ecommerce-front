@@ -88,9 +88,9 @@ export default async function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://api.razorpay.com" />
         <link rel="dns-prefetch" href="https://api.razorpay.com" />
-        <ScriptManager scripts={settings.scripts} />
       </head>
       <body className={`${montserrat.variable} ${openSans.variable} font-sans bg-bg-main min-h-screen antialiased`} suppressHydrationWarning={true}>
+        <ScriptManager scripts={settings.scripts} />
         <ThemeProvider>
           <QueryProvider>
             <SettingsInitializer />

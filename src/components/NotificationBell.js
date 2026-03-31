@@ -8,20 +8,23 @@ import { api } from "@/lib/api";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
+import { useUserStore } from "@/store/userStore";
 
 export default function NotificationBell({ className = "", align = "right" }) {
+  const { token } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   const queryClient = useQueryClient();
 
-  // Polling every 30 seconds
+  // Polling every 5 minutes (300,000 ms) - Only if logged in
   const { data } = useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
       const { data } = await api.get("/notifications");
       return data;
     },
+    enabled: !!token,
     refetchInterval: 300000, 
     staleTime: 300000,
   });

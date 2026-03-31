@@ -18,7 +18,7 @@ export default function ScriptManager({ scripts = {} }) {
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
-            strategy="beforeInteractive"
+            strategy="afterInteractive"
           />
           <Script id="google-analytics" strategy="afterInteractive">
             {`
@@ -66,7 +66,7 @@ export default function ScriptManager({ scripts = {} }) {
       {customHeadScripts && (
         <div 
           dangerouslySetInnerHTML={{ __html: customHeadScripts }} 
-          style={{ display: 'none' }}
+          hidden={true}
         />
       )}
 
@@ -74,7 +74,7 @@ export default function ScriptManager({ scripts = {} }) {
       {customBodyScripts && (
         <div 
           dangerouslySetInnerHTML={{ __html: customBodyScripts }} 
-          style={{ display: 'none' }}
+          hidden={true}
         />
       )}
     </>

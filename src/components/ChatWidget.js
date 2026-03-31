@@ -4,15 +4,18 @@
 import { useState, useRef, useEffect } from "react";
 import { useSettingsStore } from "@/store/settingsStore";
 import { AnimatePresence, motion } from "framer-motion";
-import { FiMessageSquare, FiX, FiSend, FiUser, FiHelpCircle, FiTrendingUp, FiClock } from "react-icons/fi";
+import { FiMessageSquare, FiX, FiSend, FiUser, FiHelpCircle, FiTrendingUp, FiClock, FiDownload } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "@/lib/api";
+import usePwaInstall from "@/hooks/usePwaInstall";
 
 export default function ChatWidget() {
   const { settings, isLoading } = useSettingsStore();
+  const { isInstallable, install } = usePwaInstall();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [messages, setMessages] = useState([
     { type: "bot", text: "Hi there! 👋 How can I help you today?" }
   ]);
@@ -57,8 +60,9 @@ export default function ChatWidget() {
 
   const showChatbot = settings?.marketing?.showChatbot ?? true;
   const showWhatsapp = !!settings?.marketing?.whatsappNumber;
+  const pwaEnabled = settings.appLinks?.pwaEnabled ?? true;
 
-  if (isLoading || (!showChatbot && !showWhatsapp)) return null;
+  if (isLoading || (!showChatbot && !showWhatsapp && !(isInstallable && pwaEnabled))) return null;
 
   const suggestions = [
     { label: "Trending Now 🔥", action: "trending" },
@@ -141,6 +145,19 @@ export default function ChatWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-[90] flex flex-col items-end gap-4">
       
+      {/* Backdrop (Close menu on click outside) */}
+      <AnimatePresence>
+        {isMenuOpen && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsMenuOpen(false)}
+            className="fixed inset-0 bg-transparent z-[-1]"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Chat Window */}
       <AnimatePresence>
         {isOpen && showChatbot && (
@@ -295,50 +312,132 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* WhatsApp Button */}
-      {settings?.marketing?.whatsappNumber && (
-        <a
-          href={`https://wa.me/${settings.marketing.whatsappNumber.replace(/\D/g, '')}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-14 h-14 bg-[#25D366] text-white rounded-full shadow-xl shadow-green-500/20 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 group animate-bounce"
-          title="Chat on WhatsApp"
-        >
-          <FaWhatsapp size={32} />
-        </a>
-      )}
+      {/* Expanding Menu Items */}
+      <AnimatePresence>
+        {isMenuOpen && !isOpen && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={{
+              visible: { transition: { staggerChildren: 0.1, staggerDirection: -1 } },
+              hidden: { transition: { staggerChildren: 0.05, staggerDirection: 1 } }
+            }}
+            className="flex flex-col items-end gap-3 mb-2"
+          >
+            {/* PWA Install Button */}
+            {isInstallable && pwaEnabled && (
+              <motion.div 
+                variants={{
+                  hidden: { opacity: 0, y: 10, scale: 0.8 },
+                  visible: { opacity: 1, y: 0, scale: 1 }
+                }}
+                className="flex items-center gap-3 group"
+              >
+                <span className="bg-black/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full lg:opacity-0 lg:group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
+                  Install Website
+                </span>
+                <button
+                  onClick={() => { install(); setIsMenuOpen(false); }}
+                  className="w-11 h-11 bg-primary text-white rounded-full shadow-lg shadow-primary/20 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 relative"
+                  aria-label="Install App"
+                >
+                  <FiDownload size={20} className="animate-bounce z-10" />
+                  <span className="absolute inset-0 block animate-ping rounded-full bg-primary/30" />
+                </button>
+              </motion.div>
+            )}
 
-      {/* Toggle Button */}
-      {showChatbot && (
-        <button 
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-14 h-14 bg-black text-white rounded-full shadow-xl shadow-primary/20 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 relative group"
-        >
+            {/* WhatsApp Button */}
+            {settings?.marketing?.whatsappNumber && (
+              <motion.div 
+                variants={{
+                  hidden: { opacity: 0, y: 10, scale: 0.8 },
+                  visible: { opacity: 1, y: 0, scale: 1 }
+                }}
+                className="flex items-center gap-3 group"
+              >
+                <span className="bg-black/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full lg:opacity-0 lg:group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
+                  WhatsApp Support
+                </span>
+                <a
+                  href={`https://wa.me/${settings.marketing.whatsappNumber.replace(/\D/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-11 h-11 bg-[#25D366] text-white rounded-full shadow-xl shadow-green-500/20 flex items-center justify-center hover:scale-110 transition-transform active:scale-95 animate-bounce"
+                  title="Chat on WhatsApp"
+                >
+                  <FaWhatsapp size={24} />
+                </a>
+              </motion.div>
+            )}
+
+            {/* Live Chat Sub-button */}
+            {showChatbot && (
+              <motion.div 
+                variants={{
+                  hidden: { opacity: 0, y: 10, scale: 0.8 },
+                  visible: { opacity: 1, y: 0, scale: 1 }
+                }}
+                className="flex items-center gap-3 group"
+              >
+                <span className="bg-black/80 text-white text-[10px] font-bold px-3 py-1.5 rounded-full lg:opacity-0 lg:group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl">
+                  Live Assistant
+                </span>
+                <button 
+                  onClick={() => { setIsOpen(true); setIsMenuOpen(false); }}
+                  className="w-11 h-11 bg-black text-white rounded-full shadow-xl shadow-black/20 flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+                >
+                  <FiMessageSquare size={20} />
+                </button>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Trigger Button */}
+      <button 
+        onClick={() => {
+            if (isOpen) {
+                setIsOpen(false);
+            } else {
+                setIsMenuOpen(!isMenuOpen);
+            }
+        }}
+        className={`w-11 h-11 text-white rounded-full shadow-xl transition-all duration-300 active:scale-95 relative flex items-center justify-center ${
+            isOpen || isMenuOpen ? 'bg-black rotate-0' : 'bg-primary'
+        }`}
+      >
           <AnimatePresence mode="wait">
-              {isOpen ? (
+              {isOpen || isMenuOpen ? (
                   <motion.div
                       key="close"
-                      initial={{ rotate: -90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: 90, opacity: 0 }}
+                      initial={{ scale: 0, rotate: -90 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      exit={{ scale: 0, rotate: 90 }}
                   >
-                      <FiX size={24} />
+                      <FiX size={20} />
                   </motion.div>
               ) : (
                   <motion.div
-                      key="chat"
+                      key="trigger"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
                       className="relative"
                   >
-                      <FiMessageSquare size={24} />
-                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-black"></span>
+                        {/* A stylized folder/grid icon or first char of brand? Let's use FiHelpCircle combined with a dot? */}
+                        {/* Or FiMessageSquare for familiarity */}
+                        <div className="relative">
+                            <FiHelpCircle size={22} />
+                            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-primary"></span>
+                        </div>
                   </motion.div>
               )}
           </AnimatePresence>
-        </button>
-      )}
+      </button>
 
     </div>
   );
