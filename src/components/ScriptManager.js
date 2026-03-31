@@ -18,7 +18,7 @@ export default function ScriptManager({ scripts = {} }) {
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
-            strategy="beforeInteractive"
+            strategy="afterInteractive"
           />
           <Script id="google-analytics" strategy="afterInteractive">
             {`

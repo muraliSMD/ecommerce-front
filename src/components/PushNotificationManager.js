@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useUserStore } from "@/store/userStore";
 import { api } from "@/lib/api";
 
@@ -52,7 +52,7 @@ export default function PushNotificationManager() {
       
   }, [token, isHydrated]);
 
-  const subscribeUser = async () => {
+  const subscribeUser = useCallback(async () => {
      if (!isHydrated || !token || !("serviceWorker" in navigator)) return;
      
      try {
@@ -83,7 +83,7 @@ export default function PushNotificationManager() {
             console.error("Subscription failed", err);
         }
     }
-};
+  }, [isHydrated, token]);
 
   // Auto-subscribe on load if logged in and permission granted? 
   // Or just render nothing and use this as a logic container.
@@ -93,7 +93,7 @@ export default function PushNotificationManager() {
       if(isHydrated && token && Notification.permission === 'granted') {
           subscribeUser();
       }
-  }, [token, isHydrated]);
+  }, [token, isHydrated, subscribeUser]);
 
   return null; // This component doesn't render anything visible, just handles logic
 }
