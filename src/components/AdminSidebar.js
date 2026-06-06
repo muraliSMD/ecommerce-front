@@ -63,7 +63,7 @@ export default function AdminSidebar({
 
   useEffect(() => {
     setIsMobileOpen(false);
-  }, [pathname]);
+  }, [pathname, setIsMobileOpen]);
 
   // Close mobile menu on resize > md
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function AdminSidebar({
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [setIsMobileOpen]);
 
   return (
     <>
