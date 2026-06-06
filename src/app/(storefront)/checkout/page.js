@@ -16,7 +16,7 @@ import { useWindowSize } from "react-use";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { format } from "date-fns";
-import { getClosestColorName } from "@/lib/colors";
+import { getClosestColorName, getColorValue } from "@/lib/colors";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -57,6 +57,7 @@ export default function CheckoutPage() {
   // Default to form data if no address selected (guest or new address)
   const billingDetail = selectedAddress || formData; 
   const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [paymentSubMethod, setPaymentSubMethod] = useState("UPI");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const settings = useSettingsStore((state) => state.settings);
@@ -319,6 +320,7 @@ export default function CheckoutPage() {
                 name: billingDetail.name,
                 email: billingDetail.email || userInfo?.email,
                 contact: billingDetail.phone,
+                ...(paymentSubMethod === "UPI" ? { method: 'upi' } : { method: 'card' })
             },
             theme: {
                 color: "#3399cc",
@@ -329,7 +331,27 @@ export default function CheckoutPage() {
                     toast("Payment cancelled");
                     logAbandonedCheckout('cancelled');
                 }
-            }
+            },
+            ...(paymentSubMethod === "UPI" ? {
+                config: {
+                    display: {
+                        blocks: {
+                            banks: {
+                                name: "UPI / UPI Apps",
+                                instruments: [
+                                    {
+                                        method: "upi"
+                                    }
+                                ]
+                            }
+                        },
+                        sequence: ["block.banks"],
+                        preferences: {
+                            show_default_blocks: false
+                        }
+                    }
+                }
+            } : {})
         };
 
         const paymentObject = new window.Razorpay(options);
@@ -824,21 +846,49 @@ export default function CheckoutPage() {
                 )}
 
                 {(settings.paymentMethods?.online ?? true) && (
+                  <>
                     <button
-                    onClick={() => !isSubmitting && setPaymentMethod("Online")}
-                    disabled={isSubmitting}
-                    className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
-                        paymentMethod === "Online" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
-                    } disabled:opacity-50`}
+                      onClick={() => {
+                        if (!isSubmitting) {
+                          setPaymentMethod("Online");
+                          setPaymentSubMethod("UPI");
+                        }
+                      }}
+                      disabled={isSubmitting}
+                      className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
+                          paymentMethod === "Online" && paymentSubMethod === "UPI" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
+                      } disabled:opacity-50`}
                     >
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" ? "border-primary" : "border-gray-300"}`}>
-                        {paymentMethod === "Online" && <div className="w-3 h-3 bg-primary rounded-full" />}
-                    </div>
-                    <div className="text-left">
-                        <p className="font-bold text-text-main">Online Payment</p>
-                        <p className="text-sm text-text-muted">Secure Razorpay payment</p>
-                    </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" && paymentSubMethod === "UPI" ? "border-primary" : "border-gray-300"}`}>
+                          {paymentMethod === "Online" && paymentSubMethod === "UPI" && <div className="w-3 h-3 bg-primary rounded-full" />}
+                      </div>
+                      <div className="text-left">
+                          <p className="font-bold text-text-main">UPI / UPI Apps</p>
+                          <p className="text-sm text-text-muted">Pay via GPay, PhonePe, Paytm, etc.</p>
+                      </div>
                     </button>
+
+                    <button
+                      onClick={() => {
+                        if (!isSubmitting) {
+                          setPaymentMethod("Online");
+                          setPaymentSubMethod("Card");
+                        }
+                      }}
+                      disabled={isSubmitting}
+                      className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
+                          paymentMethod === "Online" && paymentSubMethod === "Card" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
+                      } disabled:opacity-50`}
+                    >
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" && paymentSubMethod === "Card" ? "border-primary" : "border-gray-300"}`}>
+                          {paymentMethod === "Online" && paymentSubMethod === "Card" && <div className="w-3 h-3 bg-primary rounded-full" />}
+                      </div>
+                      <div className="text-left">
+                          <p className="font-bold text-text-main">Cards / Netbanking</p>
+                          <p className="text-sm text-text-muted">Debit/Credit Card, Netbanking, Wallet</p>
+                      </div>
+                    </button>
+                  </>
                 )}
 
                 {!isOrderPlaced && (!items.length || (!(settings.paymentMethods?.cod ?? true) && !(settings.paymentMethods?.online ?? true))) && (
@@ -874,12 +924,25 @@ export default function CheckoutPage() {
                     <div className="flex-grow">
                       <h4 className="font-bold text-sm line-clamp-1">{item.product?.name || "Unknown Product"}</h4>
                       {item.variant && (
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-1 line-clamp-1">
-                            {Object.entries(item.variant)
-                                .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
-                                .map(([k, v]) => k === 'color' ? resolveColorName(v) : v)
-                                .join(' • ')}
-                          </p>
+                        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 mt-1 text-[9px] font-bold uppercase tracking-wider text-text-muted">
+                          {item.variant.color && (
+                            <div className="flex items-center gap-1 bg-bg-section/60 dark:bg-bg-section/20 border border-border-main/50 px-1.5 py-0.5 rounded-full">
+                              <span 
+                                className="w-2 h-2 rounded-full border border-border-main/50 inline-block shadow-inner flex-shrink-0"
+                                style={{ backgroundColor: getColorValue(item.variant.color) }}
+                              />
+                              <span>{resolveColorName(item.variant.color)}</span>
+                            </div>
+                          )}
+                          {Object.entries(item.variant)
+                            .filter(([k, v]) => v && !['color', '_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
+                            .map(([k, v]) => (
+                              <span key={k} className="bg-bg-section/60 dark:bg-bg-section/20 border border-border-main/50 px-1.5 py-0.5 rounded-full">
+                                {v}
+                              </span>
+                            ))
+                          }
+                        </div>
                       )}
                       <p className="text-xs text-gray-400 mt-1">{item.quantity} × {getCurrencySymbol()}{item.variant?.price ?? item.product?.price ?? 0}</p>
                       {item.isPreBook && (

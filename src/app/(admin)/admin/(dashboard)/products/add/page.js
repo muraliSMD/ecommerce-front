@@ -29,6 +29,7 @@ import RichTextEditor from "@/components/admin/RichTextEditor";
 import imageCompression from "browser-image-compression";
 import Image from "next/image";
 import { formatColorInput, getColorValue } from "@/lib/colors";
+import ColorSelect from "@/components/admin/ColorSelect";
 import ColorPreview from "@/components/admin/ColorPreview";
 import { SIZE_OPTIONS, LENGTH_OPTIONS, AGE_OPTIONS, BLOUSE_OPTIONS, BLOUSE_METER_OPTIONS, SILK_TYPE_OPTIONS } from "@/lib/constants";
 
@@ -570,15 +571,10 @@ export default function AddProduct() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Color</label>
-                    <input 
-                      type="text" 
-                      name="color"
+                    <ColorSelect 
                       value={product.color}
-                      onChange={handleInputChange}
-                      placeholder="e.g. Black"
-                      className="w-full bg-white border border-gray-100 focus:border-primary focus:ring-4 focus:ring-primary/10 px-6 py-4 rounded-2xl outline-none transition-all"
+                      onChange={(val) => setProduct({...product, color: val})}
                     />
-                    <ColorPreview color={product.color} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">N-Size (Numerical)</label>
@@ -852,17 +848,14 @@ export default function AddProduct() {
           
           {/* New Variant Form */}
           <div className="bg-surface rounded-3xl p-6 mb-8 border border-gray-100 flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Color</label>
-                <input 
-                  type="text" 
+                <ColorSelect 
                   value={newVariant.color}
-                  onChange={(e) => setNewVariant({...newVariant, color: e.target.value})}
-                  placeholder="e.g. Black"
-                  className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
+                  onChange={(val) => setNewVariant({...newVariant, color: val})}
+                  placeholder="Select Color"
                 />
-                <ColorPreview color={newVariant.color} />
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Size</label>
@@ -958,7 +951,7 @@ export default function AddProduct() {
               )}
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4 items-end">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Selling Price</label>
                 <input 
@@ -1023,16 +1016,12 @@ export default function AddProduct() {
                   className="w-full bg-white border border-gray-100 px-4 py-3 rounded-xl outline-none text-sm focus:border-primary transition-colors"
                 />
               </div>
-            </div>
-
-            {/* Pre-book for New Variant */}
-            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold text-gray-700">Pre-book for this variant</p>
+              <div className="col-span-2 sm:col-span-1 bg-primary/5 p-3 rounded-xl border border-primary/10 flex items-center justify-between gap-3 h-[46px] mb-[2px]">
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Pre-book</span>
                 <button 
                   type="button" 
                   onClick={() => setNewVariant({...newVariant, isPreBook: !newVariant.isPreBook})}
-                  className={`w-10 h-5 rounded-full transition-all relative ${newVariant.isPreBook ? 'bg-primary' : 'bg-gray-200'}`}
+                  className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${newVariant.isPreBook ? 'bg-primary' : 'bg-gray-200'}`}
                 >
                   <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${newVariant.isPreBook ? 'left-5.5' : 'left-0.5'}`} />
                 </button>
@@ -1053,183 +1042,194 @@ export default function AddProduct() {
           {/* Variants Table */}
           <div className="space-y-4">
             {product.variants.map((v, i) => (
-              <div key={i} className="flex flex-col p-5 bg-surface rounded-2xl border border-gray-100 group gap-4">
-                <div className="flex flex-col lg:flex-row gap-4 flex-1 items-start lg:items-center flex-wrap">
-                  <div className="flex items-center gap-2 min-w-[100px]">
-                    <div className="w-4 h-4 rounded-full border border-gray-200 shadow-sm bg-white" style={{ backgroundColor: getColorValue(v.color) }}></div>
-                    <input 
-                        type="text"
-                        value={v.color}
-                        onChange={(e) => handleVariantChange(i, 'color', e.target.value)}
-                        className="font-bold text-gray-900 bg-transparent border-b border-transparent hover:border-gray-300 focus:border-primary outline-none transition-colors w-24"
-                    />
+              <div key={i} className="flex flex-col p-6 bg-surface rounded-[2rem] border border-gray-100 group gap-6 shadow-sm hover:shadow-md transition-shadow">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Variant #{i + 1}</span>
+                    {v.color && (
+                      <span className="px-2.5 py-1 bg-primary/5 rounded-lg text-xs font-bold text-primary">
+                        {v.color}
+                      </span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                    <span className="text-xs text-gray-500 font-medium">Size:</span>
-                    <select 
-                      value={v.size || ""} 
-                      onChange={(e) => handleVariantChange(i, 'size', e.target.value)} 
-                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16 appearance-none"
-                    >
-                      <option value="">-</option>
-                      {SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                    <span className="text-xs text-gray-500 font-medium">N-Size:</span>
-                    <input 
-                      type="text" 
-                      value={v.nSize || ""} 
-                      onChange={(e) => handleVariantChange(i, 'nSize', e.target.value)} 
-                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                    <span className="text-xs text-gray-500 font-medium">Length:</span>
-                    <select 
-                      value={v.length || ""} 
-                      onChange={(e) => handleVariantChange(i, 'length', e.target.value)} 
-                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-20 appearance-none"
-                    >
-                      <option value="">-</option>
-                      {LENGTH_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                    <span className="text-xs text-gray-500 font-medium">Age:</span>
-                    <select 
-                      value={v.age || ""} 
-                      onChange={(e) => handleVariantChange(i, 'age', e.target.value)} 
-                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-24 appearance-none"
-                    >
-                      <option value="">-</option>
-                      {AGE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                    <span className="text-xs text-gray-500 font-medium">N-Size:</span>
-                    <input 
-                      type="text" 
-                      value={v.nSize || ""} 
-                      onChange={(e) => handleVariantChange(i, 'nSize', e.target.value)} 
-                      className="bg-transparent text-sm font-bold text-gray-700 outline-none w-16"
-                    />
-                  </div>
-                  
-                  {isSaree && (
-                    <>
-                      <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                        <span className="text-xs text-gray-500 font-medium">Blouse:</span>
-                        <select 
-                          value={v.withBlouse || ""} 
-                          onChange={(e) => handleVariantChange(i, 'withBlouse', e.target.value)} 
-                          className="bg-transparent text-sm font-bold text-gray-700 outline-none w-24 appearance-none"
-                        >
-                          <option value="">-</option>
-                          {BLOUSE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                        </select>
-                      </div>
-                      <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                        <span className="text-xs text-gray-500 font-medium">Blouse Mt:</span>
-                        <select 
-                          value={v.blouseMeter || ""} 
-                          onChange={(e) => handleVariantChange(i, 'blouseMeter', e.target.value)} 
-                          className="bg-transparent text-sm font-bold text-gray-700 outline-none w-20 appearance-none"
-                        >
-                          <option value="">-</option>
-                          {BLOUSE_METER_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                        </select>
-                      </div>
-                      <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-md focus-within:ring-2 focus-within:ring-primary/20">
-                        <span className="text-xs text-gray-500 font-medium">Silk:</span>
-                        <select 
-                          value={v.silkType || ""} 
-                          onChange={(e) => handleVariantChange(i, 'silkType', e.target.value)} 
-                          className="bg-transparent text-sm font-bold text-gray-700 outline-none w-28 appearance-none"
-                        >
-                          <option value="">-</option>
-                          {SILK_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                        </select>
-                      </div>
-                    </>
-                  )}
-                  
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase">Price</span>
-                    <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{mounted ? getCurrencySymbol() : ""}</span>
-                        <input 
-                            type="number" 
-                            value={v.price} 
-                            onChange={(e) => handleVariantChange(i, 'price', e.target.value)}
-                            className="w-24 bg-white border border-gray-100 pl-6 pr-2 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
-                        />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase">MRP</span>
-                    <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">{mounted ? getCurrencySymbol() : ""}</span>
-                        <input 
-                            type="number" 
-                            value={v.mrp || ""} 
-                            onChange={(e) => handleVariantChange(i, 'mrp', e.target.value)}
-                            className="w-24 bg-white border border-gray-100 pl-6 pr-2 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
-                        />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase">Disc %</span>
-                    <input 
-                        type="number" 
-                        value={v.discount || ""} 
-                        onChange={(e) => handleVariantChange(i, 'discount', e.target.value)}
-                        className="w-16 bg-white border border-gray-100 px-2 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400 uppercase">Stock</span>
-                    <input 
-                        type="number" 
-                        value={v.stock} 
-                        onChange={(e) => handleVariantChange(i, 'stock', e.target.value)}
-                        className="w-20 bg-white border border-gray-100 px-3 py-2 rounded-lg text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1 min-w-[120px] bg-primary/5 p-2 rounded-xl border border-primary/10">
-                    <div className="flex items-center justify-between gap-2">
-                       <span className="text-[9px] font-bold text-primary uppercase">Pre-book</span>
-                       <button 
-                        type="button" 
-                        onClick={() => handleVariantChange(i, 'isPreBook', !v.isPreBook)}
-                        className={`w-8 h-4 rounded-full transition-all relative ${v.isPreBook ? 'bg-primary' : 'bg-gray-200'}`}
-                      >
-                        <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all ${v.isPreBook ? 'left-4.5' : 'left-0.5'}`} />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 md:ml-auto mt-2 md:mt-0">
                     <button 
                       type="button"
                       onClick={() => duplicateVariant(i)}
                       title="Duplicate Variant"
-                      className="p-2 text-gray-300 hover:text-primary bg-white rounded-lg border border-transparent hover:border-primary/10 transition-colors"
+                      className="p-2 text-gray-400 hover:text-primary bg-white rounded-xl border border-gray-200 hover:border-primary/10 transition-colors"
                     >
-                      <FiCopy />
+                      <FiCopy size={16} />
                     </button>
                     <button 
                       type="button"
                       onClick={() => removeVariant(i)}
                       title="Remove Variant"
-                      className="p-2 text-gray-300 hover:text-red-500 bg-white rounded-lg border border-transparent hover:border-red-100 transition-colors"
+                      className="p-2 text-gray-400 hover:text-red-500 bg-white rounded-xl border border-gray-200 hover:border-red-100 transition-colors"
                     >
-                      <FiTrash2 />
+                      <FiTrash2 size={16} />
                     </button>
+                  </div>
+                </div>
+
+                {/* Attributes Grid */}
+                <div>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Attributes</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Color</span>
+                      <ColorSelect 
+                        value={v.color}
+                        onChange={(val) => handleVariantChange(i, 'color', val)}
+                        isInline={true}
+                        className="w-full justify-between"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Size</span>
+                      <select 
+                        value={v.size || ""} 
+                        onChange={(e) => handleVariantChange(i, 'size', e.target.value)} 
+                        className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-primary transition-colors appearance-none"
+                      >
+                        <option value="">-</option>
+                        {SIZE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">N-Size</span>
+                      <input 
+                        type="text" 
+                        value={v.nSize || ""} 
+                        onChange={(e) => handleVariantChange(i, 'nSize', e.target.value)} 
+                        className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-primary transition-colors"
+                        placeholder="e.g. 38"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Length</span>
+                      <select 
+                        value={v.length || ""} 
+                        onChange={(e) => handleVariantChange(i, 'length', e.target.value)} 
+                        className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-primary transition-colors appearance-none"
+                      >
+                        <option value="">-</option>
+                        {LENGTH_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Age Group</span>
+                      <select 
+                        value={v.age || ""} 
+                        onChange={(e) => handleVariantChange(i, 'age', e.target.value)} 
+                        className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-primary transition-colors appearance-none"
+                      >
+                        <option value="">-</option>
+                        {AGE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    </div>
+                    
+                    {isSaree && (
+                      <>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Blouse</span>
+                          <select 
+                            value={v.withBlouse || ""} 
+                            onChange={(e) => handleVariantChange(i, 'withBlouse', e.target.value)} 
+                            className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-primary transition-colors appearance-none"
+                          >
+                            <option value="">-</option>
+                            {BLOUSE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                          </select>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Blouse Mt</span>
+                          <select 
+                            value={v.blouseMeter || ""} 
+                            onChange={(e) => handleVariantChange(i, 'blouseMeter', e.target.value)} 
+                            className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-primary transition-colors appearance-none"
+                          >
+                            <option value="">-</option>
+                            {BLOUSE_METER_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                          </select>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Silk Type</span>
+                          <select 
+                            value={v.silkType || ""} 
+                            onChange={(e) => handleVariantChange(i, 'silkType', e.target.value)} 
+                            className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-700 outline-none focus:border-primary transition-colors appearance-none"
+                          >
+                            <option value="">-</option>
+                            {SILK_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                          </select>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Inventory & Pricing Grid */}
+                <div className="pt-4 border-t border-gray-100">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Inventory & Pricing</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4 items-end">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Price</span>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">{mounted ? getCurrencySymbol() : ""}</span>
+                        <input 
+                          type="number" 
+                          value={v.price} 
+                          onChange={(e) => handleVariantChange(i, 'price', e.target.value)}
+                          className="w-full bg-white border border-gray-100 pl-8 pr-3 py-2 rounded-xl text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">MRP</span>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">{mounted ? getCurrencySymbol() : ""}</span>
+                        <input 
+                          type="number" 
+                          value={v.mrp || ""} 
+                          onChange={(e) => handleVariantChange(i, 'mrp', e.target.value)}
+                          className="w-full bg-white border border-gray-100 pl-8 pr-3 py-2 rounded-xl text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Disc %</span>
+                      <input 
+                        type="number" 
+                        value={v.discount || ""} 
+                        onChange={(e) => handleVariantChange(i, 'discount', e.target.value)}
+                        className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Stock</span>
+                      <input 
+                        type="number" 
+                        value={v.stock} 
+                        onChange={(e) => handleVariantChange(i, 'stock', e.target.value)}
+                        className="w-full bg-white border border-gray-100 px-3 py-2 rounded-xl text-sm font-bold text-gray-900 outline-none focus:border-primary transition-colors"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1 bg-primary/5 p-3 rounded-2xl border border-primary/10 flex items-center justify-between gap-3 h-[42px]">
+                      <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Pre-book</span>
+                      <button 
+                        type="button" 
+                        onClick={() => handleVariantChange(i, 'isPreBook', !v.isPreBook)}
+                        className={`w-10 h-5 rounded-full transition-all relative flex-shrink-0 ${v.isPreBook ? 'bg-primary' : 'bg-gray-200'}`}
+                      >
+                        <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${v.isPreBook ? 'left-5.5' : 'left-0.5'}`} />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 

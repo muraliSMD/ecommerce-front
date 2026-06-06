@@ -11,7 +11,7 @@ import ReviewModal from "@/components/ReviewModal";
 import { FiStar, FiDownload } from "react-icons/fi";
 import { generateInvoice } from "@/lib/invoiceGenerator";
 import InlineOrderReview from "@/components/InlineOrderReview";
-import { getClosestColorName } from "@/lib/colors";
+import { getClosestColorName, getColorValue } from "@/lib/colors";
 
 import { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -197,10 +197,26 @@ export default function OrderDetailsPage() {
                                  <div className="flex-1">
                                     <h4 className="font-bold text-text-main">{item.product?.name || "Product"}</h4>
                                      {item.variant && (
-                                        <p className="text-sm text-text-muted">
-                                            {resolveColorName(item.variant.color)} / {item.variant.size}
-                                        </p>
-                                    )}
+                                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-xs font-bold uppercase tracking-wider text-text-muted">
+                                          {item.variant.color && (
+                                            <div className="flex items-center gap-1.5 bg-bg-section/60 dark:bg-bg-section/20 border border-border-main/50 px-2 py-0.5 rounded-full">
+                                              <span 
+                                                className="w-2.5 h-2.5 rounded-full border border-border-main/50 inline-block shadow-inner flex-shrink-0"
+                                                style={{ backgroundColor: getColorValue(item.variant.color) }}
+                                              />
+                                              <span>{resolveColorName(item.variant.color)}</span>
+                                            </div>
+                                          )}
+                                          {Object.entries(item.variant)
+                                            .filter(([k, v]) => v && !['color', '_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
+                                            .map(([k, v]) => (
+                                              <span key={k} className="bg-bg-section/60 dark:bg-bg-section/20 border border-border-main/50 px-2 py-0.5 rounded-full">
+                                                {v}
+                                              </span>
+                                            ))
+                                          }
+                                        </div>
+                                     )}
                                         <p className="text-sm text-text-main font-bold mt-1">Qty: {item.quantity}</p>
                                     </div>
                                     <p className="font-bold text-lg">{formatPrice(item.price * item.quantity)}</p>

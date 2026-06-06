@@ -3,7 +3,7 @@ import Image from "next/image";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import { useSettingsStore } from "@/store/settingsStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { getClosestColorName } from "@/lib/colors";
+import { getClosestColorName, getColorValue } from "@/lib/colors";
 
 export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
@@ -36,12 +36,25 @@ export default function CartItem({ item, onRemove, onIncrement, onDecrement }) {
           <div>
             <h3 className="text-lg font-display font-bold text-text-main line-clamp-1">{item.product?.name || "Unknown Product"}</h3>
             {item.variant && (
-              <p className="text-xs font-bold uppercase tracking-wider text-primary/60 mt-1 line-clamp-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                {item.variant.color && (
+                  <div className="flex items-center gap-1.5 bg-bg-section/60 dark:bg-bg-section/20 border border-border-main/50 px-2 py-0.5 rounded-full">
+                    <span 
+                      className="w-2.5 h-2.5 rounded-full border border-border-main/50 inline-block shadow-inner flex-shrink-0"
+                      style={{ backgroundColor: getColorValue(item.variant.color) }}
+                    />
+                    <span>{resolveColorName(item.variant.color)}</span>
+                  </div>
+                )}
                 {Object.entries(item.variant)
-                    .filter(([k, v]) => v && !['_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
-                    .map(([k, v]) => k === 'color' ? resolveColorName(v) : v)
-                    .join(' • ')}
-              </p>
+                  .filter(([k, v]) => v && !['color', '_id', 'stock', 'price', 'images', 'mrp', 'discount', 'sku', 'videos'].includes(k))
+                  .map(([k, v]) => (
+                    <span key={k} className="bg-bg-section/60 dark:bg-bg-section/20 border border-border-main/50 px-2 py-0.5 rounded-full">
+                      {v}
+                    </span>
+                  ))
+                }
+              </div>
             )}
             {item.isPreBook && (
               <div className="mt-1">

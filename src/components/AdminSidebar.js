@@ -43,12 +43,23 @@ const navItems = [
   { label: "Settings", href: "/admin/settings", icon: FiSettings },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ 
+  isCollapsed: propIsCollapsed, 
+  setIsCollapsed: propSetIsCollapsed, 
+  isMobileOpen: propIsMobileOpen, 
+  setIsMobileOpen: propSetIsMobileOpen 
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout, userInfo } = useUserStore();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  
+  const [localIsCollapsed, localSetIsCollapsed] = useState(false);
+  const [localIsMobileOpen, localSetIsMobileOpen] = useState(false);
+
+  const isCollapsed = propIsCollapsed !== undefined ? propIsCollapsed : localIsCollapsed;
+  const setIsCollapsed = propSetIsCollapsed || localSetIsCollapsed;
+  const isMobileOpen = propIsMobileOpen !== undefined ? propIsMobileOpen : localIsMobileOpen;
+  const setIsMobileOpen = propSetIsMobileOpen || localSetIsMobileOpen;
 
   useEffect(() => {
     setIsMobileOpen(false);
