@@ -57,6 +57,7 @@ export default function CheckoutPage() {
   // Default to form data if no address selected (guest or new address)
   const billingDetail = selectedAddress || formData; 
   const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [paymentSubMethod, setPaymentSubMethod] = useState("UPI");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const settings = useSettingsStore((state) => state.settings);
@@ -319,6 +320,7 @@ export default function CheckoutPage() {
                 name: billingDetail.name,
                 email: billingDetail.email || userInfo?.email,
                 contact: billingDetail.phone,
+                ...(paymentSubMethod === "UPI" ? { method: 'upi' } : { method: 'card' })
             },
             theme: {
                 color: "#3399cc",
@@ -329,7 +331,27 @@ export default function CheckoutPage() {
                     toast("Payment cancelled");
                     logAbandonedCheckout('cancelled');
                 }
-            }
+            },
+            ...(paymentSubMethod === "UPI" ? {
+                config: {
+                    display: {
+                        blocks: {
+                            banks: {
+                                name: "UPI / UPI Apps",
+                                instruments: [
+                                    {
+                                        method: "upi"
+                                    }
+                                ]
+                            }
+                        },
+                        sequence: ["block.banks"],
+                        preferences: {
+                            show_default_blocks: false
+                        }
+                    }
+                }
+            } : {})
         };
 
         const paymentObject = new window.Razorpay(options);
@@ -824,21 +846,49 @@ export default function CheckoutPage() {
                 )}
 
                 {(settings.paymentMethods?.online ?? true) && (
+                  <>
                     <button
-                    onClick={() => !isSubmitting && setPaymentMethod("Online")}
-                    disabled={isSubmitting}
-                    className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
-                        paymentMethod === "Online" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
-                    } disabled:opacity-50`}
+                      onClick={() => {
+                        if (!isSubmitting) {
+                          setPaymentMethod("Online");
+                          setPaymentSubMethod("UPI");
+                        }
+                      }}
+                      disabled={isSubmitting}
+                      className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
+                          paymentMethod === "Online" && paymentSubMethod === "UPI" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
+                      } disabled:opacity-50`}
                     >
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" ? "border-primary" : "border-gray-300"}`}>
-                        {paymentMethod === "Online" && <div className="w-3 h-3 bg-primary rounded-full" />}
-                    </div>
-                    <div className="text-left">
-                        <p className="font-bold text-text-main">Online Payment</p>
-                        <p className="text-sm text-text-muted">Secure Razorpay payment</p>
-                    </div>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" && paymentSubMethod === "UPI" ? "border-primary" : "border-gray-300"}`}>
+                          {paymentMethod === "Online" && paymentSubMethod === "UPI" && <div className="w-3 h-3 bg-primary rounded-full" />}
+                      </div>
+                      <div className="text-left">
+                          <p className="font-bold text-text-main">UPI / UPI Apps</p>
+                          <p className="text-sm text-text-muted">Pay via GPay, PhonePe, Paytm, etc.</p>
+                      </div>
                     </button>
+
+                    <button
+                      onClick={() => {
+                        if (!isSubmitting) {
+                          setPaymentMethod("Online");
+                          setPaymentSubMethod("Card");
+                        }
+                      }}
+                      disabled={isSubmitting}
+                      className={`flex items-center gap-4 p-6 rounded-2xl border-2 transition-all ${
+                          paymentMethod === "Online" && paymentSubMethod === "Card" ? "border-primary bg-primary/5" : "border-gray-100 hover:border-gray-200"
+                      } disabled:opacity-50`}
+                    >
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === "Online" && paymentSubMethod === "Card" ? "border-primary" : "border-gray-300"}`}>
+                          {paymentMethod === "Online" && paymentSubMethod === "Card" && <div className="w-3 h-3 bg-primary rounded-full" />}
+                      </div>
+                      <div className="text-left">
+                          <p className="font-bold text-text-main">Cards / Netbanking</p>
+                          <p className="text-sm text-text-muted">Debit/Credit Card, Netbanking, Wallet</p>
+                      </div>
+                    </button>
+                  </>
                 )}
 
                 {!isOrderPlaced && (!items.length || (!(settings.paymentMethods?.cod ?? true) && !(settings.paymentMethods?.online ?? true))) && (
