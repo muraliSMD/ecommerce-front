@@ -214,3 +214,17 @@ SyntaxError: Unexpected end of JSON input
     at NextRequest.json (node:internal/deps/undici/undici:5665:18)
     at POST (webpack-internal:///(rsc)/./src/app/api/users/login/route.js:29:36)
     at async AppRouteRouteModule.do (D:\projects\ecomerce-application\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:5:38696)
+2026-06-06 11:23:54 [[33mwarn[39m]: Failed login attempt: User not found {
+  "email": "grabszy2026@gmail.com"
+} 
+2026-06-06 11:23:59 [[33mwarn[39m]: Failed login attempt: User not found {
+  "email": "grabszy2026@gmail.com"
+} 
+2026-06-06 11:24:05 [[33mwarn[39m]: Failed login attempt: User not found {
+  "email": "grabszy2026@gmail.com"
+} 
+2026-06-06 11:24:40 [[32minfo[39m]: User logged in successfully {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244",
+  "role": "admin"
+} 

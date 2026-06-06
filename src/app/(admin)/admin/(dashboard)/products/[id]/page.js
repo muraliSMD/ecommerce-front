@@ -209,9 +209,11 @@ export default function ProductDetailsAdmin({ params }) {
                   {product.color && (
                     <div className="flex items-center gap-2">
                        <span className="text-sm font-medium text-gray-500">Color:</span>
-                       <span className="font-bold text-gray-900 text-sm flex items-center gap-2">
-                        {resolveColorName(product.color)}
-                       </span>
+                       <span 
+                         className="w-3.5 h-3.5 rounded-full border border-gray-200 shadow-sm flex-shrink-0"
+                         style={{ backgroundColor: getColorValue(product.color) }}
+                       />
+                       <span className="font-bold text-gray-900 text-sm">{resolveColorName(product.color)}</span>
                     </div>
                   )}
                   {product.size && (
@@ -264,8 +266,8 @@ export default function ProductDetailsAdmin({ params }) {
             <h2 className="text-xl font-display font-bold mb-6 flex items-center gap-3">
               <FiGrid className="text-primary" /> Variants Inventory
             </h2>
-            <div className="overflow-hidden rounded-2xl border border-gray-100">
-              <table className="w-full text-left">
+            <div className="overflow-hidden overflow-x-auto rounded-2xl border border-gray-100 w-full max-w-full">
+              <table className="w-full text-left min-w-[500px]">
                 <thead>
                   <tr className="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                     <th className="px-6 py-4">Image</th>
@@ -292,7 +294,15 @@ export default function ProductDetailsAdmin({ params }) {
                         </div>
                       </td>
                        <td className="px-6 py-4">
-                        <span className={`font-bold ${selectedVariant === v ? 'text-primary' : 'text-gray-900'}`}>{resolveColorName(v.color)}</span>
+                        <div className="flex items-center gap-2">
+                          {v.color && (
+                            <span 
+                              className="w-3 h-3 rounded-full border border-gray-200 shadow-sm flex-shrink-0"
+                              style={{ backgroundColor: getColorValue(v.color) }}
+                            />
+                          )}
+                          <span className={`font-bold ${selectedVariant === v ? 'text-primary' : 'text-gray-900'}`}>{resolveColorName(v.color)}</span>
+                        </div>
                        </td>
                       <td className="px-6 py-4 font-medium text-gray-600">
                         {v.size && `Size: ${v.size}`}

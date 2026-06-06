@@ -117,5 +117,20 @@ export function getClosestColorName(hexStr) {
 }
 
 export function formatColorInput(input) {
+  if (!input) return "";
+  const lower = input.toLowerCase().trim();
+  const matched = Object.keys(colorMap).find(k => k === lower);
+  if (matched) {
+    return matched.charAt(0).toUpperCase() + matched.slice(1);
+  }
   return input;
 }
+
+export function getStandardColorName(colorName) {
+  return formatColorInput(colorName);
+}
+
+export const commonColors = Object.keys(colorMap).map(
+  (colorKey) => colorKey.charAt(0).toUpperCase() + colorKey.slice(1)
+).sort((a, b) => a.localeCompare(b));
+

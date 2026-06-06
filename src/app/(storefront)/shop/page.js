@@ -482,11 +482,11 @@ export default function ShopPage() {
               </div>
             ) : (
                 <>
-                <div className={
-                    viewMode === "grid" 
-                    ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4"
-                    : "space-y-4"
-                }>
+                 <div className={
+                     viewMode === "grid" 
+                     ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 md:gap-4"
+                     : "space-y-4"
+                 }>
                     <AnimatePresence mode="popLayout">
                         {products?.map((product, index) => (
                         viewMode === "grid" ? (

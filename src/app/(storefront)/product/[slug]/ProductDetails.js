@@ -577,12 +577,16 @@ export default function ProductDetails({ initialProduct }) {
               
               {/* Product Specifications */}
               {(product.color || product.size || product.length || product.age || product.silkType || product.withBlouse || product.blouseMeter) && (
-                <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main space-y-3 w-max min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
+                <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main space-y-3 w-full sm:w-max sm:min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
                   <p className="text-[12px] font-bold text-text-muted uppercase tracking-widest">Product Specifications</p>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2">
                     {product.color && (
                       <div className="flex items-center gap-2">
                          <span className="text-sm md:text-base text-text-muted">Color:</span>
+                         <span 
+                           className="w-3.5 h-3.5 rounded-full border border-border-main/50 shadow-inner flex-shrink-0"
+                           style={{ backgroundColor: getColorValue(product.color) }}
+                         />
                          <span className="font-bold text-text-main text-base">{resolveColorName(product.color)}</span>
                       </div>
                     )}
@@ -637,7 +641,18 @@ export default function ProductDetails({ initialProduct }) {
             {/* Colors */}
             {allColors.length > 0 && (
               <VariantSlider 
-                title={<span>Colour: <span className="text-text-main ml-2">{resolveColorName(selectedColor)}</span></span>}
+                title={
+                  <span className="flex items-center gap-2">
+                    Colour: 
+                    {selectedColor && (
+                      <span 
+                        className="w-3.5 h-3.5 rounded-full border border-border-main/50 shadow-inner inline-block align-middle" 
+                        style={{ backgroundColor: getColorValue(selectedColor) }}
+                      />
+                    )}
+                    <span className="text-text-main ml-1">{resolveColorName(selectedColor)}</span>
+                  </span>
+                }
                 orderClass="order-2 lg:order-6 mt-4 md:mt-0"
               >
                 {allColors.map((color) => {
@@ -663,7 +678,13 @@ export default function ProductDetails({ initialProduct }) {
                           <div className={`absolute inset-0 bg-black/20 ${selectedColor === color ? 'bg-black/0' : 'group-hover:bg-black/10'} transition-colors`} />
                         </>
                        ) : (
-                         <span className={`${selectedColor === color ? "text-primary font-bold" : ""}`}>{resolveColorName(color)}</span>
+                         <span className={`flex items-center gap-2 ${selectedColor === color ? "text-primary font-bold" : ""}`}>
+                           <span 
+                             className="w-3 h-3 rounded-full border border-border-main/50 shadow-inner flex-shrink-0"
+                             style={{ backgroundColor: getColorValue(color) }}
+                           />
+                           <span>{resolveColorName(color)}</span>
+                         </span>
                        )}
                     </button>
                   )

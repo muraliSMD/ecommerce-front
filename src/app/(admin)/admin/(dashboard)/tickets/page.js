@@ -48,8 +48,8 @@ export default function AdminTicketsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto w-full max-w-full">
+        <table className="w-full text-left min-w-[800px]">
             <thead className="bg-gray-50 border-b border-gray-100">
                 <tr>
                     <th className="p-4 font-bold text-gray-500 text-sm">Subject</th>
