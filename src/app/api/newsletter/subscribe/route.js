@@ -2,9 +2,13 @@ import dbConnect from "@/lib/db";
 import Subscriber from "@/models/Subscriber";
 import { NextResponse } from "next/server";
 import logger from "@/lib/logger";
+import { rateLimit } from "@/lib/rateLimit";
 
 export async function POST(request) {
   try {
+    const rateLimitResponse = rateLimit(request, 3, 60000); // 3 requests per minute per IP
+    if (rateLimitResponse) return rateLimitResponse;
+
     await dbConnect();
     const { email } = await request.json();
 

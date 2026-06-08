@@ -48,7 +48,11 @@ export const getFullUserFromRequest = async (req) => {
   
   await dbConnect();
   try {
-    return await User.findById(payload.userId).select('-password');
+    const user = await User.findById(payload.userId).select('-password');
+    if (user && user.isBanned) {
+      return null;
+    }
+    return user;
   } catch (error) {
     return null;
   }

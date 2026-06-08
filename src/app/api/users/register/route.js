@@ -51,8 +51,6 @@ export async function POST(request) {
 
     await sendVerificationEmail(newUser, verificationToken);
 
-    const token = signToken({ userId: newUser._id });
-    
     // Return user without password
     const userResponse = newUser.toObject();
     delete userResponse.password;
@@ -62,8 +60,7 @@ export async function POST(request) {
     logger.info(`New user registered`, { email, userId: newUser._id });
     return NextResponse.json({ 
         message: "Registration successful. Please verify your email.",
-        user: userResponse, 
-        token 
+        user: userResponse
     }, { status: 201 });
   } catch (error) {
     logger.error("Registration Error", { error: error.message, stack: error.stack });

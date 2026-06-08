@@ -443,17 +443,18 @@ export default function CheckoutPage() {
   }, [billingDetail.name, billingDetail.phone, items.length, isOrderPlaced, logAbandonedCheckout]);
 
   const handlePlaceOrder = async () => {
-    const hasLegacyAddress = !!billingDetail.address;
-    const hasNewAddress = billingDetail.address1 && billingDetail.city && billingDetail.pincode;
-
-    if (!billingDetail.name || (!hasLegacyAddress && !hasNewAddress) || (!userInfo && !billingDetail.email)) {
-      toast.error("Please fill in all shipping details including your email address.");
+    if (!userInfo) {
+      toast.error("Please login to complete your purchase.");
+      setAuthModalOpen(true, "login");
       return;
     }
 
-    if (!userInfo && billingDetail.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingDetail.email)) {
-        toast.error("Please enter a valid email address");
-        return;
+    const hasLegacyAddress = !!billingDetail.address;
+    const hasNewAddress = billingDetail.address1 && billingDetail.city && billingDetail.pincode;
+
+    if (!billingDetail.name || (!hasLegacyAddress && !hasNewAddress)) {
+      toast.error("Please fill in all shipping details.");
+      return;
     }
 
     setIsSubmitting(true);

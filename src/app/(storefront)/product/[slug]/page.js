@@ -5,6 +5,8 @@ import ProductDetails from "./ProductDetails";
 import ProductJsonLd from "@/components/ProductJsonLd";
 import { notFound } from "next/navigation";
 
+export const revalidate = 300; // Cache page for 5 minutes
+
 export async function generateMetadata({ params, searchParams }) {
   const { slug } = await params;
   const { color, size, length, nSize } = await searchParams;

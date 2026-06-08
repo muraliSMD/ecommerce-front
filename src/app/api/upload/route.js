@@ -1,19 +1,26 @@
 import { NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
+import { getFullUserFromRequest } from '@/lib/auth';
 
 // Add configuration to allow for larger payloads and longer execution on Vercel
 export const maxDuration = 60; // 60 seconds
 export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
-  // Configure Cloudinary inside function for Next.js lambda execution context
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY || process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET || process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
-  });
-
   try {
+    // Auth check
+    const user = await getFullUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Configure Cloudinary inside function for Next.js lambda execution context
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_NAME || process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY || process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET || process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET,
+    });
+
     const formData = await request.formData();
     const file = formData.get('file');
 

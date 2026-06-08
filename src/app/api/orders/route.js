@@ -70,6 +70,9 @@ export async function POST(request) {
 
     await dbConnect();
     const userPayload = await getUserFromRequest(request);
+    if (!userPayload) {
+      return NextResponse.json({ message: "Unauthorized. Please login to place an order." }, { status: 401 });
+    }
     
     // Parse JSON
     const rawBody = await request.json();
@@ -120,6 +123,44 @@ export async function POST(request) {
 
     if (items.length === 0) {
        return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
+    }
+
+    // --- Server-Side Stock Validation ---
+    for (const item of items) {
+      if (item.isPreBook) continue; // Pre-book orders don't require stock check
+      
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return NextResponse.json({ message: `Product not found` }, { status: 400 });
+      }
+
+      if (product.hasVariants && item.variant) {
+        const validKeys = ['color', 'size', 'length', 'age', 'nSize', 'withBlouse', 'blouseMeter', 'silkType'];
+        const targetVariant = product.variants.find(v => {
+          return validKeys.every(k => {
+            if (item.variant[k] !== undefined && item.variant[k] !== null && item.variant[k] !== "") {
+              return v[k] === item.variant[k];
+            }
+            return true;
+          });
+        });
+        
+        if (!targetVariant) {
+          return NextResponse.json({ message: `Variant not found for product ${product.name}` }, { status: 400 });
+        }
+        
+        if (targetVariant.stock < item.quantity) {
+          return NextResponse.json({ 
+            message: `Insufficient stock for product ${product.name} (${targetVariant.color || ''} ${targetVariant.size || ''}). Available: ${targetVariant.stock}` 
+          }, { status: 400 });
+        }
+      } else {
+        if (product.stock < item.quantity) {
+          return NextResponse.json({ 
+            message: `Insufficient stock for product ${product.name}. Available: ${product.stock}` 
+          }, { status: 400 });
+        }
+      }
     }
 
     let totalAmount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);

@@ -228,3 +228,21 @@ SyntaxError: Unexpected end of JSON input
   "userId": "698081fcc3e4cc458f359244",
   "role": "admin"
 } 
+2026-06-08 11:23:05 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<24227d8a-5038-f8c4-c9c3-725938c9e0c2@grabszy.com>",
+  "to": "test@gmail.com",
+  "subject": "Verify Your Email - GRABSZY 📧"
+} 
+2026-06-08 11:23:05 [[32minfo[39m]: New user registered {
+  "email": "test@gmail.com",
+  "userId": "6a2658bab8ca5e2087cea295"
+} 
+2026-06-08 11:24:12 [[32minfo[39m]: Email sent successfully {
+  "messageId": "<782fe17c-182a-db80-8d83-1878f57af964@grabszy.com>",
+  "to": "jopen32546@herojp.com",
+  "subject": "Verify Your Email - GRABSZY 📧"
+} 
+2026-06-08 11:24:12 [[32minfo[39m]: New user registered {
+  "email": "jopen32546@herojp.com",
+  "userId": "6a265902b8ca5e2087cea29b"
+} 

@@ -3,6 +3,11 @@ import Product from '@/models/Product';
 import Category from '@/models/Category';
 import { NextResponse } from 'next/server';
 import { getFullUserFromRequest, isAdmin } from '@/lib/auth';
+import logger from '@/lib/logger';
+
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
 
 export async function GET(request) {
   try {
@@ -42,10 +47,11 @@ export async function GET(request) {
             filter.category = category;
         } else {
             // 2. Try looking up by slug first, then name
+            const escapedCategory = escapeRegExp(category);
             const catDoc = await Category.findOne({ 
               $or: [
                 { slug: category },
-                { name: { $regex: new RegExp(`^${category}$`, 'i') } }
+                { name: { $regex: new RegExp(`^${escapedCategory}$`, 'i') } }
               ]
             });
 
@@ -63,7 +69,9 @@ export async function GET(request) {
             }
         }
     }
-    if (search) filter.name = { $regex: search, $options: "i" };
+    if (search) {
+        filter.name = { $regex: escapeRegExp(search), $options: "i" };
+    }
     
     if (minPrice || maxPrice) {
       filter.price = {};
@@ -74,7 +82,7 @@ export async function GET(request) {
     // Advanced Filtering
     if (colors) {
         const colorArray = colors.split(',');
-        const regexArray = colorArray.map(c => new RegExp(c, 'i'));
+        const regexArray = colorArray.map(c => new RegExp(escapeRegExp(c), 'i'));
         filter.$or = filter.$or || [];
         filter.$or.push({
             $or: [
@@ -86,7 +94,7 @@ export async function GET(request) {
 
     if (sizes) {
         const sizeArray = sizes.split(',');
-        filter['variants.size'] = { $in: sizeArray.map(s => new RegExp(s, 'i')) };
+        filter['variants.size'] = { $in: sizeArray.map(s => new RegExp(escapeRegExp(s), 'i')) };
     }
 
     if (minRating) {

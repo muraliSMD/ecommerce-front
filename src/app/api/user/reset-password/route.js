@@ -14,10 +14,14 @@ export async function POST(request) {
     const rateLimitResponse = rateLimit(request, 5, 3600000);
     if (rateLimitResponse) return rateLimitResponse;
 
-    await dbConnect();
     const { token, password } = await request.json();
 
+    if (!password || password.length < 6) {
+      return NextResponse.json({ message: "Password must be at least 6 characters long" }, { status: 400 });
+    }
+
     // Get hashed token
+    await dbConnect();
     const resetPasswordToken = crypto
       .createHash("sha256")
       .update(token)
