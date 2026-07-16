@@ -7,10 +7,12 @@ import User from '@/models/User';
 import Coupon from '@/models/Coupon';
 import CouponUsage from '@/models/CouponUsage';
 import Counter from '@/models/Counter';
+import Settings from '@/models/Settings';
 import { NextResponse } from 'next/server';
 import { getFullUserFromRequest, isAdmin, getUserFromRequest } from '@/lib/auth';
 import webpush from 'web-push';
 import logger from '@/lib/logger';
+import Razorpay from 'razorpay';
 
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
     webpush.setVapidDetails(
@@ -88,31 +90,27 @@ export async function POST(request) {
     
     const body = validation.data;
     
-    let items = [];
+    let rawItems = [];
     const userId = userPayload ? userPayload.userId : null;
 
     // Priority: Use items from request body (Client-side cart source of truth)
     if (body.items && body.items.length > 0) {
-      items = body.items.map((i) => ({
+      rawItems = body.items.map((i) => ({
         product: i.product,
         quantity: i.quantity,
         variant: i.variant,
-        price: i.price,
-        isPreBook: i.isPreBook || false,
-        preBookDeliveryDate: i.isPreBook ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) : null
+        isPreBook: i.isPreBook || false
       }));
     } 
     // Fallback: Check Server-side DB cart if body items missing (Legacy/Backup)
     else if (userId) {
       const cart = await Cart.findOne({ user: userId }).populate("items.product");
       if (cart && cart.items.length > 0) {
-        items = cart.items.map((i) => ({
-          product: i.product._id,
+        rawItems = cart.items.map((i) => ({
+          product: i.product._id.toString(),
           quantity: i.quantity,
           variant: i.variant,
-          price: i.product.price,
-          isPreBook: i.product.isPreBook || false,
-          preBookDeliveryDate: i.product.isPreBook ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) : null
+          isPreBook: i.product.isPreBook || false
         }));
         
         // Clear server cart
@@ -121,46 +119,73 @@ export async function POST(request) {
       }
     }
 
-    if (items.length === 0) {
+    if (rawItems.length === 0) {
        return NextResponse.json({ message: "Cart is empty" }, { status: 400 });
     }
 
-    // --- Server-Side Stock Validation ---
-    for (const item of items) {
-      if (item.isPreBook) continue; // Pre-book orders don't require stock check
-      
-      const product = await Product.findById(item.product);
+    const items = [];
+    for (const rawItem of rawItems) {
+      const product = await Product.findById(rawItem.product);
       if (!product) {
         return NextResponse.json({ message: `Product not found` }, { status: 400 });
       }
+      if (!product.isActive) {
+        return NextResponse.json({ message: `Product ${product.name} is no longer active` }, { status: 400 });
+      }
 
-      if (product.hasVariants && item.variant) {
+      let price = 0;
+      let variantData = null;
+
+      if (product.hasVariants) {
+        if (!rawItem.variant) {
+          return NextResponse.json({ message: `Variant selection is required for product: ${product.name}` }, { status: 400 });
+        }
+        
         const validKeys = ['color', 'size', 'length', 'age', 'nSize', 'withBlouse', 'blouseMeter', 'silkType'];
         const targetVariant = product.variants.find(v => {
           return validKeys.every(k => {
-            if (item.variant[k] !== undefined && item.variant[k] !== null && item.variant[k] !== "") {
-              return v[k] === item.variant[k];
+            if (rawItem.variant[k] !== undefined && rawItem.variant[k] !== null && rawItem.variant[k] !== "") {
+              return v[k] === rawItem.variant[k];
             }
             return true;
           });
         });
-        
+
         if (!targetVariant) {
-          return NextResponse.json({ message: `Variant not found for product ${product.name}` }, { status: 400 });
+          return NextResponse.json({ message: `Selected variant is invalid/not found for product: ${product.name}` }, { status: 400 });
         }
-        
-        if (targetVariant.stock < item.quantity) {
+
+        if (!rawItem.isPreBook && targetVariant.stock < rawItem.quantity) {
           return NextResponse.json({ 
             message: `Insufficient stock for product ${product.name} (${targetVariant.color || ''} ${targetVariant.size || ''}). Available: ${targetVariant.stock}` 
           }, { status: 400 });
         }
+
+        price = rawItem.isPreBook 
+          ? (targetVariant.preBookPrice || targetVariant.price) 
+          : targetVariant.price;
+          
+        variantData = rawItem.variant;
       } else {
-        if (product.stock < item.quantity) {
+        if (!rawItem.isPreBook && product.stock < rawItem.quantity) {
           return NextResponse.json({ 
             message: `Insufficient stock for product ${product.name}. Available: ${product.stock}` 
           }, { status: 400 });
         }
+
+        price = rawItem.isPreBook 
+          ? (product.preBookPrice || product.price) 
+          : product.price;
       }
+
+      items.push({
+        product: product._id,
+        quantity: rawItem.quantity,
+        variant: variantData,
+        price: price,
+        isPreBook: rawItem.isPreBook,
+        preBookDeliveryDate: rawItem.isPreBook ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) : null
+      });
     }
 
     let totalAmount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -230,10 +255,43 @@ export async function POST(request) {
         logger.error("Failed to generate sequential orderId", { error: counterError.message });
     }
 
-    // Calculate final total
-    const shippingCharge = body.shippingCharge || 0;
-    const taxAmount = body.taxAmount || 0;
+    // Calculate final total securely from settings
+    const settings = await Settings.findOne() || await Settings.create({});
+    const shippingCharge = settings.shippingCharge || 0;
+    const taxAmount = (totalAmount * (settings.taxRate || 0)) / 100;
     const finalAmount = Math.max(0, totalAmount - discountAmount + shippingCharge + taxAmount);
+
+    let razorpayOrderId = null;
+    let razorpayOrder = null;
+
+    if (body.paymentMethod === "Online") {
+      const keyId = process.env.RAZORPAY_KEY_ID;
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+      if (!keyId || !keySecret) {
+        logger.error("Razorpay keys missing on server");
+        return NextResponse.json({ message: "Server configuration error: Razorpay keys missing" }, { status: 500 });
+      }
+
+      const razorpay = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret,
+      });
+
+      const options = {
+        amount: Math.round(finalAmount * 100), // amount in paise
+        currency: "INR",
+        receipt: `receipt_${orderId}`,
+      };
+
+      try {
+        razorpayOrder = await razorpay.orders.create(options);
+        razorpayOrderId = razorpayOrder.id;
+      } catch (razorpayError) {
+        logger.error("Razorpay order creation failed", { error: razorpayError.message });
+        return NextResponse.json({ message: "Failed to initiate online payment session" }, { status: 500 });
+      }
+    }
 
     const isPreBook = items.some(i => i.isPreBook);
     const preBookDeliveryDate = isPreBook ? new Date(Date.now() + 10 * 24 * 60 * 60 * 1000) : null;
@@ -250,11 +308,11 @@ export async function POST(request) {
       discountAmount: discountAmount,
       couponCode: usedCoupon ? usedCoupon.code : null,
       transactionId: body.paymentInfo?.transactionId,
-      razorpayOrderId: body.paymentInfo?.razorpayOrderId,
+      razorpayOrderId: razorpayOrderId,
       paymentMethod: body.paymentMethod || "COD",
       shippingAddress: body.shippingAddress,
       paymentStatus: 'pending', // SANITIZED: Always start as pending. Online orders updated via verification.
-      orderStatus: 'Processing' // Force initial status
+      orderStatus: (body.paymentMethod || "COD") === "Online" ? "Pending" : "Processing" // Online starts as Pending, COD starts as Processing
     }).save();
 
     // --- Post-Order Extensions ---
@@ -418,6 +476,9 @@ export async function POST(request) {
         }
     })();
 
+    if (razorpayOrder) {
+        return NextResponse.json({ ...order.toObject(), razorpayOrder }, { status: 201 });
+    }
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
     return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });

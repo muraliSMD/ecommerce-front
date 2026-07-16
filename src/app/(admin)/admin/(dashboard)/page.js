@@ -20,6 +20,7 @@ import AnalyticsChart from "@/components/AnalyticsChart";
 import CategorySalesChart from "@/components/CategorySalesChart";
 import TopSellers from "@/components/TopSellers";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function AdminDashboard() {
   const formatPrice = useSettingsStore((state) => state.formatPrice);
@@ -113,6 +114,33 @@ export default function AdminDashboard() {
           </motion.div>
         ))}
       </div>
+
+      {/* Financial Breakdown Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-black/5 border border-gray-100"
+      >
+        <h2 className="text-2xl font-display font-bold mb-6">Financial Breakdown</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 bg-green-50/50 rounded-3xl border border-green-100">
+            <p className="text-xs font-bold text-green-600 uppercase tracking-widest mb-2">Revenue (Paid Payments)</p>
+            <h4 className="text-3xl font-display font-bold text-green-700">{formatPrice(analytics?.totalRevenue || 0)}</h4>
+            <p className="text-xs text-green-600 mt-2">Total amount successfully captured from completed or paid orders.</p>
+          </div>
+          <div className="p-6 bg-orange-50/50 rounded-3xl border border-orange-100">
+            <p className="text-xs font-bold text-orange-600 uppercase tracking-widest mb-2">Pending & Cancelled (Unpaid)</p>
+            <h4 className="text-3xl font-display font-bold text-orange-700">{formatPrice(analytics?.pendingAndCancelled || 0)}</h4>
+            <p className="text-xs text-orange-600 mt-2">Active pending payments and cancelled/failed order amounts that are unpaid.</p>
+          </div>
+          <div className="p-6 bg-red-50/50 rounded-3xl border border-red-100">
+            <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">Refunded & Returned</p>
+            <h4 className="text-3xl font-display font-bold text-red-700">{formatPrice(analytics?.refundedAmount || 0)}</h4>
+            <p className="text-xs text-red-600 mt-2">Amounts from returned orders or refunded payments.</p>
+          </div>
+        </div>
+      </motion.div>
 
       {/* Analytics Charts Row */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
@@ -277,22 +305,60 @@ export default function AdminDashboard() {
                         const isNoVariant = !product.variants || product.variants.length === 0;
                         const isOutOfStock = isNoVariant ? product.stock === 0 : product.variants.some(v => v.stock === 0);
                         const lowVariantsCount = product.variants?.filter(v => v.stock < 5).length || 0;
+                        const imageSrc = product.images?.[0] || product.variants?.find(v => v.images?.length > 0)?.images?.[0] || null;
 
                         return (
-                            <div key={product._id} className={`flex items-center gap-4 p-4 rounded-2xl border ${isOutOfStock ? 'bg-red-50 border-red-200' : 'bg-orange-50/50 border-orange-100'}`}>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2">
-                                        <p className="font-bold text-sm truncate text-gray-900">{product.name}</p>
-                                        {isOutOfStock && <span className="text-[8px] font-black bg-red-500 text-white px-1.5 py-0.5 rounded uppercase">Out of Stock</span>}
+                            <div 
+                                key={product._id} 
+                                className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all duration-300 hover:scale-[1.01] hover:shadow-md hover:shadow-black/[0.01] ${
+                                    isOutOfStock 
+                                    ? 'bg-rose-50/20 border-rose-100 hover:border-rose-200' 
+                                    : 'bg-amber-50/15 border-amber-100 hover:border-amber-200'
+                                }`}
+                            >
+                                {/* Product Thumbnail */}
+                                {imageSrc ? (
+                                    <div className="w-11 h-11 rounded-xl overflow-hidden relative border border-gray-150/50 bg-gray-50 flex-shrink-0">
+                                        <Image src={imageSrc} alt="" fill className="object-cover" />
                                     </div>
-                                    <p className={`text-xs font-bold mt-1 ${isOutOfStock ? 'text-red-600' : 'text-orange-600'}`}>
-                                        {product.variants?.length > 0 
-                                            ? `${lowVariantsCount} variant${lowVariantsCount > 1 ? 's' : ''} ${isOutOfStock ? 'out/low' : 'low'}`
-                                            : `${product.stock} items left`
-                                        }
+                                ) : (
+                                    <div className="w-11 h-11 rounded-xl bg-gray-50 border border-gray-150/50 flex items-center justify-center text-gray-400 flex-shrink-0">
+                                        <FiPackage size={18} />
+                                    </div>
+                                )}
+
+                                {/* Product Info */}
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-xs text-gray-900 truncate" title={product.name}>
+                                        {product.name}
                                     </p>
+                                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                                        <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider whitespace-nowrap flex-shrink-0 ${
+                                            isOutOfStock 
+                                            ? 'bg-red-500 text-white' 
+                                            : 'bg-amber-500 text-white'
+                                        }`}>
+                                            {isOutOfStock ? 'Out of Stock' : 'Low Stock'}
+                                        </span>
+                                        <span className="text-gray-300 text-[10px] select-none">•</span>
+                                        <span className="text-[10px] text-gray-500 font-bold whitespace-nowrap">
+                                            {product.variants?.length > 0 
+                                                ? `${lowVariantsCount} variant${lowVariantsCount > 1 ? 's' : ''} ${isOutOfStock ? 'out/low' : 'low'}`
+                                                : `${product.stock} items left`
+                                            }
+                                        </span>
+                                    </div>
                                 </div>
-                                <Link href={`/admin/products/edit/${product._id}`} className={`text-xs px-3 py-2 rounded-lg border font-bold transition-colors ${isOutOfStock ? 'bg-red-600 text-white border-red-600 hover:bg-red-700' : 'bg-white text-gray-900 border-gray-200 hover:bg-gray-50'}`}>
+
+                                {/* Action Button */}
+                                <Link 
+                                    href={`/admin/products/edit/${product._id}`} 
+                                    className={`text-[11px] px-3 py-2 rounded-xl font-bold transition-all duration-300 flex-shrink-0 active:scale-95 shadow-sm ${
+                                        isOutOfStock 
+                                        ? 'bg-red-600 hover:bg-red-700 text-white hover:shadow-red-500/10 hover:shadow-lg' 
+                                        : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200'
+                                    }`}
+                                >
                                     Restock
                                 </Link>
                             </div>

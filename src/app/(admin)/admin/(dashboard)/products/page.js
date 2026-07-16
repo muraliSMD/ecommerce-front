@@ -16,7 +16,8 @@ import {
   FiShoppingBag,
   FiPackage,
   FiInfo,
-  FiCopy
+  FiCopy,
+  FiUpload
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
@@ -148,12 +149,20 @@ export default function AdminProducts() {
           <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Products</h1>
           <p className="text-gray-500 mt-2">Manage your catalog and inventory.</p>
         </div>
-        <Link 
-          href="/admin/products/add"
-          className="bg-primary hover:bg-secondary text-white px-6 py-4 md:px-8 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95 w-full md:w-auto mt-4 md:mt-0"
-        >
-          <FiPlus size={20} /> Add New Product
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto mt-4 md:mt-0">
+          <Link 
+            href="/admin/products/bulk-upload"
+            className="border-2 border-primary/20 hover:border-primary text-primary px-6 py-4 md:px-8 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 w-full sm:w-auto bg-white shadow-sm"
+          >
+            <FiUpload size={20} /> Bulk Upload
+          </Link>
+          <Link 
+            href="/admin/products/add"
+            className="bg-primary hover:bg-secondary text-white px-6 py-4 md:px-8 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95 w-full sm:w-auto"
+          >
+            <FiPlus size={20} /> Add New Product
+          </Link>
+        </div>
       </div>
 
       {/* Filters Bar */}

@@ -31,19 +31,78 @@ export async function GET(request) {
       User.countDocuments({ role: "customer" }),
     ]);
 
-    // Calculate Total Revenue based on period
-    const revenueResult = await Order.aggregate([
-      { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
-      { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
+    // Calculate disjoint financial breakdown based on period
+    const financialBreakdown = await Order.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $eq: ["$paymentStatus", "Paid"] },
+                    { $not: { $in: ["$orderStatus", ["Cancelled", "Abandoned", "Returned", "Payment Failed"]] } }
+                  ]
+                },
+                "$totalAmount",
+                0
+              ]
+            }
+          },
+          refundedAmount: {
+            $sum: {
+              $cond: [
+                {
+                  $or: [
+                    { $eq: ["$paymentStatus", "Refunded"] },
+                    { $eq: ["$orderStatus", "Returned"] }
+                  ]
+                },
+                "$totalAmount",
+                0
+              ]
+            }
+          },
+          pendingAndCancelled: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $not: { $eq: ["$paymentStatus", "Refunded"] } },
+                    { $not: { $eq: ["$orderStatus", "Returned"] } },
+                    {
+                      $not: {
+                        $and: [
+                          { $eq: ["$paymentStatus", "Paid"] },
+                          { $not: { $in: ["$orderStatus", ["Cancelled", "Abandoned", "Returned", "Payment Failed"]] } }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "$totalAmount",
+                0
+              ]
+            }
+          }
+        }
+      }
     ]);
-    const totalRevenue = revenueResult[0]?.totalRevenue || 0;
+
+    const statsBreakdown = financialBreakdown[0] || { totalRevenue: 0, pendingAndCancelled: 0, refundedAmount: 0 };
+    const totalRevenue = statsBreakdown.totalRevenue;
+    const pendingAndCancelled = statsBreakdown.pendingAndCancelled;
+    const refundedAmount = statsBreakdown.refundedAmount;
 
     // Daily Sales for Chart
     const dailyData = await Order.aggregate([
       {
         $match: {
           createdAt: { $gte: startDate },
-          orderStatus: { $nin: ["Cancelled", "Abandoned"] },
+          paymentStatus: "Paid",
+          orderStatus: { $nin: ["Cancelled", "Abandoned", "Returned", "Payment Failed"] },
         },
       },
       {
@@ -74,7 +133,7 @@ export async function GET(request) {
 
     // Sales by Category
     const salesByCategory = await Order.aggregate([
-        { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
+        { $match: { createdAt: { $gte: startDate }, paymentStatus: "Paid", orderStatus: { $nin: ["Cancelled", "Abandoned", "Returned", "Payment Failed"] } } },
         { $unwind: "$items" },
         {
             $lookup: {
@@ -106,7 +165,7 @@ export async function GET(request) {
 
     // Top Selling Products
     const topSellers = await Order.aggregate([
-        { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
+        { $match: { createdAt: { $gte: startDate }, paymentStatus: "Paid", orderStatus: { $nin: ["Cancelled", "Abandoned", "Returned", "Payment Failed"] } } },
         { $unwind: "$items" },
         {
             $group: {
@@ -192,6 +251,8 @@ export async function GET(request) {
 
     return NextResponse.json({
       totalRevenue,
+      pendingAndCancelled,
+      refundedAmount,
       totalOrders,
       totalProducts,
       totalUsers,

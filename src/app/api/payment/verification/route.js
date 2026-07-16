@@ -16,7 +16,15 @@ export async function POST(req) {
       .update(sign.toString())
       .digest("hex");
 
-    if (razorpay_signature === expectedSignature) {
+    const signatureBuffer = Buffer.from(razorpay_signature || "", "utf-8");
+    const expectedBuffer = Buffer.from(expectedSignature, "utf-8");
+
+    let isSignatureValid = false;
+    if (signatureBuffer.length === expectedBuffer.length) {
+      isSignatureValid = crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
+    }
+
+    if (isSignatureValid) {
       // Find the order and update it atomically
       const order = await Order.findOneAndUpdate(
         { razorpayOrderId: razorpay_order_id },

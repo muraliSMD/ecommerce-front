@@ -1,0 +1,810 @@
+diff --git a/logs/combined.log b/logs/combined.log
+index 0529f9b..1854725 100644
+--- a/logs/combined.log
++++ b/logs/combined.log
+@@ -246,3 +246,94 @@ SyntaxError: Unexpected end of JSON input
+   "email": "jopen32546@herojp.com",
+   "userId": "6a265902b8ca5e2087cea29b"
+ } 
++2026-06-08 20:52:10 [[33mwarn[39m]: Failed login attempt: Invalid password {
++  "email": "grabszy2025@gmail.com",
++  "userId": "698081fcc3e4cc458f359244"
++} 
++2026-06-08 20:52:16 [[33mwarn[39m]: Failed login attempt: Invalid password {
++  "email": "grabszy2025@gmail.com",
++  "userId": "698081fcc3e4cc458f359244"
++} 
++2026-06-08 20:52:29 [[32minfo[39m]: User logged in successfully {
++  "email": "grabszy2025@gmail.com",
++  "userId": "698081fcc3e4cc458f359244",
++  "role": "admin"
++} 
++2026-06-27 01:28:39 [[32minfo[39m]: User logged in successfully {
++  "email": "admin@grabszy.com",
++  "userId": "6999529325432b9ec24ca902",
++  "role": "admin"
++} 
++2026-06-27 11:17:39 [[31merror[39m]: Failed to fetch products {
++  "error": "getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net"
++} 
++MongoServerSelectionError: getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net
++    at Topology.selectServer (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/sdam/topology.js:346:38)
++    at runNextTicks (node:internal/process/task_queues:65:5)
++    at listOnTimeout (node:internal/timers:567:9)
++    at process.processTimers (node:internal/timers:541:7)
++    at async tryOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:150:18)
++    at async executeOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:80:16)
++    at async FindCursor._initialize (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/find_cursor.js:62:26)
++    at async FindCursor.cursorInit (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:620:27)
++    at async FindCursor.fetchBatch (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:654:13)
++    at async FindCursor.next (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:326:17)
++    at async [Symbol.asyncIterator] (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:254:34)
++    at async FindCursor.toArray (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:406:26)
++    at async model.Query._find (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:2432:14)
++    at async model.Query.exec (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:4652:63)
++    at async GET (webpack-internal:///(rsc)/./src/app/api/products/route.js:156:26)
++    at async AppRouteRouteModule.do (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:38696)
++    at async AppRouteRouteModule.handle (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:45978)
++    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:203:38)
++    at async AppRouteRouteModule.handleResponse (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:1:187565)
++    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:265:32)
++    at async handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:317:13)
++    at async DevServer.renderToResponseWithComponentsImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1422:9)
++    at async DevServer.renderPageComponent (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1474:24)
++    at async DevServer.renderToResponseImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1514:32)
++    at async DevServer.pipeImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1025:25)
++    at async NextNodeServer.handleCatchallRenderRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/next-server.js:393:17)
++    at async DevServer.handleRequestImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:916:17)
++    at async /Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:399:20
++    at async Span.traceAsyncFn (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/trace/trace.js:157:20)
++    at async DevServer.handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:395:24)
++    at async invokeRender (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:240:21)
++    at async handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:437:24)
++    at async requestHandlerImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:485:13)
++    at async Server.requestListener (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/start-server.js:226:13)
++2026-06-27 11:17:39 [[31merror[39m]: Failed to fetch products {
++  "error": "getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net"
++} 
++MongoServerSelectionError: getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net
++    at Topology.selectServer (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/sdam/topology.js:346:38)
++    at async tryOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:150:18)
++    at async executeOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:80:16)
++    at async FindCursor._initialize (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/find_cursor.js:62:26)
++    at async FindCursor.cursorInit (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:620:27)
++    at async FindCursor.fetchBatch (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:654:13)
++    at async FindCursor.next (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:326:17)
++    at async [Symbol.asyncIterator] (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:254:34)
++    at async FindCursor.toArray (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:406:26)
++    at async model.Query._find (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:2432:14)
++    at async model.Query.exec (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:4652:63)
++    at async GET (webpack-internal:///(rsc)/./src/app/api/products/route.js:156:26)
++    at async AppRouteRouteModule.do (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:38696)
++    at async AppRouteRouteModule.handle (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:45978)
++    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:203:38)
++    at async AppRouteRouteModule.handleResponse (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:1:187565)
++    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:265:32)
++    at async handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:317:13)
++    at async DevServer.renderToResponseWithComponentsImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1422:9)
++    at async DevServer.renderPageComponent (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1474:24)
++    at async DevServer.renderToResponseImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1514:32)
++    at async DevServer.pipeImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1025:25)
++    at async NextNodeServer.handleCatchallRenderRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/next-server.js:393:17)
++    at async DevServer.handleRequestImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:916:17)
++    at async /Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:399:20
++    at async Span.traceAsyncFn (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/trace/trace.js:157:20)
++    at async DevServer.handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:395:24)
++    at async invokeRender (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:240:21)
++    at async handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:437:24)
++    at async requestHandlerImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:485:13)
++    at async Server.requestListener (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/start-server.js:226:13)
+diff --git a/logs/error.log b/logs/error.log
+index cbec3c4..1f12f42 100644
+--- a/logs/error.log
++++ b/logs/error.log
+@@ -39,3 +39,76 @@ SyntaxError: Unexpected end of JSON input
+     at NextRequest.json (node:internal/deps/undici/undici:5665:18)
+     at POST (webpack-internal:///(rsc)/./src/app/api/users/login/route.js:29:36)
+     at async AppRouteRouteModule.do (D:\projects\ecomerce-application\frontend\node_modules\next\dist\compiled\next-server\app-route.runtime.dev.js:5:38696)
++2026-06-27 11:17:39 [[31merror[39m]: Failed to fetch products {
++  "error": "getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net"
++} 
++MongoServerSelectionError: getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net
++    at Topology.selectServer (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/sdam/topology.js:346:38)
++    at runNextTicks (node:internal/process/task_queues:65:5)
++    at listOnTimeout (node:internal/timers:567:9)
++    at process.processTimers (node:internal/timers:541:7)
++    at async tryOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:150:18)
++    at async executeOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:80:16)
++    at async FindCursor._initialize (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/find_cursor.js:62:26)
++    at async FindCursor.cursorInit (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:620:27)
++    at async FindCursor.fetchBatch (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:654:13)
++    at async FindCursor.next (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:326:17)
++    at async [Symbol.asyncIterator] (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:254:34)
++    at async FindCursor.toArray (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:406:26)
++    at async model.Query._find (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:2432:14)
++    at async model.Query.exec (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:4652:63)
++    at async GET (webpack-internal:///(rsc)/./src/app/api/products/route.js:156:26)
++    at async AppRouteRouteModule.do (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:38696)
++    at async AppRouteRouteModule.handle (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:45978)
++    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:203:38)
++    at async AppRouteRouteModule.handleResponse (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:1:187565)
++    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:265:32)
++    at async handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:317:13)
++    at async DevServer.renderToResponseWithComponentsImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1422:9)
++    at async DevServer.renderPageComponent (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1474:24)
++    at async DevServer.renderToResponseImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1514:32)
++    at async DevServer.pipeImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1025:25)
++    at async NextNodeServer.handleCatchallRenderRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/next-server.js:393:17)
++    at async DevServer.handleRequestImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:916:17)
++    at async /Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:399:20
++    at async Span.traceAsyncFn (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/trace/trace.js:157:20)
++    at async DevServer.handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:395:24)
++    at async invokeRender (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:240:21)
++    at async handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:437:24)
++    at async requestHandlerImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:485:13)
++    at async Server.requestListener (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/start-server.js:226:13)
++2026-06-27 11:17:39 [[31merror[39m]: Failed to fetch products {
++  "error": "getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net"
++} 
++MongoServerSelectionError: getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net
++    at Topology.selectServer (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/sdam/topology.js:346:38)
++    at async tryOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:150:18)
++    at async executeOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:80:16)
++    at async FindCursor._initialize (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/find_cursor.js:62:26)
++    at async FindCursor.cursorInit (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:620:27)
++    at async FindCursor.fetchBatch (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:654:13)
++    at async FindCursor.next (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:326:17)
++    at async [Symbol.asyncIterator] (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:254:34)
++    at async FindCursor.toArray (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:406:26)
++    at async model.Query._find (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:2432:14)
++    at async model.Query.exec (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:4652:63)
++    at async GET (webpack-internal:///(rsc)/./src/app/api/products/route.js:156:26)
++    at async AppRouteRouteModule.do (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:38696)
++    at async AppRouteRouteModule.handle (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:45978)
++    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:203:38)
++    at async AppRouteRouteModule.handleResponse (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:1:187565)
++    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:265:32)
++    at async handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:317:13)
++    at async DevServer.renderToResponseWithComponentsImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1422:9)
++    at async DevServer.renderPageComponent (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1474:24)
++    at async DevServer.renderToResponseImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1514:32)
++    at async DevServer.pipeImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1025:25)
++    at async NextNodeServer.handleCatchallRenderRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/next-server.js:393:17)
++    at async DevServer.handleRequestImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:916:17)
++    at async /Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:399:20
++    at async Span.traceAsyncFn (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/trace/trace.js:157:20)
++    at async DevServer.handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:395:24)
++    at async invokeRender (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:240:21)
++    at async handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:437:24)
++    at async requestHandlerImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:485:13)
++    at async Server.requestListener (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/start-server.js:226:13)
+diff --git a/package-lock.json b/package-lock.json
+index 3d71de6..e648c8a 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -39,6 +39,7 @@
+         "recharts": "^3.7.0",
+         "web-push": "^3.6.7",
+         "winston": "^3.19.0",
++        "xlsx": "^0.18.5",
+         "zod": "^4.3.6",
+         "zustand": "^5.0.8"
+       },
+@@ -2238,6 +2239,15 @@
+         "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0"
+       }
+     },
++    "node_modules/adler-32": {
++      "version": "1.3.1",
++      "resolved": "https://registry.npmjs.org/adler-32/-/adler-32-1.3.1.tgz",
++      "integrity": "sha512-ynZ4w/nUUv5rrsR8UUGoe1VC9hZj6V5hU9Qw1HlMDJGEJw5S7TfTErWTjMys6M7vr0YWcPqs3qAr4ss0nDfP+A==",
++      "license": "Apache-2.0",
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/agent-base": {
+       "version": "7.1.4",
+       "resolved": "https://registry.npmjs.org/agent-base/-/agent-base-7.1.4.tgz",
+@@ -2754,6 +2764,19 @@
+         "url": "https://github.com/sponsors/wooorm"
+       }
+     },
++    "node_modules/cfb": {
++      "version": "1.2.2",
++      "resolved": "https://registry.npmjs.org/cfb/-/cfb-1.2.2.tgz",
++      "integrity": "sha512-KfdUZsSOw19/ObEWasvBP/Ac4reZvAGauZhs6S/gqNhXhI7cKwvlH7ulj+dOEYnca4bm4SGo8C1bTAQvnTjgQA==",
++      "license": "Apache-2.0",
++      "dependencies": {
++        "adler-32": "~1.3.0",
++        "crc-32": "~1.2.0"
++      },
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/chalk": {
+       "version": "4.1.2",
+       "resolved": "https://registry.npmjs.org/chalk/-/chalk-4.1.2.tgz",
+@@ -2853,6 +2876,15 @@
+         "node": ">=6"
+       }
+     },
++    "node_modules/codepage": {
++      "version": "1.15.0",
++      "resolved": "https://registry.npmjs.org/codepage/-/codepage-1.15.0.tgz",
++      "integrity": "sha512-3g6NUTPd/YtuuGrhMnOMRjFc+LJw/bnMp3+0r/Wcz3IXUuCosKRJvMphm5+Q+bvTVGcJJuRvVLuYba+WojaFaA==",
++      "license": "Apache-2.0",
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/color": {
+       "version": "4.2.3",
+       "resolved": "https://registry.npmjs.org/color/-/color-4.2.3.tgz",
+@@ -2958,6 +2990,18 @@
+         "url": "https://opencollective.com/core-js"
+       }
+     },
++    "node_modules/crc-32": {
++      "version": "1.2.2",
++      "resolved": "https://registry.npmjs.org/crc-32/-/crc-32-1.2.2.tgz",
++      "integrity": "sha512-ROmzCKrTnOwybPcJApAA6WBWij23HVfGVNKqqrZpuyZOHqK2CwHSvpGuyt/UNNvaIjEd8X5IFGp4Mh+Ie1IHJQ==",
++      "license": "Apache-2.0",
++      "bin": {
++        "crc32": "bin/crc32.njs"
++      },
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/cross-spawn": {
+       "version": "7.0.6",
+       "resolved": "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.6.tgz",
+@@ -4370,6 +4414,15 @@
+         "node": ">= 6"
+       }
+     },
++    "node_modules/frac": {
++      "version": "1.1.2",
++      "resolved": "https://registry.npmjs.org/frac/-/frac-1.1.2.tgz",
++      "integrity": "sha512-w/XBfkibaTl3YDqASwfDUqkna4Z2p9cFSr1aHDt0WoMTECnRfBOv2WArlZILlqgWlmdIlALXGpM2AOhEk5W3IA==",
++      "license": "Apache-2.0",
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/framer-motion": {
+       "version": "12.23.12",
+       "resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-12.23.12.tgz",
+@@ -8251,6 +8304,18 @@
+         "memory-pager": "^1.0.2"
+       }
+     },
++    "node_modules/ssf": {
++      "version": "0.11.2",
++      "resolved": "https://registry.npmjs.org/ssf/-/ssf-0.11.2.tgz",
++      "integrity": "sha512-+idbmIXoYET47hH+d7dfm2epdOMUDjqcB4648sTZ+t2JwoyBFL/insLfB/racrDmsKB3diwsDA696pZMieAC5g==",
++      "license": "Apache-2.0",
++      "dependencies": {
++        "frac": "~1.1.2"
++      },
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/stable-hash": {
+       "version": "0.0.5",
+       "resolved": "https://registry.npmjs.org/stable-hash/-/stable-hash-0.0.5.tgz",
+@@ -9326,6 +9391,24 @@
+         "node": ">= 12.0.0"
+       }
+     },
++    "node_modules/wmf": {
++      "version": "1.0.2",
++      "resolved": "https://registry.npmjs.org/wmf/-/wmf-1.0.2.tgz",
++      "integrity": "sha512-/p9K7bEh0Dj6WbXg4JG0xvLQmIadrner1bi45VMJTfnbVHsc7yIajZyoSoK60/dtVBs12Fm6WkUI5/3WAVsNMw==",
++      "license": "Apache-2.0",
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
++    "node_modules/word": {
++      "version": "0.3.0",
++      "resolved": "https://registry.npmjs.org/word/-/word-0.3.0.tgz",
++      "integrity": "sha512-OELeY0Q61OXpdUfTp+oweA/vtLVg5VDOXh+3he3PNzLGG/y0oylSOC1xRVj0+l4vQ3tj/bB1HVHv1ocXkQceFA==",
++      "license": "Apache-2.0",
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/word-wrap": {
+       "version": "1.2.5",
+       "resolved": "https://registry.npmjs.org/word-wrap/-/word-wrap-1.2.5.tgz",
+@@ -9336,6 +9419,27 @@
+         "node": ">=0.10.0"
+       }
+     },
++    "node_modules/xlsx": {
++      "version": "0.18.5",
++      "resolved": "https://registry.npmjs.org/xlsx/-/xlsx-0.18.5.tgz",
++      "integrity": "sha512-dmg3LCjBPHZnQp5/F/+nnTa+miPJxUXB6vtk42YjBBKayDNagxGEeIdWApkYPOf3Z3pm3k62Knjzp7lMeTEtFQ==",
++      "license": "Apache-2.0",
++      "dependencies": {
++        "adler-32": "~1.3.0",
++        "cfb": "~1.2.1",
++        "codepage": "~1.15.0",
++        "crc-32": "~1.2.1",
++        "ssf": "~0.11.2",
++        "wmf": "~1.0.1",
++        "word": "~0.3.0"
++      },
++      "bin": {
++        "xlsx": "bin/xlsx.njs"
++      },
++      "engines": {
++        "node": ">=0.8"
++      }
++    },
+     "node_modules/yallist": {
+       "version": "5.0.0",
+       "resolved": "https://registry.npmjs.org/yallist/-/yallist-5.0.0.tgz",
+diff --git a/package.json b/package.json
+index 33b61e6..28cbdda 100644
+--- a/package.json
++++ b/package.json
+@@ -40,6 +40,7 @@
+     "recharts": "^3.7.0",
+     "web-push": "^3.6.7",
+     "winston": "^3.19.0",
++    "xlsx": "^0.18.5",
+     "zod": "^4.3.6",
+     "zustand": "^5.0.8"
+   },
+diff --git a/src/app/(admin)/admin/(dashboard)/page.js b/src/app/(admin)/admin/(dashboard)/page.js
+index 2861721..a7cbe75 100644
+--- a/src/app/(admin)/admin/(dashboard)/page.js
++++ b/src/app/(admin)/admin/(dashboard)/page.js
+@@ -114,6 +114,33 @@ export default function AdminDashboard() {
+         ))}
+       </div>
+ 
++      {/* Financial Breakdown Section */}
++      <motion.div
++        initial={{ opacity: 0, y: 20 }}
++        animate={{ opacity: 1, y: 0 }}
++        transition={{ delay: 0.3 }}
++        className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-black/5 border border-gray-100"
++      >
++        <h2 className="text-2xl font-display font-bold mb-6">Financial Breakdown</h2>
++        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
++          <div className="p-6 bg-green-50/50 rounded-3xl border border-green-100">
++            <p className="text-xs font-bold text-green-600 uppercase tracking-widest mb-2">Revenue (Paid Payments)</p>
++            <h4 className="text-3xl font-display font-bold text-green-700">{formatPrice(analytics?.totalRevenue || 0)}</h4>
++            <p className="text-xs text-green-600 mt-2">Total amount successfully captured from completed or paid orders.</p>
++          </div>
++          <div className="p-6 bg-orange-50/50 rounded-3xl border border-orange-100">
++            <p className="text-xs font-bold text-orange-600 uppercase tracking-widest mb-2">Pending & Cancelled (Unpaid)</p>
++            <h4 className="text-3xl font-display font-bold text-orange-700">{formatPrice(analytics?.pendingAndCancelled || 0)}</h4>
++            <p className="text-xs text-orange-600 mt-2">Active pending payments and cancelled/failed order amounts that are unpaid.</p>
++          </div>
++          <div className="p-6 bg-red-50/50 rounded-3xl border border-red-100">
++            <p className="text-xs font-bold text-red-600 uppercase tracking-widest mb-2">Refunded & Returned</p>
++            <h4 className="text-3xl font-display font-bold text-red-700">{formatPrice(analytics?.refundedAmount || 0)}</h4>
++            <p className="text-xs text-red-600 mt-2">Amounts from returned orders or refunded payments.</p>
++          </div>
++        </div>
++      </motion.div>
++
+       {/* Analytics Charts Row */}
+       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+         {analytics?.chartData && (
+diff --git a/src/app/(admin)/admin/(dashboard)/products/page.js b/src/app/(admin)/admin/(dashboard)/products/page.js
+index 7c007ad..3dde187 100644
+--- a/src/app/(admin)/admin/(dashboard)/products/page.js
++++ b/src/app/(admin)/admin/(dashboard)/products/page.js
+@@ -16,7 +16,8 @@ import {
+   FiShoppingBag,
+   FiPackage,
+   FiInfo,
+-  FiCopy
++  FiCopy,
++  FiUpload
+ } from "react-icons/fi";
+ import Image from "next/image";
+ import Link from "next/link";
+@@ -148,12 +149,20 @@ export default function AdminProducts() {
+           <h1 className="text-3xl md:text-4xl font-display font-bold text-gray-900">Products</h1>
+           <p className="text-gray-500 mt-2">Manage your catalog and inventory.</p>
+         </div>
+-        <Link 
+-          href="/admin/products/add"
+-          className="bg-primary hover:bg-secondary text-white px-6 py-4 md:px-8 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95 w-full md:w-auto mt-4 md:mt-0"
+-        >
+-          <FiPlus size={20} /> Add New Product
+-        </Link>
++        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto mt-4 md:mt-0">
++          <Link 
++            href="/admin/products/bulk-upload"
++            className="border-2 border-primary/20 hover:border-primary text-primary px-6 py-4 md:px-8 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 w-full sm:w-auto bg-white shadow-sm"
++          >
++            <FiUpload size={20} /> Bulk Upload
++          </Link>
++          <Link 
++            href="/admin/products/add"
++            className="bg-primary hover:bg-secondary text-white px-6 py-4 md:px-8 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95 w-full sm:w-auto"
++          >
++            <FiPlus size={20} /> Add New Product
++          </Link>
++        </div>
+       </div>
+ 
+       {/* Filters Bar */}
+diff --git a/src/app/(storefront)/checkout/page.js b/src/app/(storefront)/checkout/page.js
+index 33064ef..ca92fcc 100644
+--- a/src/app/(storefront)/checkout/page.js
++++ b/src/app/(storefront)/checkout/page.js
+@@ -330,6 +330,13 @@ export default function CheckoutPage() {
+                     setIsSubmitting(false);
+                     toast("Payment cancelled");
+                     logAbandonedCheckout('cancelled');
++                    if (dbOrderResponse?._id) {
++                        fetch(`/api/orders/${dbOrderResponse._id}/cancel`, {
++                            method: "PUT",
++                            headers: { "Content-Type": "application/json" },
++                            body: JSON.stringify({ reason: "Payment cancelled by user", isPaymentFailure: true })
++                        }).catch(err => console.error("Cancel order error:", err));
++                    }
+                 }
+             },
+             ...(paymentSubMethod === "UPI" ? {
+@@ -359,6 +366,13 @@ export default function CheckoutPage() {
+                 toast.error(response.error.description || "Payment Failed");
+                 setIsSubmitting(false);
+                 logAbandonedCheckout('payment failed');
++                if (dbOrderResponse?._id) {
++                    fetch(`/api/orders/${dbOrderResponse._id}/cancel`, {
++                        method: "PUT",
++                        headers: { "Content-Type": "application/json" },
++                        body: JSON.stringify({ reason: response.error.description || "Payment failed", isPaymentFailure: true })
++                    }).catch(err => console.error("Cancel order error:", err));
++                }
+         });
+         paymentObject.open();
+ 
+diff --git a/src/app/(storefront)/product/[slug]/ProductDetails.js b/src/app/(storefront)/product/[slug]/ProductDetails.js
+index 50ad924..af19400 100644
+--- a/src/app/(storefront)/product/[slug]/ProductDetails.js
++++ b/src/app/(storefront)/product/[slug]/ProductDetails.js
+@@ -577,67 +577,68 @@ export default function ProductDetails({ initialProduct }) {
+               
+               {/* Product Specifications */}
+               {(product.color || product.size || product.length || product.age || product.silkType || product.withBlouse || product.blouseMeter) && (
+-                <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main space-y-3 w-full sm:w-max sm:min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
+-                  <p className="text-[12px] font-bold text-text-muted uppercase tracking-widest">Product Specifications</p>
+-                  <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+-                    {product.color && (
+-                      <div className="flex items-center gap-2">
+-                         <span className="text-sm md:text-base text-text-muted">Color:</span>
+-                         <span 
+-                           className="w-3.5 h-3.5 rounded-full border border-border-main/50 shadow-inner flex-shrink-0"
+-                           style={{ backgroundColor: getColorValue(product.color) }}
+-                         />
+-                         <span className="font-bold text-text-main text-base">{resolveColorName(product.color)}</span>
+-                      </div>
+-                    )}
+-                    {product.size && (
+-                      <div className="flex items-center gap-2">
+-                         <span className="text-sm md:text-base text-text-muted">Size:</span>
+-                         <span className="font-bold text-text-main text-base">{product.size}</span>
+-                      </div>
+-                    )}
+-                    {product.length && (
+-                      <div className="flex items-center gap-2">
+-                         <span className="text-sm md:text-base text-text-muted">Length:</span>
+-                         <span className="font-bold text-text-main text-base">{product.length}</span>
+-                      </div>
+-                    )}
+-                    {product.age && (
+-                      <div className="flex items-center gap-2">
+-                         <span className="text-sm md:text-base text-text-muted">Age:</span>
+-                         <span className="font-bold text-text-main text-base">{product.age}</span>
+-                      </div>
+-                    )}
+-                    {product.silkType && (
+-                      <div className="flex items-center gap-2">
+-                         <span className="text-sm md:text-base text-text-muted">Silk:</span>
+-                         <span className="font-bold text-text-main text-base">{product.silkType}</span>
+-                      </div>
+-                    )}
+-                    {product.withBlouse && (
+-                      <div className="flex items-center gap-2">
+-                         <span className="text-sm md:text-base text-text-muted">Blouse:</span>
+-                         <span className="font-bold text-text-main text-base">{product.withBlouse}</span>
+-                      </div>
+-                    )}
+-                    {product.blouseMeter && (
+-                      <div className="flex items-center gap-2">
+-                         <span className="text-sm md:text-base text-text-muted">Blouse Length:</span>
+-                         <span className="font-bold text-text-main text-base">{product.blouseMeter}</span>
+-                      </div>
+-                    )}
+-                     {product.nSize && (
+-                       <div className="flex items-center gap-2">
+-                          <span className="text-sm md:text-base text-text-muted">N-Size:</span>
+-                          <span className="font-bold text-text-main text-base">{product.nSize}</span>
+-                       </div>
+-                     )}
++                <>
++                  <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main space-y-3 w-full sm:w-max sm:min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
++                    <p className="text-[12px] font-bold text-text-muted uppercase tracking-widest">Product Specifications</p>
++                    <div className="grid grid-cols-2 gap-x-8 gap-y-2">
++                      {product.color && (
++                        <div className="flex items-center gap-2">
++                           <span className="text-sm md:text-base text-text-muted">Color:</span>
++                           <span 
++                             className="w-3.5 h-3.5 rounded-full border border-border-main/50 shadow-inner flex-shrink-0"
++                             style={{ backgroundColor: getColorValue(product.color) }}
++                           />
++                           <span className="font-bold text-text-main text-base">{resolveColorName(product.color)}</span>
++                        </div>
++                      )}
++                      {product.size && (
++                        <div className="flex items-center gap-2">
++                           <span className="text-sm md:text-base text-text-muted">Size:</span>
++                           <span className="font-bold text-text-main text-base">{product.size}</span>
++                        </div>
++                      )}
++                      {product.length && (
++                        <div className="flex items-center gap-2">
++                           <span className="text-sm md:text-base text-text-muted">Length:</span>
++                           <span className="font-bold text-text-main text-base">{product.length}</span>
++                        </div>
++                      )}
++                      {product.age && (
++                        <div className="flex items-center gap-2">
++                           <span className="text-sm md:text-base text-text-muted">Age:</span>
++                           <span className="font-bold text-text-main text-base">{product.age}</span>
++                        </div>
++                      )}
++                      {product.silkType && (
++                        <div className="flex items-center gap-2">
++                           <span className="text-sm md:text-base text-text-muted">Silk:</span>
++                           <span className="font-bold text-text-main text-base">{product.silkType}</span>
++                        </div>
++                      )}
++                      {product.withBlouse && (
++                        <div className="flex items-center gap-2">
++                           <span className="text-sm md:text-base text-text-muted">Blouse:</span>
++                           <span className="font-bold text-text-main text-base">{product.withBlouse}</span>
++                        </div>
++                      )}
++                      {product.blouseMeter && (
++                        <div className="flex items-center gap-2">
++                           <span className="text-sm md:text-base text-text-muted">Blouse Length:</span>
++                           <span className="font-bold text-text-main text-base">{product.blouseMeter}</span>
++                        </div>
++                      )}
++                       {product.nSize && (
++                         <div className="flex items-center gap-2">
++                            <span className="text-sm md:text-base text-text-muted">N-Size:</span>
++                            <span className="font-bold text-text-main text-base">{product.nSize}</span>
++                         </div>
++                       )}
++                    </div>
+                   </div>
+-                </div>
++                  <div className="h-px bg-border-main w-full order-10 lg:hidden" />
++                </>
+               )}
+ 
+-            <div className="h-px bg-border-main w-full order-10 lg:order-8" />
+-
+             {/* Colors */}
+             {allColors.length > 0 && (
+               <VariantSlider 
+@@ -918,9 +919,8 @@ export default function ProductDetails({ initialProduct }) {
+               )}
+             </VariantSlider>
+ 
+-            <div className="h-px bg-gray-200 w-full order-7 lg:order-8 mt-6" />
++            <div className="h-px bg-border-main w-full order-7 lg:order-8" />
+ 
+-            {/* Quantity and Actions */}
+             {/* Quantity and Actions */}
+             <div className="flex flex-col gap-6 pt-4 order-11 lg:order-9">
+               {/* Utility Section: Quantity, Wishlist, Share */}
+diff --git a/src/app/api/admin/analytics/route.js b/src/app/api/admin/analytics/route.js
+index b14515f..0f1d2dd 100644
+--- a/src/app/api/admin/analytics/route.js
++++ b/src/app/api/admin/analytics/route.js
+@@ -31,19 +31,78 @@ export async function GET(request) {
+       User.countDocuments({ role: "customer" }),
+     ]);
+ 
+-    // Calculate Total Revenue based on period
+-    const revenueResult = await Order.aggregate([
+-      { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
+-      { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
++    // Calculate disjoint financial breakdown based on period
++    const financialBreakdown = await Order.aggregate([
++      { $match: { createdAt: { $gte: startDate } } },
++      {
++        $group: {
++          _id: null,
++          totalRevenue: {
++            $sum: {
++              $cond: [
++                {
++                  $and: [
++                    { $eq: ["$paymentStatus", "Paid"] },
++                    { $not: { $in: ["$orderStatus", ["Cancelled", "Abandoned", "Returned", "Payment Failed"]] } }
++                  ]
++                },
++                "$totalAmount",
++                0
++              ]
++            }
++          },
++          refundedAmount: {
++            $sum: {
++              $cond: [
++                {
++                  $or: [
++                    { $eq: ["$paymentStatus", "Refunded"] },
++                    { $eq: ["$orderStatus", "Returned"] }
++                  ]
++                },
++                "$totalAmount",
++                0
++              ]
++            }
++          },
++          pendingAndCancelled: {
++            $sum: {
++              $cond: [
++                {
++                  $and: [
++                    { $not: { $eq: ["$paymentStatus", "Refunded"] } },
++                    { $not: { $eq: ["$orderStatus", "Returned"] } },
++                    {
++                      $not: {
++                        $and: [
++                          { $eq: ["$paymentStatus", "Paid"] },
++                          { $not: { $in: ["$orderStatus", ["Cancelled", "Abandoned", "Returned", "Payment Failed"]] } }
++                        ]
++                      }
++                    }
++                  ]
++                },
++                "$totalAmount",
++                0
++              ]
++            }
++          }
++        }
++      }
+     ]);
+-    const totalRevenue = revenueResult[0]?.totalRevenue || 0;
++
++    const statsBreakdown = financialBreakdown[0] || { totalRevenue: 0, pendingAndCancelled: 0, refundedAmount: 0 };
++    const totalRevenue = statsBreakdown.totalRevenue;
++    const pendingAndCancelled = statsBreakdown.pendingAndCancelled;
++    const refundedAmount = statsBreakdown.refundedAmount;
+ 
+     // Daily Sales for Chart
+     const dailyData = await Order.aggregate([
+       {
+         $match: {
+           createdAt: { $gte: startDate },
+-          orderStatus: { $nin: ["Cancelled", "Abandoned"] },
++          paymentStatus: "Paid",
++          orderStatus: { $nin: ["Cancelled", "Abandoned", "Returned", "Payment Failed"] },
+         },
+       },
+       {
+@@ -74,7 +133,7 @@ export async function GET(request) {
+ 
+     // Sales by Category
+     const salesByCategory = await Order.aggregate([
+-        { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
++        { $match: { createdAt: { $gte: startDate }, paymentStatus: "Paid", orderStatus: { $nin: ["Cancelled", "Abandoned", "Returned", "Payment Failed"] } } },
+         { $unwind: "$items" },
+         {
+             $lookup: {
+@@ -106,7 +165,7 @@ export async function GET(request) {
+ 
+     // Top Selling Products
+     const topSellers = await Order.aggregate([
+-        { $match: { createdAt: { $gte: startDate }, orderStatus: { $nin: ["Cancelled", "Abandoned"] } } },
++        { $match: { createdAt: { $gte: startDate }, paymentStatus: "Paid", orderStatus: { $nin: ["Cancelled", "Abandoned", "Returned", "Payment Failed"] } } },
+         { $unwind: "$items" },
+         {
+             $group: {
+@@ -192,6 +251,8 @@ export async function GET(request) {
+ 
+     return NextResponse.json({
+       totalRevenue,
++      pendingAndCancelled,
++      refundedAmount,
+       totalOrders,
+       totalProducts,
+       totalUsers,
+diff --git a/src/app/api/orders/[id]/cancel/route.js b/src/app/api/orders/[id]/cancel/route.js
+index d3b34fc..601c3f6 100644
+--- a/src/app/api/orders/[id]/cancel/route.js
++++ b/src/app/api/orders/[id]/cancel/route.js
+@@ -26,6 +26,7 @@ export async function PUT(request, { params }) {
+     const { id } = await params;
+     const json = await request.json();
+     const reason = json.reason;
++    const isPaymentFailure = json.isPaymentFailure === true;
+ 
+     const order = await Order.findById(id).populate("items.product");
+     console.log("Order found:", order ? order._id : "null");
+@@ -38,6 +39,52 @@ export async function PUT(request, { params }) {
+       return NextResponse.json({ message: "Access denied" }, { status: 403 });
+     }
+ 
++    // Immediate cancellation and stock restore on online payment failure
++    if (isPaymentFailure && order.paymentMethod === 'Online' && order.paymentStatus === 'pending') {
++        order.orderStatus = 'Payment Failed';
++        order.paymentStatus = 'Failed';
++        order.cancellationReason = reason || "Payment cancelled/failed by customer";
++        await order.save();
++
++        // Restore Stock
++        for (const item of order.items) {
++            try {
++                const product = await Product.findById(item.product._id || item.product);
++                if (!product) continue;
++
++                if (product.hasVariants && item.variant) {
++                    const queryConditions = { _id: product._id };
++                    const validKeys = ['color', 'size', 'length', 'age', 'nSize', 'withBlouse', 'blouseMeter', 'silkType'];
++                    
++                    for (const key of validKeys) {
++                        if (item.variant[key] !== undefined && item.variant[key] !== null && item.variant[key] !== "") {
++                            queryConditions[`variants.${key}`] = item.variant[key];
++                        }
++                    }
++
++                    await Product.findOneAndUpdate(
++                        queryConditions,
++                        { 
++                            $inc: { 
++                                "variants.$.stock": item.quantity,
++                                "stock": item.quantity 
++                            } 
++                        }
++                    );
++                } else {
++                    await Product.findByIdAndUpdate(
++                        product._id,
++                        { $inc: { stock: item.quantity } }
++                    );
++                }
++            } catch (stockError) {
++                console.error("Failed to restore stock for item", item, stockError);
++            }
++        }
++
++        return NextResponse.json({ message: "Order payment marked as failed and stock restored", order });
++    }
++
+     if (!['Pending', 'Processing'].includes(order.orderStatus)) {
+         return NextResponse.json({ message: "Order cannot be cancelled at this stage" }, { status: 400 });
+     }
+diff --git a/src/app/api/orders/route.js b/src/app/api/orders/route.js
+index c13a93f..d072289 100644
+--- a/src/app/api/orders/route.js
++++ b/src/app/api/orders/route.js
+@@ -254,7 +254,7 @@ export async function POST(request) {
+       paymentMethod: body.paymentMethod || "COD",
+       shippingAddress: body.shippingAddress,
+       paymentStatus: 'pending', // SANITIZED: Always start as pending. Online orders updated via verification.
+-      orderStatus: 'Processing' // Force initial status
++      orderStatus: (body.paymentMethod || "COD") === "Online" ? "Pending" : "Processing" // Online starts as Pending, COD starts as Processing
+     }).save();
+ 
+     // --- Post-Order Extensions ---

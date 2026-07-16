@@ -246,3 +246,94 @@ SyntaxError: Unexpected end of JSON input
   "email": "jopen32546@herojp.com",
   "userId": "6a265902b8ca5e2087cea29b"
 } 
+2026-06-08 20:52:10 [[33mwarn[39m]: Failed login attempt: Invalid password {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244"
+} 
+2026-06-08 20:52:16 [[33mwarn[39m]: Failed login attempt: Invalid password {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244"
+} 
+2026-06-08 20:52:29 [[32minfo[39m]: User logged in successfully {
+  "email": "grabszy2025@gmail.com",
+  "userId": "698081fcc3e4cc458f359244",
+  "role": "admin"
+} 
+2026-06-27 01:28:39 [[32minfo[39m]: User logged in successfully {
+  "email": "admin@grabszy.com",
+  "userId": "6999529325432b9ec24ca902",
+  "role": "admin"
+} 
+2026-06-27 11:17:39 [[31merror[39m]: Failed to fetch products {
+  "error": "getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net"
+} 
+MongoServerSelectionError: getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net
+    at Topology.selectServer (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/sdam/topology.js:346:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:567:9)
+    at process.processTimers (node:internal/timers:541:7)
+    at async tryOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:150:18)
+    at async executeOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:80:16)
+    at async FindCursor._initialize (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/find_cursor.js:62:26)
+    at async FindCursor.cursorInit (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:620:27)
+    at async FindCursor.fetchBatch (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:654:13)
+    at async FindCursor.next (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:326:17)
+    at async [Symbol.asyncIterator] (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:254:34)
+    at async FindCursor.toArray (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:406:26)
+    at async model.Query._find (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:2432:14)
+    at async model.Query.exec (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:4652:63)
+    at async GET (webpack-internal:///(rsc)/./src/app/api/products/route.js:156:26)
+    at async AppRouteRouteModule.do (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:38696)
+    at async AppRouteRouteModule.handle (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:45978)
+    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:203:38)
+    at async AppRouteRouteModule.handleResponse (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:1:187565)
+    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:265:32)
+    at async handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:317:13)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1422:9)
+    at async DevServer.renderPageComponent (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1474:24)
+    at async DevServer.renderToResponseImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:916:17)
+    at async /Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:399:20
+    at async Span.traceAsyncFn (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:395:24)
+    at async invokeRender (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/start-server.js:226:13)
+2026-06-27 11:17:39 [[31merror[39m]: Failed to fetch products {
+  "error": "getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net"
+} 
+MongoServerSelectionError: getaddrinfo ENOTFOUND ac-aswvyzd-shard-00-00.eqb4ccq.mongodb.net
+    at Topology.selectServer (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/sdam/topology.js:346:38)
+    at async tryOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:150:18)
+    at async executeOperation (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/operations/execute_operation.js:80:16)
+    at async FindCursor._initialize (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/find_cursor.js:62:26)
+    at async FindCursor.cursorInit (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:620:27)
+    at async FindCursor.fetchBatch (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:654:13)
+    at async FindCursor.next (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:326:17)
+    at async [Symbol.asyncIterator] (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:254:34)
+    at async FindCursor.toArray (/Users/muralimalathi/development/frontend-ecom/node_modules/mongodb/lib/cursor/abstract_cursor.js:406:26)
+    at async model.Query._find (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:2432:14)
+    at async model.Query.exec (/Users/muralimalathi/development/frontend-ecom/node_modules/mongoose/lib/query.js:4652:63)
+    at async GET (webpack-internal:///(rsc)/./src/app/api/products/route.js:156:26)
+    at async AppRouteRouteModule.do (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:38696)
+    at async AppRouteRouteModule.handle (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:5:45978)
+    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:203:38)
+    at async AppRouteRouteModule.handleResponse (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:1:187565)
+    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:265:32)
+    at async handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fproducts%2Froute&page=%2Fapi%2Fproducts%2Froute&appPaths=&pagePath=private-next-app-dir%2Fapi%2Fproducts%2Froute.js&appDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmuralimalathi%2Fdevelopment%2Ffrontend-ecom&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:317:13)
+    at async DevServer.renderToResponseWithComponentsImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1422:9)
+    at async DevServer.renderPageComponent (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1474:24)
+    at async DevServer.renderToResponseImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1514:32)
+    at async DevServer.pipeImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:1025:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/next-server.js:393:17)
+    at async DevServer.handleRequestImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/base-server.js:916:17)
+    at async /Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:399:20
+    at async Span.traceAsyncFn (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/dev/next-dev-server.js:395:24)
+    at async invokeRender (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:240:21)
+    at async handleRequest (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:437:24)
+    at async requestHandlerImpl (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/router-server.js:485:13)
+    at async Server.requestListener (/Users/muralimalathi/development/frontend-ecom/node_modules/next/dist/server/lib/start-server.js:226:13)

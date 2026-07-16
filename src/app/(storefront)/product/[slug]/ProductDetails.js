@@ -577,66 +577,67 @@ export default function ProductDetails({ initialProduct }) {
               
               {/* Product Specifications */}
               {(product.color || product.size || product.length || product.age || product.silkType || product.withBlouse || product.blouseMeter) && (
-                <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main space-y-3 w-full sm:w-max sm:min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
-                  <p className="text-[12px] font-bold text-text-muted uppercase tracking-widest">Product Specifications</p>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-2">
-                    {product.color && (
-                      <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-text-muted">Color:</span>
-                         <span 
-                           className="w-3.5 h-3.5 rounded-full border border-border-main/50 shadow-inner flex-shrink-0"
-                           style={{ backgroundColor: getColorValue(product.color) }}
-                         />
-                         <span className="font-bold text-text-main text-base">{resolveColorName(product.color)}</span>
-                      </div>
-                    )}
-                    {product.size && (
-                      <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-text-muted">Size:</span>
-                         <span className="font-bold text-text-main text-base">{product.size}</span>
-                      </div>
-                    )}
-                    {product.length && (
-                      <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-text-muted">Length:</span>
-                         <span className="font-bold text-text-main text-base">{product.length}</span>
-                      </div>
-                    )}
-                    {product.age && (
-                      <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-text-muted">Age:</span>
-                         <span className="font-bold text-text-main text-base">{product.age}</span>
-                      </div>
-                    )}
-                    {product.silkType && (
-                      <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-text-muted">Silk:</span>
-                         <span className="font-bold text-text-main text-base">{product.silkType}</span>
-                      </div>
-                    )}
-                    {product.withBlouse && (
-                      <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-text-muted">Blouse:</span>
-                         <span className="font-bold text-text-main text-base">{product.withBlouse}</span>
-                      </div>
-                    )}
-                    {product.blouseMeter && (
-                      <div className="flex items-center gap-2">
-                         <span className="text-sm md:text-base text-text-muted">Blouse Length:</span>
-                         <span className="font-bold text-text-main text-base">{product.blouseMeter}</span>
-                      </div>
-                    )}
-                     {product.nSize && (
-                       <div className="flex items-center gap-2">
-                          <span className="text-sm md:text-base text-text-muted">N-Size:</span>
-                          <span className="font-bold text-text-main text-base">{product.nSize}</span>
-                       </div>
-                     )}
+                <>
+                  <div className="bg-bg-section/30 dark:bg-bg-section/10 p-4 rounded-2xl border border-border-main space-y-3 w-full sm:w-max sm:min-w-[50%] order-9 mt-6 lg:order-5 lg:mt-0">
+                    <p className="text-[12px] font-bold text-text-muted uppercase tracking-widest">Product Specifications</p>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+                      {product.color && (
+                        <div className="flex items-center gap-2">
+                           <span className="text-sm md:text-base text-text-muted">Color:</span>
+                           <span 
+                             className="w-3.5 h-3.5 rounded-full border border-border-main/50 shadow-inner flex-shrink-0"
+                             style={{ backgroundColor: getColorValue(product.color) }}
+                           />
+                           <span className="font-bold text-text-main text-base">{resolveColorName(product.color)}</span>
+                        </div>
+                      )}
+                      {product.size && (
+                        <div className="flex items-center gap-2">
+                           <span className="text-sm md:text-base text-text-muted">Size:</span>
+                           <span className="font-bold text-text-main text-base">{product.size}</span>
+                        </div>
+                      )}
+                      {product.length && (
+                        <div className="flex items-center gap-2">
+                           <span className="text-sm md:text-base text-text-muted">Length:</span>
+                           <span className="font-bold text-text-main text-base">{product.length}</span>
+                        </div>
+                      )}
+                      {product.age && (
+                        <div className="flex items-center gap-2">
+                           <span className="text-sm md:text-base text-text-muted">Age:</span>
+                           <span className="font-bold text-text-main text-base">{product.age}</span>
+                        </div>
+                      )}
+                      {product.silkType && (
+                        <div className="flex items-center gap-2">
+                           <span className="text-sm md:text-base text-text-muted">Silk:</span>
+                           <span className="font-bold text-text-main text-base">{product.silkType}</span>
+                        </div>
+                      )}
+                      {product.withBlouse && (
+                        <div className="flex items-center gap-2">
+                           <span className="text-sm md:text-base text-text-muted">Blouse:</span>
+                           <span className="font-bold text-text-main text-base">{product.withBlouse}</span>
+                        </div>
+                      )}
+                      {product.blouseMeter && (
+                        <div className="flex items-center gap-2">
+                           <span className="text-sm md:text-base text-text-muted">Blouse Length:</span>
+                           <span className="font-bold text-text-main text-base">{product.blouseMeter}</span>
+                        </div>
+                      )}
+                       {product.nSize && (
+                         <div className="flex items-center gap-2">
+                            <span className="text-sm md:text-base text-text-muted">N-Size:</span>
+                            <span className="font-bold text-text-main text-base">{product.nSize}</span>
+                         </div>
+                       )}
+                    </div>
                   </div>
-                </div>
+                  <div className="h-px bg-border-main w-full order-10 lg:hidden" />
+                </>
               )}
-
-            <div className="h-px bg-border-main w-full order-10 lg:order-8" />
 
             {/* Colors */}
             {allColors.length > 0 && (
@@ -918,9 +919,8 @@ export default function ProductDetails({ initialProduct }) {
               )}
             </VariantSlider>
 
-            <div className="h-px bg-gray-200 w-full order-7 lg:order-8 mt-6" />
+            <div className="h-px bg-border-main w-full order-7 lg:order-8" />
 
-            {/* Quantity and Actions */}
             {/* Quantity and Actions */}
             <div className="flex flex-col gap-6 pt-4 order-11 lg:order-9">
               {/* Utility Section: Quantity, Wishlist, Share */}

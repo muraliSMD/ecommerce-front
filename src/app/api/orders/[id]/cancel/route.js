@@ -26,6 +26,7 @@ export async function PUT(request, { params }) {
     const { id } = await params;
     const json = await request.json();
     const reason = json.reason;
+    const isPaymentFailure = json.isPaymentFailure === true;
 
     const order = await Order.findById(id).populate("items.product");
     console.log("Order found:", order ? order._id : "null");
@@ -36,6 +37,52 @@ export async function PUT(request, { params }) {
 
     if (order.user.toString() !== user._id.toString()) {
       return NextResponse.json({ message: "Access denied" }, { status: 403 });
+    }
+
+    // Immediate cancellation and stock restore on online payment failure
+    if (isPaymentFailure && order.paymentMethod === 'Online' && order.paymentStatus === 'pending') {
+        order.orderStatus = 'Payment Failed';
+        order.paymentStatus = 'Failed';
+        order.cancellationReason = reason || "Payment cancelled/failed by customer";
+        await order.save();
+
+        // Restore Stock
+        for (const item of order.items) {
+            try {
+                const product = await Product.findById(item.product._id || item.product);
+                if (!product) continue;
+
+                if (product.hasVariants && item.variant) {
+                    const queryConditions = { _id: product._id };
+                    const validKeys = ['color', 'size', 'length', 'age', 'nSize', 'withBlouse', 'blouseMeter', 'silkType'];
+                    
+                    for (const key of validKeys) {
+                        if (item.variant[key] !== undefined && item.variant[key] !== null && item.variant[key] !== "") {
+                            queryConditions[`variants.${key}`] = item.variant[key];
+                        }
+                    }
+
+                    await Product.findOneAndUpdate(
+                        queryConditions,
+                        { 
+                            $inc: { 
+                                "variants.$.stock": item.quantity,
+                                "stock": item.quantity 
+                            } 
+                        }
+                    );
+                } else {
+                    await Product.findByIdAndUpdate(
+                        product._id,
+                        { $inc: { stock: item.quantity } }
+                    );
+                }
+            } catch (stockError) {
+                console.error("Failed to restore stock for item", item, stockError);
+            }
+        }
+
+        return NextResponse.json({ message: "Order payment marked as failed and stock restored", order });
     }
 
     if (!['Pending', 'Processing'].includes(order.orderStatus)) {

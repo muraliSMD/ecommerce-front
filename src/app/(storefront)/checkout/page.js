@@ -259,34 +259,25 @@ export default function CheckoutPage() {
             return;
         }
 
-        // 1. Create Order on Razorpay Backend
-        const orderRes = await fetch("/api/payment/razorpay", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount: Math.max(0, total - (appliedCoupon?.discountAmount || 0)) }),
-        });
-        const orderData = await orderRes.json();
+        // 1. CREATE PENDING ORDER AND RAZORPAY SESSION ON BACKEND IN ONE STEP
+        const dbOrderResponse = await submitOrderToBackend({}, false); // Pass 'false' to prevent redirect
 
-        if (!orderRes.ok) throw new Error(orderData.error || "Failed to create order");
-
-        // 2. CREATE PENDING ORDER IN DATABASE FIRST
-        const dbOrderResponse = await submitOrderToBackend({ 
-            razorpayOrderId: orderData.id 
-        }, false); // Pass 'false' to prevent redirect
-
-        if (!dbOrderResponse) {
+        if (!dbOrderResponse || !dbOrderResponse.razorpayOrder) {
+            toast.error(dbOrderResponse?.message || "Failed to create order. Please try again.");
             setIsSubmitting(false);
             return;
         }
 
+        const razorpayOrder = dbOrderResponse.razorpayOrder;
+
         const options = {
             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
-            amount: orderData.amount, 
-            currency: orderData.currency,
+            amount: razorpayOrder.amount, 
+            currency: razorpayOrder.currency,
             name: settings.siteName || "GRABSZY",
             description: "Order Payment",
             image: settings.logo || "/logo.png",
-            order_id: orderData.id,
+            order_id: razorpayOrder.id,
             handler: async function (response) {
                 try {
                     // 3. Verify Payment
@@ -330,6 +321,13 @@ export default function CheckoutPage() {
                     setIsSubmitting(false);
                     toast("Payment cancelled");
                     logAbandonedCheckout('cancelled');
+                    if (dbOrderResponse?._id) {
+                        fetch(`/api/orders/${dbOrderResponse._id}/cancel`, {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ reason: "Payment cancelled by user", isPaymentFailure: true })
+                        }).catch(err => console.error("Cancel order error:", err));
+                    }
                 }
             },
             ...(paymentSubMethod === "UPI" ? {
@@ -359,6 +357,13 @@ export default function CheckoutPage() {
                 toast.error(response.error.description || "Payment Failed");
                 setIsSubmitting(false);
                 logAbandonedCheckout('payment failed');
+                if (dbOrderResponse?._id) {
+                    fetch(`/api/orders/${dbOrderResponse._id}/cancel`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ reason: response.error.description || "Payment failed", isPaymentFailure: true })
+                    }).catch(err => console.error("Cancel order error:", err));
+                }
         });
         paymentObject.open();
 

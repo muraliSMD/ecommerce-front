@@ -1,0 +1,156 @@
+
+> frontend@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.2
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 2.6s
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ⚠ Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/86) ...
+   Generating static pages (21/86) 
+(node:12618) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:12617) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+   Generating static pages (42/86) 
+(node:12615) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+   Generating static pages (64/86) 
+ ✓ Generating static pages (86/86)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                  Size  First Load JS
+┌ ○ /                                     7.47 kB         200 kB
+├ ○ /_not-found                              1 kB         103 kB
+├ ○ /about                                4.01 kB         119 kB
+├ ○ /account                              5.75 kB         145 kB
+├ ○ /account/addresses                    5.04 kB         147 kB
+├ ○ /account/orders                       4.31 kB         147 kB
+├ ƒ /account/orders/[id]                  9.08 kB         335 kB
+├ ○ /account/profile                      4.43 kB         147 kB
+├ ○ /account/tickets                      2.03 kB         154 kB
+├ ƒ /account/tickets/[id]                 1.86 kB         150 kB
+├ ƒ /admin                                 119 kB         301 kB
+├ ƒ /admin/blogs                          4.15 kB         194 kB
+├ ƒ /admin/blogs/[id]                     2.84 kB         192 kB
+├ ƒ /admin/blogs/new                      5.04 kB         148 kB
+├ ƒ /admin/categories                     6.46 kB         212 kB
+├ ƒ /admin/collections                    6.59 kB         192 kB
+├ ƒ /admin/coupons                         7.1 kB         197 kB
+├ ƒ /admin/coupons/add                    4.69 kB         151 kB
+├ ƒ /admin/coupons/edit/[id]              2.67 kB         201 kB
+├ ƒ /admin/customers                      4.58 kB         185 kB
+├ ƒ /admin/faqs                           4.25 kB         188 kB
+├ ƒ /admin/faqs/[id]                      2.51 kB         186 kB
+├ ƒ /admin/faqs/new                       2.51 kB         186 kB
+├ ƒ /admin/gallery                        6.69 kB         192 kB
+├ ƒ /admin/hero-slides                    5.55 kB         191 kB
+├ ○ /admin/login                          5.81 kB         176 kB
+├ ƒ /admin/messages                       4.57 kB         185 kB
+├ ƒ /admin/orders                         7.88 kB         197 kB
+├ ƒ /admin/orders/[id]                     7.8 kB         374 kB
+├ ƒ /admin/products                       8.32 kB         197 kB
+├ ƒ /admin/products/[id]                  6.21 kB         229 kB
+├ ƒ /admin/products/add                   6.66 kB         266 kB
+├ ƒ /admin/products/bulk-upload           6.09 kB         176 kB
+├ ƒ /admin/products/edit/[id]             6.93 kB         266 kB
+├ ƒ /admin/settings                       8.05 kB         194 kB
+├ ƒ /admin/subscribers                    4.35 kB         185 kB
+├ ƒ /admin/tickets                        3.02 kB         185 kB
+├ ƒ /admin/tickets/[id]                   2.52 kB         193 kB
+├ ƒ /api/admin/analytics                    290 B         103 kB
+├ ƒ /api/admin/collections                  290 B         103 kB
+├ ƒ /api/admin/collections/[id]             290 B         103 kB
+├ ƒ /api/admin/collections/[id]/products    290 B         103 kB
+├ ƒ /api/admin/collections/bulk             290 B         103 kB
+├ ƒ /api/admin/contacts                     290 B         103 kB
+├ ƒ /api/admin/coupons/[code]/usage         290 B         103 kB
+├ ƒ /api/admin/orders/[id]/refund           290 B         103 kB
+├ ƒ /api/admin/subscribers                  290 B         103 kB
+├ ƒ /api/admin/users                        290 B         103 kB
+├ ƒ /api/blogs                              290 B         103 kB
+├ ƒ /api/blogs/[id]                         290 B         103 kB
+├ ƒ /api/cart                               290 B         103 kB
+├ ƒ /api/categories                         290 B         103 kB
+├ ƒ /api/categories/[id]                    290 B         103 kB
+├ ƒ /api/collections                        290 B         103 kB
+├ ƒ /api/contact                            290 B         103 kB
+├ ƒ /api/coupons                            290 B         103 kB
+├ ƒ /api/coupons/[id]                       290 B         103 kB
+├ ƒ /api/coupons/validate                   290 B         103 kB
+├ ƒ /api/faqs                               290 B         103 kB
+├ ƒ /api/faqs/[id]                          290 B         103 kB
+├ ƒ /api/gallery                            290 B         103 kB
+├ ƒ /api/gallery/categories                 290 B         103 kB
+├ ƒ /api/health                             290 B         103 kB
+├ ƒ /api/hero-slides                        290 B         103 kB
+├ ƒ /api/newsletter/subscribe               290 B         103 kB
+├ ƒ /api/notifications                      290 B         103 kB
+├ ƒ /api/notifications/subscribe            290 B         103 kB
+├ ƒ /api/og/product                         290 B         103 kB
+├ ƒ /api/orders                             290 B         103 kB
+├ ƒ /api/orders/[id]                        290 B         103 kB
+├ ƒ /api/orders/[id]/cancel                 290 B         103 kB
+├ ƒ /api/orders/[id]/return                 290 B         103 kB
+├ ƒ /api/orders/abandoned                   290 B         103 kB
+├ ƒ /api/payment/razorpay                   290 B         103 kB
+├ ƒ /api/payment/verification               290 B         103 kB
+├ ƒ /api/products                           290 B         103 kB
+├ ƒ /api/products/[id]                      290 B         103 kB
+├ ƒ /api/products/[id]/duplicate            290 B         103 kB
+├ ƒ /api/products/[id]/reviews              290 B         103 kB
+├ ƒ /api/products/bulk                      290 B         103 kB
+├ ƒ /api/products/related                   290 B         103 kB
+├ ƒ /api/settings                           290 B         103 kB
+├ ƒ /api/tickets                            290 B         103 kB
+├ ƒ /api/tickets/[id]                       290 B         103 kB
+├ ƒ /api/upload                             290 B         103 kB
+├ ƒ /api/user/addresses                     290 B         103 kB
+├ ƒ /api/user/cart                          290 B         103 kB
+├ ƒ /api/user/forgot-password               290 B         103 kB
+├ ƒ /api/user/profile                       290 B         103 kB
+├ ƒ /api/user/reset-password                290 B         103 kB
+├ ƒ /api/user/wishlist                      290 B         103 kB
+├ ƒ /api/user/wishlist/share                290 B         103 kB
+├ ƒ /api/users/login                        290 B         103 kB
+├ ƒ /api/users/logout                       290 B         103 kB
+├ ƒ /api/users/register                     290 B         103 kB
+├ ƒ /api/users/resend-verification          290 B         103 kB
+├ ƒ /api/users/verify-email                 290 B         103 kB
+├ ƒ /api/wishlist/[shareId]                 290 B         103 kB
+├ ○ /blog                                 1.93 kB         147 kB
+├ ƒ /blog/[slug]                          41.3 kB         229 kB
+├ ○ /cart                                 9.86 kB         230 kB
+├ ○ /checkout                             17.4 kB         252 kB
+├ ƒ /checkout/success/[id]                9.33 kB         124 kB
+├ ○ /contact                              5.63 kB         146 kB
+├ ○ /faq                                  5.18 kB         181 kB
+├ ○ /gallery                               5.7 kB         187 kB
+├ ○ /privacy-policy                       4.06 kB         157 kB
+├ ƒ /product/[slug]                       11.6 kB         252 kB
+├ ƒ /reset-password/[token]               5.26 kB         155 kB
+├ ○ /returns-and-exchange                  3.2 kB         157 kB
+├ ○ /robots.txt                             290 B         103 kB
+├ ○ /shipping-policy                      3.23 kB         153 kB
+├ ○ /shop                                 7.46 kB         241 kB
+├ ○ /sitemap.xml                            290 B         103 kB
+├ ○ /terms-of-service                     4.17 kB         157 kB
+├ ○ /verify-email                         2.54 kB         117 kB
+├ ○ /wishlist                             6.26 kB         126 kB
+└ ƒ /wishlist/share/[id]                  5.01 kB         163 kB
++ First Load JS shared by all              102 kB
+  ├ chunks/1255-49bf57147b1628c5.js       45.6 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js   54.2 kB
+  └ other shared chunks (total)           2.42 kB
+
+
+ƒ Middleware                              34.3 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
